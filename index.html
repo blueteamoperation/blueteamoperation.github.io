@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8">
+<title>BlueTeamOps</title>
+
+<style>
+body {
+    margin: 0;
+    font-family: 'Courier New', monospace;
+    background: radial-gradient(circle at top, #0a0f1f, #000);
+    color: #00f7ff;
+}
+
+/* BANNER */
+.banner img {
+    width: 100%;
+    border-bottom: 2px solid #00f7ff;
+}
+
+/* MENU */
+.nav {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    padding: 20px;
+    background: rgba(0,0,0,0.8);
+    box-shadow: 0 0 15px #00f7ff;
+}
+
+.nav a {
+    text-decoration: none;
+    color: #00f7ff;
+    padding: 10px 20px;
+    border: 1px solid #00f7ff;
+    border-radius: 10px;
+    transition: 0.3s;
+}
+
+.nav a:hover {
+    background: #00f7ff;
+    color: #000;
+    box-shadow: 0 0 15px #00f7ff;
+}
+
+/* CONTEÚDO */
+.container {
+    padding: 40px;
+    text-align: center;
+}
+
+h1 {
+    font-size: 40px;
+    text-shadow: 0 0 15px #00f7ff;
+}
+
+.card {
+    background: rgba(0,0,0,0.7);
+    border: 1px solid #00f7ff;
+    padding: 20px;
+    margin: 20px auto;
+    width: 300px;
+    border-radius: 15px;
+    box-shadow: 0 0 10px #00f7ff;
+    transition: 0.3s;
+}
+
+.card:hover {
+    transform: scale(1.05);
+    box-shadow: 0 0 25px #00f7ff;
+}
+
+/* RODAPÉ */
+.footer {
+    text-align: center;
+    padding: 20px;
+    border-top: 1px solid #00f7ff;
+    margin-top: 40px;
+    font-size: 12px;
+    opacity: 0.7;
+}
+</style>
+</head>
+
+<body>
+
+<!-- BANNER -->
+<div class="banner">
+<p align="center">
+  <img src="https://raw.githubusercontent.com/professorsilvioroxo/blueteamops/refs/heads/main/banner.png" />
+</p>
+</div>
+
+<!-- MENU -->
+<div class="nav">
+    <a href="#">Início</a>
+    <a href="#">Labs</a>
+    <a href="#">Ferramentas</a>
+    <a href="#">Artigos</a>
+    <a href="#">Contato</a>
+</div>
+
+<!-- CONTEÚDO -->
+<div class="container">
+
+    <h1>BLUE TEAM OPERATION</h1>
+    <p>Forense • Threat Hunting • Cyber Defense</p>
+
+    <div class="card">
+        <h3>🔍 Digital Forensics</h3>
+        <p>Análise de evidências digitais</p>
+    </div>
+
+    <div class="card">
+        <h3>🛡️ Threat Hunting</h3>
+        <p>Detecção de atividades maliciosas</p>
+    </div>
+
+    <div class="card">
+        <h3>⚡ Cyber Defense</h3>
+        <p>Proteção e resposta a incidentes</p>
+    </div>
+
+</div>
+
+<!-- RODAPÉ -->
+<div class="footer">
+    © BlueTeamOps | Cyber Security Lab
+</div>
+
+</body>
+</html>
