@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Desafio Matriz de Risco Interativa</title>
+    <style>
+        :root {
+            --bg: #0d1117; --card: #161b22; --text: #e6edf3; --border: #30363d;
+            --low: #c6e48b; --medium: #e3b341; --high: #f85149;
+        }
+        body { font-family: sans-serif; background: var(--bg); color: var(--text); display: flex; flex-direction: column; align-items: center; padding: 20px; }
+        
+        .scenario-card { background: var(--card); border: 1px solid var(--border); padding: 20px; border-radius: 8px; max-width: 900px; margin-bottom: 20px; border-left: 5px solid #58a6ff; }
+        
+        table { border-collapse: collapse; margin-top: 10px; cursor: pointer; user-select: none; }
+        th, td { border: 1px solid #444; text-align: center; padding: 12px; font-weight: bold; width: 60px; }
+        
+        /* Cabeçalhos */
+        .header-prob { color: white; text-transform: uppercase; font-size: 0.8rem; }
+        .prob-baixa { background: #1e4620; } .prob-media { background: #85660e; } .prob-alta { background: #8e1f1a; }
+        .row-label { background: #1c2128; font-size: 0.75rem; width: 150px; text-align: left; }
+
+        /* Cores da Matriz baseadas na imagem */
+        .c-low { background: #95d39d; color: #000; }
+        .c-med { background: #ffd33d; color: #000; }
+        .c-high { background: #f85149; color: #fff; }
+
+        /* Seleção */
+        .selected { outline: 4px solid #58a6ff; outline-offset: -4px; transform: scale(1.05); z-index: 10; box-shadow: 0 0 15px rgba(88, 166, 255, 0.5); }
+
+        .btn-verificar { margin-top: 25px; padding: 15px 40px; background: #238636; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; }
+        .btn-verificar:hover { background: #2ea043; }
+        
+        #feedback { margin-top: 20px; font-size: 1.2rem; font-weight: bold; min-height: 30px; }
+        .success { color: #3fb950; } .error { color: #f85149; }
+    </style>
+</head>
+<body>
+
+    <div class="scenario-card">
+        <h3>DESAFIO 2: ANÁLISE DE CENÁRIO</h3>
+        <p><strong>Cenário:</strong> Um banco de dados contendo <strong>segredos industriais (Ativo Muito Alto - 4)</strong> está exposto em um servidor cuja correção de segurança não foi aplicada. Devido à complexidade do sistema, a <strong>facilidade de exploração é MÉDIA</strong>, porém a <strong>probabilidade</strong> de um atacante descobrir esse servidor específico é considerada <strong>MÉDIA (Ocasional)</strong>.</p>
+        <p><em>Instrução: Clique na célula da matriz que representa o risco correto para este cenário.</em></p>
+    </div>
+
+    <table>
+        <thead>
+            <tr>
+                <th rowspan="3" style="background: #0d1117; border:none"></th>
+                <th colspan="9" class="header-prob">Probabilidade da Ocorrência - Ameaças</th>
+            </tr>
+            <tr>
+                <th colspan="3" class="prob-baixa">BAIXA (Improvável)</th>
+                <th colspan="3" class="prob-media">MÉDIA (Ocasional)</th>
+                <th colspan="3" class="prob-alta">ALTA (Frequente)</th>
+            </tr>
+            <tr style="font-size: 0.7rem;">
+                <th class="prob-baixa">B</th><th class="prob-baixa">M</th><th class="prob-baixa">A</th>
+                <th class="prob-media">B</th><th class="prob-media">M</th><th class="prob-media">A</th>
+                <th class="prob-alta">B</th><th class="prob-alta">M</th><th class="prob-alta">A</th>
+            </tr>
+        </thead>
+        <tbody id="matrix-body">
+            </tbody>
+    </table>
+
+    <div id="feedback"></div>
+    <button class="btn-verificar" onclick="validarResposta()">Verificar Resposta</button>
+
+    <script>
+        // Dados da Matriz (conforme imagem 17.53.17)
+        const matrixData = [
+            { label: "0 - Muito Baixo", values: [0,1,2, 1,2,3, 2,3,4], colors: ["c-low","c-low","c-low", "c-low","c-low","c-med", "c-low","c-med","c-med"] },
+            { label: "1 - Baixo",      values: [1,2,3, 2,3,4, 3,4,5], colors: ["c-low","c-low","c-low", "c-low","c-med","c-med", "c-med","c-med","c-med"] },
+            { label: "2 - Médio",      values: [2,3,4, 3,4,5, 4,5,6], colors: ["c-low","c-low","c-med", "c-med","c-med","c-med", "c-med","c-med","c-high"] },
+            { label: "3 - Alto",       values: [3,4,5, 4,5,6, 5,6,7], colors: ["c-low","c-med","c-med", "c-med","c-med","c-high", "c-med","c-high","c-high"] },
+            { label: "4 - Muito Alto", values: [4,5,6, 5,6,7, 6,7,8], colors: ["c-med","c-med","c-med", "c-med","c-high","c-high", "c-high","c-high","c-high"] }
+        ];
+
+        // Resposta Correta: Ativo 4, Prob Média, Facilidade Média (Coluna index 4 da linha 4) -> Valor 6
+        const CORRECT_ROW = 4; // Ativo 4
+        const CORRECT_COL = 4; // Prob Média / Facilidade Média
+        let selectedCell = null;
+
+        const tableBody = document.getElementById('matrix-body');
+
+        // Gerar a tabela
+        matrixData.forEach((row, rowIndex) => {
+            const tr = document.createElement('tr');
+            tr.innerHTML = `<td class="row-label">${row.label}</td>`;
+            
+            row.values.forEach((val, colIndex) => {
+                const td = document.createElement('td');
+                td.innerText = val;
+                td.className = row.colors[colIndex];
+                td.onclick = () => select(td, rowIndex, colIndex);
+                tr.appendChild(td);
+            });
+            tableBody.appendChild(tr);
+        });
+
+        function select(element, r, c) {
+            if(selectedCell) selectedCell.el.classList.remove('selected');
+            element.classList.add('selected');
+            selectedCell = { el: element, r: r, c: c };
+            document.getElementById('feedback').innerText = "";
+        }
+
+        function validarResposta() {
+            const fb = document.getElementById('feedback');
+            if(!selectedCell) {
+                fb.innerText = "Selecione um valor na tabela primeiro!";
+                fb.className = "error";
+                return;
+            }
+
+            if(selectedCell.r === CORRECT_ROW && selectedCell.c === CORRECT_COL) {
+                fb.innerText = "CORRETO! Ativo 4 + Probabilidade Média (M) = Risco 6 (ALTO).";
+                fb.className = "success";
+            } else {
+                fb.innerText = "Resposta incorreta. Analise novamente o valor do Ativo e a Facilidade/Probabilidade.";
+                fb.className = "error";
+            }
+        }
+    </script>
+</body>
+</html>
