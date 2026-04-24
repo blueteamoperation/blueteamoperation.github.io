@@ -7,125 +7,125 @@
 <style>
 body {
     margin: 0;
-    font-family: 'Courier New', monospace;
-    background: radial-gradient(circle at top, #0a0f1f, #000);
-    color: #00f7ff;
+    font-family: monospace;
+    background: #0b0f14;
+    color: #c7d1db;
 }
 
 /* BANNER */
 .banner img {
     width: 100%;
-    border-bottom: 2px solid #00f7ff;
+    border-bottom: 1px solid #1f2933;
 }
 
-/* MENU */
-.nav {
-    display: flex;
-    justify-content: center;
-    gap: 20px;
-    padding: 20px;
-    background: rgba(0,0,0,0.8);
-    box-shadow: 0 0 15px #00f7ff;
-}
-
-.nav a {
-    text-decoration: none;
-    color: #00f7ff;
-    padding: 10px 20px;
-    border: 1px solid #00f7ff;
-    border-radius: 10px;
-    transition: 0.3s;
-}
-
-.nav a:hover {
-    background: #00f7ff;
-    color: #000;
-    box-shadow: 0 0 15px #00f7ff;
-}
-
-/* CONTEÚDO */
+/* CONTAINER */
 .container {
-    padding: 40px;
-    text-align: center;
+    max-width: 900px;
+    margin: auto;
+    padding: 30px;
 }
 
+/* TÍTULO */
 h1 {
-    font-size: 40px;
-    text-shadow: 0 0 15px #00f7ff;
+    color: #00f0ff;
+    font-size: 28px;
 }
 
-.card {
-    background: rgba(0,0,0,0.7);
-    border: 1px solid #00f7ff;
-    padding: 20px;
-    margin: 20px auto;
-    width: 300px;
-    border-radius: 15px;
-    box-shadow: 0 0 10px #00f7ff;
-    transition: 0.3s;
+/* SEÇÕES */
+.section {
+    margin-top: 30px;
 }
 
-.card:hover {
-    transform: scale(1.05);
-    box-shadow: 0 0 25px #00f7ff;
+.section h2 {
+    font-size: 18px;
+    border-bottom: 1px solid #1f2933;
+    padding-bottom: 5px;
+    color: #7aa2f7;
+}
+
+/* LINKS */
+ul {
+    list-style: none;
+    padding: 0;
+}
+
+li {
+    margin: 8px 0;
+}
+
+a {
+    text-decoration: none;
+    color: #9ece6a;
+}
+
+a:hover {
+    text-decoration: underline;
 }
 
 /* RODAPÉ */
 .footer {
-    text-align: center;
-    padding: 20px;
-    border-top: 1px solid #00f7ff;
     margin-top: 40px;
     font-size: 12px;
-    opacity: 0.7;
+    opacity: 0.5;
 }
 </style>
+
 </head>
 
 <body>
 
 <!-- BANNER -->
 <div class="banner">
-<p align="center">
-  <img src="https://raw.githubusercontent.com/professorsilvioroxo/blueteamops/refs/heads/main/banner.png" />
-</p>
+    <img src="https://raw.githubusercontent.com/blueteamoperation/blueteamoperation.github.io/refs/heads/main/banner.png">
 </div>
 
-<!-- MENU -->
-<div class="nav">
-    <a href="#">Início</a>
-    <a href="#">Labs</a>
-    <a href="#">Ferramentas</a>
-    <a href="#">Artigos</a>
-    <a href="#">Contato</a>
-</div>
-
-<!-- CONTEÚDO -->
 <div class="container">
 
-    <h1>BLUE TEAM OPERATION</h1>
-    <p>Forense • Threat Hunting • Cyber Defense</p>
+    <h1>Blue Team Operation</h1>
+    <p>Repositório de artefatos, labs e análise forense.</p>
 
-    <div class="card">
-        <h3>🔍 Digital Forensics</h3>
-        <p>Análise de evidências digitais</p>
+    <!-- SEÇÃO 1 -->
+    <div class="section">
+        <h2>📂 Artefatos</h2>
+        <ul>
+            <li><a href="#">memory_dump.raw</a></li>
+            <li><a href="#">network_capture.pcap</a></li>
+            <li><a href="#">logs_suspeitos.evtx</a></li>
+        </ul>
     </div>
 
-    <div class="card">
-        <h3>🛡️ Threat Hunting</h3>
-        <p>Detecção de atividades maliciosas</p>
+    <!-- SEÇÃO 2 -->
+    <div class="section">
+        <h2>🧪 Labs</h2>
+        <ul>
+            <li><a href="#">Lab DFIR 01</a></li>
+            <li><a href="#">Lab Threat Hunting</a></li>
+        </ul>
     </div>
 
-    <div class="card">
-        <h3>⚡ Cyber Defense</h3>
-        <p>Proteção e resposta a incidentes</p>
+    <!-- SEÇÃO 3 -->
+    <div class="section">
+        <h2>🔧 Ferramentas</h2>
+        <ul>
+            <li><a href="#">Volatility</a></li>
+            <li><a href="#">Wireshark</a></li>
+            <li><a href="#">Autopsy</a></li>
+        </ul>
     </div>
 
-</div>
+    <!-- SEÇÃO 4 -->
+    <div class="section">
+        <h2>📖 Writeups</h2>
+        <ul>
+            <li><a href="#">Análise de Malware</a></li>
+            <li><a href="#">Investigação de Incidente</a></li>
+        </ul>
+    </div>
 
-<!-- RODAPÉ -->
-<div class="footer">
-    © BlueTeamOps | Cyber Security Lab
+    <div class="footer">
+        BlueTeamOps • DFIR • Cyber Defense
+    </div>
+
 </div>
 
 </body>
