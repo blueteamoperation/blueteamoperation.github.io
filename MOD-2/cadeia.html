@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>FIAP :: DFIR - Multi-Hash Challenge</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+    <style>
+        :root { --cyan: #00f2ff; --yellow: #ffd700; --bg: #080808; }
+        body { background: var(--bg); color: var(--cyan); font-family: 'Courier New', monospace; padding: 30px; }
+        .terminal { max-width: 900px; margin: 0 auto; border: 1px solid var(--cyan); background: #000; padding: 25px; box-shadow: 0 0 20px rgba(0,242,255,0.1); }
+        h2 { color: var(--yellow); border-bottom: 1px solid var(--yellow); padding-bottom: 10px; text-transform: uppercase; }
+        
+        .evidence-block { margin-bottom: 30px; border: 1px solid #222; padding: 15px; background: #050505; }
+        .evidence-title { color: var(--yellow); font-weight: bold; margin-bottom: 10px; display: block; }
+        pre { background: #111; color: #fff; padding: 10px; font-size: 0.8rem; overflow-x: auto; border: 1px solid #333; }
+        
+        .input-row { display: flex; align-items: center; gap: 10px; margin-top: 10px; }
+        .algo-tag { background: var(--cyan); color: #000; padding: 2px 8px; font-weight: bold; font-size: 0.7rem; border-radius: 3px; min-width: 60px; text-align: center; }
+        input { background: #000; border: 1px solid #444; color: var(--yellow); padding: 8px; flex-grow: 1; font-family: inherit; font-size: 0.8rem; }
+        input:focus { border-color: var(--cyan); outline: none; }
+
+        .btn-validate { background: var(--yellow); color: #000; border: none; padding: 15px 30px; width: 100%; font-weight: bold; cursor: pointer; margin-top: 20px; transition: 0.3s; }
+        .btn-validate:hover { background: var(--cyan); box-shadow: 0 0 10px var(--cyan); }
+        
+        #result { margin-top: 20px; text-align: center; font-weight: bold; min-height: 24px; }
+    </style>
+</head>
+<body>
+
+<div class="terminal">
+    <h2>[SISTEMA DE CUSTÓDIA DE EVIDÊNCIAS]</h2>
+    <p style="font-size: 0.85rem; color: #888;">Analista, gere os hashes das evidências abaixo usando os algoritmos solicitados para fechar o caso.</p>
+
+    <div class="evidence-block">
+        <span class="evidence-title">EVIDÊNCIA 01: LOG DE ACESSO SSH</span>
+        <pre id="text1">Apr 25 17:10:01 server-prod sshd[1204]: Failed password for root from 192.168.1.45 port 54322 ssh2</pre>
+        <div class="input-row">
+            <div class="algo-tag">MD5</div>
+            <input type="text" id="hash1" placeholder="Insira o hash MD5 resultante...">
+        </div>
+    </div>
+
+    <div class="evidence-block">
+        <span class="evidence-title">EVIDÊNCIA 02: LISTA DE PROCESSOS SUSPEITOS</span>
+        <pre id="text2">PID: 4501 | USER: www-data | CMD: /tmp/.hidden_miner --pool=stratum+tcp://xmr.pool</pre>
+        <div class="input-row">
+            <div class="algo-tag">SHA-1</div>
+            <input type="text" id="hash2" placeholder="Insira o hash SHA-1 resultante...">
+        </div>
+    </div>
+
+    <div class="evidence-block">
+        <span class="evidence-title">EVIDÊNCIA 03: CHAVE DE REGISTRO PERSISTENTE</span>
+        <pre id="text3">HKLM\Software\Microsoft\Windows\CurrentVersion\Run\Infection -> C:\Windows\Temp\malware.exe</pre>
+        <div class="input-row">
+            <div class="algo-tag">SHA-256</div>
+            <input type="text" id="hash3" placeholder="Insira o hash SHA-256 resultante...">
+        </div>
+    </div>
+
+    <button class="btn-validate" onclick="validateHashes()">VALIDAR CADEIA DE CUSTÓDIA</button>
+    <div id="result"></div>
+</div>
+
+<script>
+    function validateHashes() {
+        // Textos originais (devem ser idênticos ao conteúdo do <pre>)
+        const t1 = document.getElementById('text1').innerText;
+        const t2 = document.getElementById('text2').innerText;
+        const t3 = document.getElementById('text3').innerText;
+
+        // Cálculos reais
+        const correct1 = CryptoJS.MD5(t1).toString();
+        const correct2 = CryptoJS.SHA1(t2).toString();
+        const correct3 = CryptoJS.SHA256(t3).toString();
+
+        // Inputs do aluno
+        const h1 = document.getElementById('hash1').value.trim().toLowerCase();
+        const h2 = document.getElementById('hash2').value.trim().toLowerCase();
+        const h3 = document.getElementById('hash3').value.trim().toLowerCase();
+
+        const resultDiv = document.getElementById('result');
+
+        if(h1 === correct1 && h2 === correct2 && h3 === correct3) {
+            resultDiv.innerHTML = "<span style='color: #00ff00;'>[+] SUCESSO: TODOS OS HASHES CONFEREM. EVIDÊNCIAS INTEGRAS.</span>";
+        } else {
+            let errors = [];
+            if(h1 !== correct1) errors.push("EVID-01");
+            if(h2 !== correct2) errors.push("EVID-02");
+            if(h3 !== correct3) errors.push("EVID-03");
+            
+            resultDiv.innerHTML = "<span style='color: #ff3333;'>[!] FALHA NA VALIDAÇÃO: " + errors.join(", ") + " com hash incorreto.</span>";
+        }
+    }
+</script>
+
+</body>
+</html>
