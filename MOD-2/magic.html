@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Desafio: Magic Numbers - Forense Digital</title>
+    <style>
+        :root { --cyber-blue: #00d4ff; --cyber-yellow: #ffca28; --bg: #05080a; --card: #10141b; }
+        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); color: #e0e0e0; padding: 20px; display: flex; flex-direction: column; align-items: center; }
+        
+        .container { width: 100%; max-width: 900px; background: var(--card); border: 1px solid #30363d; border-radius: 12px; overflow: hidden; box-shadow: 0 0 30px rgba(0, 212, 255, 0.2); }
+        .header { background: #161b22; padding: 20px; border-bottom: 2px solid var(--cyber-blue); text-align: center; }
+        .header h1 { margin: 0; color: var(--cyber-blue); text-transform: uppercase; letter-spacing: 2px; }
+        
+        .main-content { padding: 30px; }
+        .file-info { display: flex; align-items: center; gap: 20px; background: #1c2128; padding: 15px; border-radius: 8px; margin-bottom: 20px; border-left: 5px solid var(--cyber-yellow); }
+        .file-icon { font-size: 2.5rem; }
+        
+        /* Hex Viewer Estilizado */
+        .hex-viewer { background: #000; color: #00ff00; padding: 20px; border-radius: 6px; font-family: 'Consolas', 'Monaco', monospace; font-size: 0.9rem; line-height: 1.5; border: 1px solid #333; margin-bottom: 25px; overflow-x: auto; }
+        .magic-highlight { background: #ffca28; color: #000; font-weight: bold; padding: 0 2px; border-radius: 2px; }
+
+        .options-title { margin-bottom: 15px; font-weight: bold; color: var(--cyber-blue); text-transform: uppercase; font-size: 0.8rem; }
+        .options-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+        .opt-btn { background: #161b22; border: 1px solid #30363d; padding: 12px; color: #fff; cursor: pointer; border-radius: 4px; transition: 0.2s; }
+        .opt-btn:hover { border-color: var(--cyber-blue); background: #1c2128; }
+        .opt-btn.selected { background: var(--cyber-blue); color: #000; font-weight: bold; border-color: var(--cyber-blue); }
+
+        .btn-verify { width: 100%; padding: 18px; background: var(--cyber-blue); color: #000; border: none; border-radius: 4px; font-weight: bold; cursor: pointer; text-transform: uppercase; margin-top: 30px; font-size: 1rem; }
+        .btn-verify:hover { background: #00b8e6; box-shadow: 0 0 15px rgba(0, 212, 255, 0.4); }
+
+        #feedback { margin-top: 20px; padding: 15px; border-radius: 4px; text-align: center; display: none; font-weight: bold; border: 1px solid transparent; }
+        .success { background: rgba(0, 255, 128, 0.1); border-color: #00ff80 !important; color: #00ff80; }
+        .error { background: rgba(255, 49, 49, 0.1); border-color: #ff3131 !important; color: #ff3131; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="header">
+        <h1>Análise de Magic Numbers</h1>
+        <small id="counter">CASO: 1 / 5</small>
+    </div>
+
+    <div class="main-content">
+        <div class="file-info">
+            <div class="file-icon" id="file-ext-icon">📄</div>
+            <div>
+                <strong>Arquivo Suspeito:</strong> <span id="file-name">foto_ferias.jpg</span><br>
+                <span>O Analista desconfia que a extensão não condiz com o conteúdo.</span>
+            </div>
+        </div>
+
+        <div class="options-title">Visualização Hexadecimal (Primeiros 16 Bytes):</div>
+        <div class="hex-viewer" id="hex-display">
+            00000000  <span class="magic-highlight">FF D8 FF E0</span> 00 10 4A 46 49 46 00 01 01 01 00 60
+        </div>
+
+        <div class="options-title">Qual é o formato REAL deste arquivo?</div>
+        <div class="options-grid" id="options">
+            </div>
+
+        <button class="btn-verify" onclick="verify()">Analisar Assinatura Oculta</button>
+        <div id="feedback"></div>
+    </div>
+</div>
+
+<script>
+    const cases = [
+        { name: "imagem_secreta.jpg", hex: "89 50 4E 47 0D 0A 1A 0A 00 00 00 0D 49 48 44 52", magic: "89 50 4E 47", ans: "PNG" },
+        { name: "documento.pdf", hex: "4D 5A 90 00 03 00 00 00 04 00 00 00 FF FF 00 00", magic: "4D 5A", ans: "EXE" },
+        { name: "planilha.xlsx", hex: "25 50 44 46 2D 31 2E 34 0A 25 D3 EB E9 E1 0A 32", magic: "25 50 44 46", ans: "PDF" },
+        { name: "musica.mp3", hex: "47 49 46 38 39 61 20 00 20 00 F7 00 00 00 00 00", magic: "47 49 46", ans: "GIF" },
+        { name: "backup.zip", hex: "52 61 72 21 1A 07 00 CF 90 73 00 00 0D 00 00 00", magic: "52 61 72 21", ans: "RAR" }
+    ];
+
+    const allTypes = ["JPEG", "PNG", "PDF", "EXE", "GIF", "ZIP", "RAR", "MP3", "MP4"];
+    let current = 0;
+    let selected = "";
+
+    function load() {
+        const c = cases[current];
+        document.getElementById('file-name').innerText = c.name;
+        document.getElementById('counter').innerText = `CASO: ${current + 1} / ${cases.length}`;
+        
+        // Formata o Hex com o destaque no Magic Number
+        const parts = c.hex.split(" ");
+        const magicLen = c.magic.split(" ").length;
+        let formattedHex = `<span class="magic-highlight">${parts.slice(0, magicLen).join(" ")}</span> ` + parts.slice(magicLen).join(" ");
+        document.getElementById('hex-display').innerHTML = `00000000  ${formattedHex}`;
+        
+        const grid = document.getElementById('options');
+        grid.innerHTML = "";
+        allTypes.forEach(t => {
+            const btn = document.createElement('button');
+            btn.className = 'opt-btn';
+            btn.innerText = t;
+            btn.onclick = () => {
+                document.querySelectorAll('.opt-btn').forEach(b => b.classList.remove('selected'));
+                btn.classList.add('selected');
+                selected = t;
+            };
+            grid.appendChild(btn);
+        });
+        document.getElementById('feedback').style.display = "none";
+    }
+
+    function verify() {
+        const res = document.getElementById('feedback');
+        res.style.display = "block";
+        if (selected === cases[current].ans) {
+            res.className = "success";
+            res.innerHTML = `✅ CORRETO! A assinatura ${cases[current].magic} revela um arquivo ${cases[current].ans}.`;
+            setTimeout(() => {
+                current++;
+                if (current < cases.length) load();
+                else document.querySelector('.main-content').innerHTML = "<h2>🏆 PERITO FORENSE!</h2><p>Você identificou todos os arquivos camuflados com sucesso.</p>";
+            }, 2000);
+        } else {
+            res.className = "error";
+            res.innerText = "❌ ASSINATURA INCORRETA. Verifique a tabela de Magic Numbers no infográfico.";
+        }
+    }
+
+    load();
+</script>
+</body>
+</html>
