@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>FIAP :: HEX Editor Challenge</title>
+    <style>
+        :root { --cyan: #00f2ff; --yellow: #ffd700; --bg: #0a0a0a; }
+        body { background: var(--bg); color: var(--cyan); font-family: 'Courier New', monospace; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; margin: 0; }
+        
+        .hex-editor { background: #000; border: 2px solid var(--yellow); padding: 20px; box-shadow: 0 0 20px rgba(0,242,255,0.1); width: 90%; max-width: 650px; }
+        .header { color: var(--yellow); text-align: center; border-bottom: 1px solid var(--yellow); margin-bottom: 15px; padding-bottom: 10px; font-weight: bold; }
+        
+        /* Simulação do Layout de Hex Editor */
+        .dump-container { display: flex; justify-content: space-between; background: #111; padding: 15px; border-radius: 4px; border: 1px solid #333; }
+        .offset { color: #555; margin-right: 15px; }
+        .hex-values { color: #fff; letter-spacing: 2px; }
+        .ascii-sidebar { color: #444; border-left: 1px solid #333; padding-left: 15px; }
+
+        .input-area { margin-top: 25px; text-align: center; }
+        input { background: #000; border: 1px solid var(--cyan); color: var(--yellow); padding: 12px; width: 250px; text-align: center; font-size: 1.1rem; outline: none; }
+        button { background: var(--yellow); color: #000; border: none; padding: 12px 25px; cursor: pointer; font-weight: bold; margin-left: 10px; transition: 0.3s; }
+        button:hover { background: var(--cyan); box-shadow: 0 0 10px var(--cyan); }
+        
+        #status { margin-top: 20px; font-weight: bold; min-height: 24px; }
+        .blink { animation: blinker 1s linear infinite; }
+        @keyframes blinker { 50% { opacity: 0; } }
+    </style>
+</head>
+<body>
+
+    <div class="hex-editor">
+        <div class="header">MEMORY_DUMP_0x0045.DAT - HEX VIEW</div>
+        
+        <div class="dump-container">
+            <div class="offset">
+                00000000<br>00000008
+            </div>
+            <div class="hex-values">
+                46 49 41 50 5F 42 4C 55<br>
+                45 5F 54 45 41 4D 21 00
+            </div>
+            <div class="ascii-sidebar">
+                ........<br>........
+            </div>
+        </div>
+
+        <div class="input-area">
+            <p style="color: var(--yellow)">> DECODIFIQUE A STRING ASCII:</p>
+            <input type="text" id="flagInput" placeholder="FLAG{...}" autocomplete="off">
+            <button onclick="checkFlag()">INJECT</button>
+        </div>
+
+        <div id="status"></div>
+    </div>
+
+    <script>
+        function checkFlag() {
+            const input = document.getElementById('flagInput').value.toUpperCase().trim();
+            const status = document.getElementById('status');
+            
+            // Gabarito: FIAP_BLUE_TEAM!
+            // 46=F, 49=I, 41=A, 50=P, 5F=_, 42=B, 4C=L, 55=U, 45=E, 5F=_, 54=T, 45=E, 41=A, 4D=M, 21=!
+            if(input === "FIAP_BLUE_TEAM!") {
+                status.style.color = "#00ff00";
+                status.innerHTML = "[+] ACESSO CONCEDIDO: CREDENCIAL VÁLIDA RECONHECIDA.";
+            } else {
+                status.style.color = "#ff0000";
+                status.innerHTML = "[!] ERRO: DADOS CORROMPIDOS OU TRADUÇÃO INCORRETA.";
+                status.classList.add('blink');
+                setTimeout(() => status.classList.remove('blink'), 2000);
+            }
+        }
+    </script>
+</body>
+</html>
