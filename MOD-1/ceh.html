@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Desafio CEH: Fases de um Ataque</title>
+    <style>
+        :root { --hacker-green: #00ff41; --bg: #050505; --terminal-win: #1a1a1a; --text: #d1d1d1; }
+        body { background: var(--bg); color: var(--text); font-family: 'Courier New', Courier, monospace; padding: 20px; }
+        .terminal { background: var(--terminal-win); border: 1px solid #333; border-radius: 6px; max-width: 1100px; margin: auto; box-shadow: 0 0 20px rgba(0, 255, 65, 0.2); overflow: hidden; }
+        .top-bar { background: #333; padding: 5px 15px; color: #aaa; font-size: 12px; display: flex; justify-content: space-between; }
+        .content { padding: 20px; }
+        
+        h2 { color: var(--hacker-green); text-align: center; text-transform: uppercase; letter-spacing: 2px; }
+        .instruction { text-align: center; margin-bottom: 25px; color: #888; border-bottom: 1px solid #333; padding-bottom: 10px; }
+
+        .fases-container { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; margin-bottom: 30px; }
+        .fase-box { background: #000; border: 1px solid #444; padding: 10px; border-radius: 4px; text-align: center; min-height: 180px; display: flex; flex-direction: column; }
+        .fase-title { color: var(--hacker-green); font-size: 0.8rem; font-weight: bold; margin-bottom: 10px; border-bottom: 1px solid #222; padding-bottom: 5px; }
+        
+        .drop-zone { flex-grow: 1; border: 1px dashed #333; margin: 5px 0; display: flex; align-items: center; justify-content: center; font-size: 0.7rem; color: #555; position: relative; }
+        .drop-zone.over { background: rgba(0, 255, 65, 0.05); border-color: var(--hacker-green); }
+
+        /* Estilo das Peças */
+        .tools-bank { background: #111; padding: 20px; border-radius: 4px; border: 1px solid #333; display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; }
+        .drag-item { padding: 8px 12px; border-radius: 3px; cursor: grab; font-size: 0.8rem; font-weight: bold; transition: 0.3s; }
+        .item-tool { background: #1a1a1a; border: 1px solid var(--hacker-green); color: var(--hacker-green); }
+        .item-tech { background: #1a1a1a; border: 1px solid #58a6ff; color: #58a6ff; }
+
+        .btn-exploit { display: block; margin: 30px auto; padding: 15px 40px; background: transparent; border: 2px solid var(--hacker-green); color: var(--hacker-green); font-weight: bold; cursor: pointer; text-transform: uppercase; }
+        .btn-exploit:hover { background: var(--hacker-green); color: black; }
+
+        .correct { border-color: var(--hacker-green) !important; box-shadow: inset 0 0 10px rgba(0, 255, 65, 0.2); }
+        .incorrect { border-color: #ff3333 !important; }
+    </style>
+</head>
+<body>
+
+<div class="terminal">
+    <div class="top-bar">
+        <span>CEH_ATTACK_SIMULATOR_V4.exe</span>
+        <span>[ _ □ x ]</span>
+    </div>
+    <div class="content">
+        <h2>Fases do Ataque Metodologia C|EH</h2>
+        <p class="instruction">Arraste a FERRAMENTA e a TÉCNICA correta para cada fase do modelo CEH.</p>
+
+        <div class="fases-container">
+            <div class="fase-box">
+                <div class="fase-title">1. Reconhecimento</div>
+                <div class="drop-zone" data-type="tool" data-ans="theHarvester">Tool?</div>
+                <div class="drop-zone" data-type="tech" data-ans="Google Hacking">Tech?</div>
+            </div>
+            <div class="fase-box">
+                <div class="fase-title">2. Varredura</div>
+                <div class="drop-zone" data-type="tool" data-ans="Nmap">Tool?</div>
+                <div class="drop-zone" data-type="tech" data-ans="Port Scanning">Tech?</div>
+            </div>
+            <div class="fase-box">
+                <div class="fase-title">3. Ganhar Acesso</div>
+                <div class="drop-zone" data-type="tool" data-ans="Metasploit">Tool?</div>
+                <div class="drop-zone" data-type="tech" data-ans="Exploit de Vulnerabilidade">Tech?</div>
+            </div>
+            <div class="fase-box">
+                <div class="fase-title">4. Manter Acesso</div>
+                <div class="drop-zone" data-type="tool" data-ans="Meterpreter">Tool?</div>
+                <div class="drop-zone" data-type="tech" data-ans="Backdoors">Tech?</div>
+            </div>
+            <div class="fase-box">
+                <div class="fase-title">5. Apagar Rastros</div>
+                <div class="drop-zone" data-type="tool" data-ans="CCleaner">Tool?</div>
+                <div class="drop-zone" data-type="tech" data-ans="Limpeza de Logs">Tech?</div>
+            </div>
+        </div>
+
+        <div class="tools-bank" id="bank">
+            </div>
+
+        <button class="btn-exploit" onclick="validate()">Executar Sequência de Ataque</button>
+    </div>
+</div>
+
+<script>
+    const items = [
+        { id: "t1", txt: "theHarvester", type: "item-tool" },
+        { id: "t2", txt: "Nmap", type: "item-tool" },
+        { id: "t3", txt: "Metasploit", type: "item-tool" },
+        { id: "t4", txt: "Meterpreter", type: "item-tool" },
+        { id: "t5", txt: "CCleaner", type: "item-tool" },
+        { id: "te1", txt: "Google Hacking", type: "item-tech" },
+        { id: "te2", txt: "Port Scanning", type: "item-tech" },
+        { id: "te3", txt: "Exploit de Vulnerabilidade", type: "item-tech" },
+        { id: "te4", txt: "Backdoors", type: "item-tech" },
+        { id: "te5", txt: "Limpeza de Logs", type: "item-tech" }
+    ];
+
+    const bank = document.getElementById('bank');
+    items.sort(() => Math.random() - 0.5).forEach(i => {
+        const div = document.createElement('div');
+        div.className = `drag-item ${i.type}`;
+        div.draggable = true;
+        div.id = i.id;
+        div.innerText = i.txt;
+        bank.appendChild(div);
+    });
+
+    let dragged = null;
+    document.addEventListener("dragstart", e => { dragged = e.target; });
+
+    document.querySelectorAll('.drop-zone').forEach(zone => {
+        zone.addEventListener("dragover", e => e.preventDefault());
+        zone.addEventListener("dragenter", function() { this.classList.add('over'); });
+        zone.addEventListener("dragleave", function() { this.classList.remove('over'); });
+        zone.addEventListener("drop", function(e) {
+            e.preventDefault();
+            this.classList.remove('over');
+            if(this.children.length > 0) bank.appendChild(this.children[0]);
+            this.appendChild(dragged);
+            this.style.color = "white";
+        });
+    });
+
+    function validate() {
+        let score = 0;
+        document.querySelectorAll('.drop-zone').forEach(zone => {
+            if(zone.children.length > 0 && zone.children[0].innerText === zone.dataset.ans) {
+                zone.className = "drop-zone correct";
+                score++;
+            } else {
+                zone.className = "drop-zone incorrect";
+            }
+        });
+
+        if(score === 10) {
+            alert("SISTEMA INVADIDO COM SUCESSO! Você dominou o ciclo CEH.");
+        } else {
+            alert("FALHA NA SEQUÊNCIA: O Blue Team detectou suas ferramentas. Corrija o planejamento.");
+        }
+    }
+</script>
+</body>
+</html>
