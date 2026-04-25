@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Blue Team Operations - Diagnóstico Simplificado</title>
+    <style>
+        :root { --blue: #00d4ff; --green: #39ff14; --red: #ff3131; --bg: #05070a; --card: #0d1117; }
+        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); color: #fff; padding: 20px; }
+        
+        .container { max-width: 900px; margin: auto; border: 1px solid #30363d; border-radius: 8px; background: var(--card); overflow: hidden; box-shadow: 0 0 40px rgba(0,0,0,0.8); }
+        
+        .header { background: #161b22; padding: 20px; border-bottom: 2px solid var(--green); display: flex; justify-content: space-between; align-items: center; }
+        .header-title h1 { margin: 0; color: var(--green); font-size: 1.6rem; text-transform: uppercase; }
+        .case-counter { color: var(--green); font-family: monospace; font-size: 1.1rem; }
+
+        .main-content { padding: 25px; }
+
+        .alert-box { background: #000; border: 1px solid #30363d; padding: 20px; border-radius: 6px; margin-bottom: 25px; color: #ffca28; font-family: 'Consolas', monospace; font-size: 1rem; border-left: 5px solid #ffca28; }
+        
+        .question-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 25px; margin-bottom: 25px; }
+        .question-item label { display: block; margin-bottom: 12px; font-weight: bold; font-size: 0.85rem; text-transform: uppercase; color: var(--blue); }
+
+        .options-group { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
+        .opt { background: #21262d; border: 1px solid #30363d; padding: 12px; border-radius: 4px; cursor: pointer; text-align: center; font-size: 0.8rem; transition: 0.2s; }
+        .opt:hover { border-color: var(--green); }
+        .opt.selected { background: var(--green); color: #000; font-weight: bold; border-color: var(--green); }
+
+        .impact-group { grid-template-columns: repeat(3, 1fr); }
+
+        select { width: 100%; padding: 12px; background: #21262d; color: white; border: 1px solid #30363d; border-radius: 4px; outline: none; font-size: 0.9rem; }
+        select:focus { border-color: var(--green); }
+
+        .btn-validate { width: 100%; padding: 18px; background: var(--green); color: #000; border: none; border-radius: 4px; font-weight: bold; cursor: pointer; text-transform: uppercase; font-size: 1rem; margin-top: 20px; }
+        .btn-validate:hover { background: #32e112; box-shadow: 0 0 20px rgba(57, 255, 20, 0.4); }
+
+        #result { margin-top: 20px; padding: 15px; border-radius: 4px; text-align: center; display: none; font-weight: bold; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="header">
+        <div class="header-title">
+            <h1>Atividade 07</h1>
+            <small>ANÁLISE DE VULNERABILIDADE</small>
+        </div>
+        <div class="case-counter" id="counter">CASO: 1 / 6</div>
+    </div>
+
+    <div class="main-content">
+        <div class="alert-box" id="alert-text">
+            CARREGANDO ALERTA DO SIEM...
+        </div>
+
+        <div class="question-grid">
+            <div class="question-item">
+                <label>1. Tipo da Vulnerabilidade</label>
+                <div class="options-group" id="type-group">
+                    <div class="opt" onclick="sel('type', this)">Configuração</div>
+                    <div class="opt" onclick="sel('type', this)">Código</div>
+                    <div class="opt" onclick="sel('type', this)">Execução Remota</div>
+                    <div class="opt" onclick="sel('type', this)">Elevação de Privilégio</div>
+                </div>
+            </div>
+
+            <div class="question-item">
+                <label>2. Impacto Potencial</label>
+                <div class="options-group impact-group">
+                    <div class="opt" onclick="sel('impact', this)">Baixo</div>
+                    <div class="opt" onclick="sel('impact', this)">Médio</div>
+                    <div class="opt" onclick="sel('impact', this)">Alto</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="question-item">
+            <label>3. Melhor Ação de Mitigação</label>
+            <select id="mitigation">
+                <option value="">Selecione a ação corretiva...</option>
+                <option value="A">Aplicar Patch/Atualização de segurança imediata</option>
+                <option value="B">Resetar senhas para padrão forte e aplicar MFA</option>
+                <option value="C">Corrigir permissões de ACL e isolar segmento</option>
+                <option value="D">Instalar barreiras físicas e monitoramento local</option>
+            </select>
+        </div>
+
+        <button class="btn-validate" onclick="validate()">Validar Diagnóstico</button>
+        <div id="result"></div>
+    </div>
+</div>
+
+<script>
+    const cases = [
+        {
+            alert: '"Servidor Apache Tomcat (WEB-01) desatualizado permitindo execução de código remoto (RCE)."',
+            type: "Execução Remota", impact: "Alto", mitigation: "A"
+        },
+        {
+            alert: '"Banco de Dados (DB-PROD) acessível via internet com usuário admin e senha padrão fábrica."',
+            type: "Configuração", impact: "Alto", mitigation: "B"
+        },
+        {
+            alert: '"Detecção de biblioteca Log4j v2.14 em aplicação crítica de processamento de dados."',
+            type: "Código", impact: "Alto", mitigation: "A"
+        },
+        {
+            alert: '"Usuário de nível estagiário possui permissão de leitura/escrita no diretório raiz do sistema."',
+            type: "Elevação de Privilégio", impact: "Alto", mitigation: "C"
+        },
+        {
+            alert: '"Roteador de borda com protocolo Telnet ativo e sem restrição de IPs de gerência."',
+            type: "Configuração", impact: "Médio", mitigation: "C"
+        },
+        {
+            alert: '"Terminal de autoatendimento físico com portas USB expostas e sem trava de segurança."',
+            type: "Configuração", impact: "Médio", mitigation: "D"
+        }
+    ];
+
+    let currentCase = 0;
+    let choices = { type: "", impact: "" };
+
+    function loadCase() {
+        const c = cases[currentCase];
+        document.getElementById('alert-text').innerText = c.alert;
+        document.getElementById('counter').innerText = `CASO: ${currentCase + 1} / ${cases.length}`;
+        document.getElementById('result').style.display = "none";
+        document.getElementById('mitigation').value = "";
+        document.querySelectorAll('.opt').forEach(o => o.classList.remove('selected'));
+        choices = { type: "", impact: "" };
+    }
+
+    function sel(cat, el) {
+        el.parentElement.querySelectorAll('.opt').forEach(o => o.classList.remove('selected'));
+        el.classList.add('selected');
+        choices[cat] = el.innerText;
+    }
+
+    function validate() {
+        const mit = document.getElementById('mitigation').value;
+        const res = document.getElementById('result');
+        const c = cases[currentCase];
+
+        const isCorrect = 
+            choices.type === c.type && 
+            choices.impact === c.impact && 
+            mit === c.mitigation;
+
+        res.style.display = "block";
+
+        if(isCorrect) {
+            res.innerHTML = "🎯 DIAGNÓSTICO CORRETO! Procedendo para o próximo alerta...";
+            res.style.color = "var(--green)";
+            res.style.border = "1px solid var(--green)";
+            
+            setTimeout(() => {
+                currentCase++;
+                if(currentCase < cases.length) {
+                    loadCase();
+                } else {
+                    document.querySelector('.main-content').innerHTML = "<h2 style='color:var(--green); text-align:center;'>🏆 EXCELENTE!<br>Você concluiu todas as análises do Blue Team.</h2>";
+                }
+            }, 2000);
+        } else {
+            res.innerHTML = "❌ ERRO NA ANÁLISE! Reavalie o tipo de ameaça e a mitigação.";
+            res.style.color = "var(--red)";
+            res.style.border = "1px solid var(--red)";
+        }
+    }
+
+    loadCase();
+</script>
+
+</body>
+</html>
