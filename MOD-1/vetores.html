@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="pt-br"> 
+<head>
+    <meta charset="UTF-8">
+    <title>Desafio: Vetores de Ataque</title>
+    <style>
+        :root { --neon-green: #00ff9d; --neon-blue: #00d4ff; --dark-bg: #050a0e; }
+        body { font-family: 'Segoe UI', sans-serif; background: var(--dark-bg); color: #fff; display: flex; flex-direction: column; align-items: center; padding: 20px; }
+        
+        .game-header { text-align: center; border: 1px solid var(--neon-blue); padding: 20px; border-radius: 10px; width: 100%; max-width: 800px; background: rgba(0, 212, 255, 0.05); }
+        .game-header h1 { margin: 0; color: var(--neon-blue); text-transform: uppercase; letter-spacing: 3px; }
+        
+        .mission-box { margin: 20px 0; padding: 20px; background: #101820; border-left: 5px solid var(--neon-green); border-radius: 4px; width: 100%; max-width: 800px; }
+        
+        .grid-vectors { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 15px; width: 100%; max-width: 800px; margin-top: 20px; }
+        
+        .vector-card { background: #1a242d; border: 1px solid #334; padding: 15px; border-radius: 8px; text-align: center; cursor: pointer; transition: 0.3s; position: relative; overflow: hidden; }
+        .vector-card:hover { border-color: var(--neon-green); transform: translateY(-5px); background: #232d36; }
+        .vector-card.selected { border-color: var(--neon-green); box-shadow: 0 0 15px var(--neon-green); }
+        .vector-card i { display: block; font-size: 2rem; margin-bottom: 10px; }
+
+        .status-bar { width: 100%; max-width: 800px; height: 10px; background: #222; border-radius: 5px; margin-top: 30px; }
+        .progress { height: 100%; width: 0%; background: var(--neon-green); border-radius: 5px; transition: 0.5s; }
+
+        .btn-action { margin-top: 30px; padding: 15px 50px; background: var(--neon-green); color: #000; border: none; border-radius: 5px; font-weight: bold; cursor: pointer; text-transform: uppercase; }
+        .btn-action:disabled { background: #444; cursor: not-allowed; }
+
+        #log { margin-top: 20px; font-family: 'Consolas', monospace; color: var(--neon-green); font-size: 0.9rem; min-height: 50px; text-align: center; }
+    </style>
+</head>
+<body>
+
+<div class="game-header">
+    <h1>Infiltration Path Simulator</h1>
+    <p>Escolha o vetor de ataque correto para superar as defesas.</p>
+</div>
+
+<div class="mission-box" id="mission-display">
+    <strong>OBJETIVO ATUAL:</strong> <span id="objective">Acessar a rede interna. Você encontrou um roteador Wi-Fi desatualizado na recepção da empresa.</span>
+</div>
+
+<div class="grid-vectors" id="vectors-container">
+    </div>
+
+<div class="status-bar"><div class="progress" id="progress-bar"></div></div>
+
+<div id="log">Aguardando início da operação...</div>
+
+<button class="btn-action" id="action-btn" onclick="processChoice()" disabled>Executar Ataque</button>
+
+<script>
+    const vectors = [
+        { id: 1, name: "Phishing", desc: "E-mails ou sites falsos" },
+        { id: 2, name: "Malware", desc: "Vírus, Trojans e Spywares" },
+        { id: 3, name: "Exploração de Vulnerabilidade", desc: "Falhas em sistemas/apps" },
+        { id: 4, name: "Engenharia Social", desc: "Manipulação psicológica" },
+        { id: 5, name: "Credenciais Vulneráveis", desc: "Senhas fracas ou vazadas" },
+        { id: 6, name: "Ataques Aplicacionais", desc: "SQL Injection e XSS" },
+        { id: 7, name: "Rede e Comunicação", desc: "MITM e Wi-Fi não seguro" },
+        { id: 8, name: "Dispositivos Removíveis", desc: "Pendrives infectados (BadUSB)" },
+        { id: 9, name: "Ameaças Internas", desc: "Funcionário mal-intencionado" },
+        { id: 10, name: "Ataques Físicos", desc: "Roubo ou acesso local" }
+    ];
+
+    const stages = [
+        { 
+            text: "OBJETIVO 1: O roteador Wi-Fi do escritório usa um protocolo de criptografia antigo (WEP). Qual vetor você usa?", 
+            correct: 7, 
+            log: "Sucesso! Você interceptou o tráfego da rede e obteve as primeiras credenciais."
+        },
+        { 
+            text: "OBJETIVO 2: Agora dentro da rede, você precisa entrar no Servidor de Arquivos, mas ele pede login. Você descobriu que o administrador usa a senha 'empresa123'.", 
+            correct: 5, 
+            log: "Acesso concedido! A política de senhas fracas permitiu sua entrada."
+        },
+        { 
+            text: "OBJETIVO 3: Para expandir seu controle, você precisa que um gerente execute um arquivo no computador dele. Você deixa um pendrive 'perdido' na mesa dele.", 
+            correct: 8, 
+            log: "O gerente conectou o pendrive! Malware instalado com sucesso."
+        },
+        { 
+            text: "OBJETIVO FINAL: O Banco de Dados principal só aceita comandos via formulário web, mas o formulário não filtra caracteres como aspas simples (').", 
+            correct: 6, 
+            log: "SQL Injection executado! Dados exfiltrados. Missão cumprida."
+        }
+    ];
+
+    let currentStage = 0;
+    let selectedVectorId = null;
+
+    function initGame() {
+        const container = document.getElementById('vectors-container');
+        vectors.forEach(v => {
+            const card = document.createElement('div');
+            card.className = 'vector-card';
+            card.innerHTML = `<strong>${v.id}. ${v.name}</strong><br><small>${v.desc}</small>`;
+            card.onclick = () => selectCard(v.id, card);
+            container.appendChild(card);
+        });
+    }
+
+    function selectCard(id, element) {
+        document.querySelectorAll('.vector-card').forEach(c => c.classList.remove('selected'));
+        element.classList.add('selected');
+        selectedVectorId = id;
+        document.getElementById('action-btn').disabled = false;
+    }
+
+    function processChoice() {
+        const log = document.getElementById('log');
+        const stage = stages[currentStage];
+
+        if (selectedVectorId === stage.correct) {
+            currentStage++;
+            const progress = (currentStage / stages.length) * 100;
+            document.getElementById('progress-bar').style.width = progress + "%";
+            log.innerText = stage.log;
+            log.style.color = "var(--neon-green)";
+
+            if (currentStage < stages.length) {
+                setTimeout(() => {
+                    document.getElementById('objective').innerText = stages[currentStage].text;
+                    resetSelection();
+                }, 1500);
+            } else {
+                document.getElementById('mission-display').innerHTML = "<h2>🏆 SISTEMA TOTALMENTE COMPROMETIDO!</h2>";
+                document.getElementById('action-btn').style.display = "none";
+            }
+        } else {
+            log.innerText = "ERRO: O sistema de defesa bloqueou este vetor. Tente outra abordagem.";
+            log.style.color = "#ff4444";
+        }
+    }
+
+    function resetSelection() {
+        selectedVectorId = null;
+        document.querySelectorAll('.vector-card').forEach(c => c.classList.remove('selected'));
+        document.getElementById('action-btn').disabled = true;
+    }
+
+    initGame();
+</script>
+</body>
+</html>
