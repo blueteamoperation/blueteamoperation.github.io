@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>TERMINAL_LOG_SIMULATOR_V3</title>
+    <style>
+        :root { --neon: #00ff41; --bg: #050505; --panel: #111; --blue: #00d4ff; }
+        body { background: var(--bg); color: var(--neon); font-family: 'Courier New', monospace; padding: 20px; display: flex; flex-direction: column; align-items: center; }
+        .container { width: 98%; max-width: 1200px; display: grid; grid-template-columns: 1fr 380px; gap: 20px; }
+        .terminal-section { background: var(--panel); border: 1px solid #333; padding: 20px; border-radius: 5px; box-shadow: 0 0 20px rgba(0,255,65,0.1); }
+        .log-view { background: #000; height: 250px; overflow-y: auto; padding: 10px; border: 1px solid #222; font-size: 11px; margin-bottom: 15px; color: #777; white-space: pre; }
+        .input-line { display: flex; background: #000; padding: 12px; border: 1px solid var(--neon); }
+        .prompt { margin-right: 10px; font-weight: bold; color: var(--blue); }
+        input { background: transparent; border: none; color: var(--neon); flex: 1; font-family: inherit; outline: none; font-size: 16px; }
+        .results-area { background: #000; min-height: 200px; max-height: 400px; overflow-y: auto; margin-top: 15px; padding: 10px; border: 1px solid #333; color: #fff; font-size: 14px; white-space: pre; border-left: 3px solid var(--blue); }
+        .missions-section { background: #0d0d0d; padding: 20px; border: 1px solid #444; border-radius: 5px; height: 85vh; overflow-y: auto; }
+        .mission-card { border-bottom: 1px solid #222; padding: 12px 5px; font-size: 12px; color: #666; }
+        .active-mission { color: var(--blue); font-weight: bold; border-left: 3px solid var(--blue); padding-left: 10px; background: rgba(0,212,255,0.05); }
+        .completed { text-decoration: line-through; color: #225522; }
+        .btn-check { width: 100%; margin-top: 10px; background: var(--blue); color: #000; border: none; padding: 12px; font-weight: bold; cursor: pointer; }
+    </style>
+</head>
+<body>
+
+<h1 style="text-shadow: 0 0 10px var(--neon);">[ LOG_FORENSICS_LAB_V3.0 ]</h1>
+
+<div class="container">
+    <div class="terminal-section">
+        <h2>Console de Investigação (access.log)</h2>
+        <div class="log-view" id="logRaw"></div>
+        <div class="input-line">
+            <span class="prompt">analyst@cyber-ops:~$</span>
+            <input type="text" id="cmdInput" placeholder="grep 'PATTERN' | wc -l" autocomplete="off">
+        </div>
+        <div class="results-area" id="output">Aguardando comando...</div>
+    </div>
+
+    <div class="missions-section" id="missionPanel">
+        <h2>Objetivos de Análise</h2>
+        <div id="missionList"></div>
+        <div style="margin-top: 20px; position: sticky; bottom: 0; background: #0d0d0d; padding-top: 10px;">
+            <label style="font-size: 11px; color: var(--blue);">SUBMETER RESULTADO:</label>
+            <input type="text" id="missionAnswer" placeholder="Valor exato...">
+            <button class="btn-check" onclick="checkMission()">Validar No Sistema</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    const rawLogs = [
+        '192.168.1.10 - - [26/Apr/2026:10:01:05] "GET /index.html HTTP/1.1" 200 1543',
+        '10.0.0.55 - - [26/Apr/2026:10:05:12] "POST /login.php HTTP/1.1" 401 128',
+        '10.0.0.55 - - [26/Apr/2026:10:05:15] "POST /login.php HTTP/1.1" 401 128',
+        '172.16.0.5 - - [26/Apr/2026:10:10:01] "GET /etc/passwd HTTP/1.1" 404 230',
+        '192.168.1.10 - - [26/Apr/2026:10:12:00] "GET /images/logo.png HTTP/1.1" 200 4512',
+        '10.0.0.55 - - [26/Apr/2026:10:15:44] "POST /login.php HTTP/1.1" 200 3400',
+        '192.168.1.15 - - [26/Apr/2026:10:16:01] "GET /admin.php HTTP/1.1" 403 50',
+        '172.16.0.5 - - [26/Apr/2026:10:18:22] "GET /wp-admin HTTP/1.1" 404 200',
+        '10.0.0.55 - - [26/Apr/2026:10:20:00] "GET /dashboard.php HTTP/1.1" 200 1200',
+        '192.168.1.30 - - [26/Apr/2026:10:21:10] "GET /config.bak HTTP/1.1" 404 0',
+        '172.16.0.5 - - [26/Apr/2026:10:22:05] "GET /../../etc/shadow HTTP/1.1" 404 150',
+        '192.168.1.10 - - [26/Apr/2026:10:25:00] "GET /contact.html HTTP/1.1" 200 800',
+        '10.0.0.55 - - [26/Apr/2026:10:26:12] "POST /login.php HTTP/1.1" 401 128',
+        '10.0.0.55 - - [26/Apr/2026:10:26:15] "POST /login.php HTTP/1.1" 401 128',
+        '172.16.0.5 - - [26/Apr/2026:10:28:01] "GET /shell.php?cmd=id HTTP/1.1" 404 300',
+        '192.168.1.45 - - [26/Apr/2026:10:30:10] "GET /phpmyadmin HTTP/1.1" 404 180',
+        '10.0.0.55 - - [26/Apr/2026:10:31:00] "POST /login.php HTTP/1.1" 401 128',
+        '192.168.1.10 - - [26/Apr/2026:10:32:45] "GET /style.css HTTP/1.1" 200 2100',
+        '172.16.0.5 - - [26/Apr/2026:10:35:12] "GET /backup.zip HTTP/1.1" 404 500',
+        '10.0.0.99 - - [26/Apr/2026:10:36:00] "GET /robots.txt HTTP/1.1" 200 45',
+        '10.0.0.99 - - [26/Apr/2026:10:36:05] "GET /sitemap.xml HTTP/1.1" 200 300',
+        '192.168.1.10 - - [26/Apr/2026:10:38:00] "GET /favicon.ico HTTP/1.1" 200 120',
+        '172.16.0.5 - - [26/Apr/2026:10:40:01] "GET /proc/self/environ HTTP/1.1" 404 200',
+        '10.0.0.55 - - [26/Apr/2026:10:42:15] "POST /login.php HTTP/1.1" 401 128',
+        '10.0.0.55 - - [26/Apr/2026:10:42:18] "POST /login.php HTTP/1.1" 401 128',
+        '10.0.0.55 - - [26/Apr/2026:10:42:20] "POST /login.php HTTP/1.1" 200 3400',
+        '192.168.1.10 - - [26/Apr/2026:10:45:00] "GET /index.html HTTP/1.1" 200 1543',
+        '172.16.0.5 - - [26/Apr/2026:10:46:10] "GET /var/log/apache2/access.log HTTP/1.1" 404 250',
+        '192.168.1.100 - - [26/Apr/2026:10:48:22] "GET /api/v1/status HTTP/1.1" 200 40',
+        '192.168.1.100 - - [26/Apr/2026:10:48:25] "GET /api/v1/users HTTP/1.1" 403 15',
+        '10.0.0.99 - - [26/Apr/2026:10:50:00] "GET /login.html HTTP/1.1" 200 560',
+        '172.16.0.5 - - [26/Apr/2026:10:52:44] "GET /boot.ini HTTP/1.1" 404 100',
+        '192.168.1.10 - - [26/Apr/2026:10:55:00] "GET /about.html HTTP/1.1" 200 1200',
+        '10.0.0.55 - - [26/Apr/2026:10:56:01] "GET /dashboard.php HTTP/1.1" 200 1200',
+        '10.0.0.55 - - [26/Apr/2026:10:56:10] "GET /logout.php HTTP/1.1" 200 50',
+        '192.168.1.10 - - [26/Apr/2026:10:58:22] "GET /gallery.php HTTP/1.1" 200 6500',
+        '172.16.0.5 - - [26/Apr/2026:11:00:05] "GET /win.ini HTTP/1.1" 404 100',
+        '192.168.1.10 - - [26/Apr/2026:11:02:12] "GET /index.html HTTP/1.1" 200 1543',
+        '192.168.1.200 - - [26/Apr/2026:11:05:00] "GET /secret_data.txt HTTP/1.1" 404 0',
+        '192.168.1.200 - - [26/Apr/2026:11:05:10] "GET /credentials.xml HTTP/1.1" 404 0'
+    ];
+
+    // GABARITO AJUSTADO COM PRECISÃO
+    const missions = [
+    { q: "1. Quantas linhas totais existem no log?", a: "40" },
+    { q: "2. Quantas vezes o IP 172.16.0.5 aparece no log?", a: "9" },
+    { q: "3. Qual o código HTTP da requisição do arquivo '/admin.php'?", a: "403" },
+    { q: "4. Qual IP realizou tentativas de login falhas (401)?", a: "10.0.0.55" },
+    { q: "5. Quantos status 200 (OK) existem no total?", a: "18" }, // CORRIGIDO PARA 18
+    { q: "6. Qual IP tentou acessar '/secret_data.txt'?", a: "192.168.1.200" },
+    { q: "7. Quantas requisições do tipo POST foram feitas?", a: "9" },
+    { q: "8. Quantos arquivos '.html' foram acessados com sucesso (200)?", a: "6" },
+    { q: "9. Qual o maior tamanho (bytes) de arquivo retornado no log?", a: "6500" },
+    { q: "10. Quantas requisições resultaram em 404?", a: "13" }
+];
+
+    let currentMission = 0;
+    document.getElementById('cmdInput').addEventListener('keyup', e => { if(e.key==='Enter') executeCommand(e.target.value); });
+
+    function executeCommand(input) {
+        let lines = [...rawLogs];
+        const pipes = input.split('|').map(p => p.trim());
+        pipes.forEach(pipe => {
+            const parts = pipe.split(' ');
+            const cmd = parts[0];
+            const arg = parts.slice(1).join(' ').replace(/['"]/g, "");
+            if (cmd === 'grep') lines = lines.filter(l => l.includes(arg));
+            else if (cmd === 'wc' && arg.includes('-l')) lines = [lines.filter(l=>l.trim()!=='').length.toString()];
+            else if (cmd === 'cut') {
+                const d = pipe.match(/-d'(.*?)'/) ? pipe.match(/-d'(.*?)'/)[1] : " ";
+                const f = parseInt(pipe.match(/-f(\d+)/)[1]) - 1;
+                lines = lines.map(l => l.split(d)[f] || "");
+            }
+            else if (cmd === 'sort') { lines.sort(); if(arg.includes('-r')) lines.reverse(); }
+            else if (cmd === 'uniq') lines = pipe.includes('-c') ? Object.entries(lines.reduce((a,b)=>{a[b]=(a[b]||0)+1;return a},{})).map(([k,v])=>`${v} ${k}`) : [...new Set(lines)];
+        });
+        document.getElementById('output').textContent = lines.join('\n');
+    }
+
+    function checkMission() {
+        const val = document.getElementById('missionAnswer').value.trim();
+        if (val === missions[currentMission].a) {
+            currentMission++;
+            document.getElementById('missionAnswer').value = "";
+            updateMissions();
+            if (currentMission >= missions.length) alert("SISTEMA DOMINADO!");
+        } else { alert("NEGADO: O valor não corresponde."); }
+    }
+
+    function updateMissions() {
+        const list = document.getElementById('missionList');
+        list.innerHTML = "";
+        missions.forEach((m, i) => {
+            let div = document.createElement('div');
+            div.className = `mission-card ${i === currentMission ? 'active-mission' : ''} ${i < currentMission ? 'completed' : ''}`;
+            div.textContent = m.q;
+            list.appendChild(div);
+        });
+    }
+
+    document.getElementById('logRaw').textContent = rawLogs.join('\n');
+    updateMissions();
+</script>
+</body>
+</html>
