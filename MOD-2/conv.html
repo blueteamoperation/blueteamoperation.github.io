@@ -45,25 +45,22 @@
                 document.getElementById('q4').value
             ];
             
-            // Transforma em números para o cálculo
+     
             const n = v.map(x => parseInt(x) || 0);
 
-            // Lógica de Checksum (Gabarito: 192, 168, 10, 100)
-            // Peso: 13, 7, 5, 3. Soma esperada: 4022 (0xFB6)
-            // XOR check: 192 ^ 85 = 149 (0x95)
+          
             const ck = (n[0] * 13) + (n[1] * 7) + (n[2] * 5) + (n[3] * 3);
             const valid = (ck === 0xFB6 && (n[0] ^ 85) === 149);
 
             if(valid) {
-                // AQUI ESTÁ A MUDANÇA: O IP é montado com o que ele digitou (v[0].v[1]...)
-                // Se ele chegou aqui, é porque os números que ele digitou são os corretos.
+               
                 out.innerHTML = `<div class='success'>DATA_MATCH: IP ${v[0]}.${v[1]}.${v[2]}.${v[3]} IDENTIFICADO.<br>SESSÃO ENCERRADA.</div>`;
             } else {
                 out.innerHTML = "<div class='error'>CHECKSUM_ERROR: Falha na integridade dos dados.</div>";
             }
         }
 
-        // Bloqueia letras
+  
         document.querySelectorAll('input').forEach(el => {
             el.addEventListener('input', function() { this.value = this.value.replace(/[^0-9]/g, ''); });
         });
