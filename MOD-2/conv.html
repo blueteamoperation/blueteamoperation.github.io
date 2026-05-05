@@ -2,145 +2,70 @@
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FIAP :: Cyber Challenge - Binary Decoder</title>
+    <title>BlueTeamOps | Binary Decoder Lab</title>
     <style>
-        :root { --main: #00f2ff; --warn: #ffd700; --bg: #0a0a0a; }
-        body {
-            background-color: var(--bg);
-            color: var(--main);
-            font-family: 'Courier New', Courier, monospace;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            height: 100vh;
-            margin: 0;
-            border: 4px solid #111;
-        }
-
-        .terminal {
-            background: #000;
-            padding: 30px;
-            border: 1px solid var(--warn);
-            box-shadow: 0 0 30px rgba(0, 242, 255, 0.1);
-            width: 85%;
-            max-width: 550px;
-            position: relative;
-        }
-
-        .terminal::before {
-            content: "SECURE_SESSION_ACTIVE";
-            position: absolute;
-            top: -10px;
-            right: 10px;
-            background: var(--bg);
-            padding: 0 5px;
-            font-size: 10px;
-            color: var(--warn);
-        }
-
-        h2 { color: var(--warn); text-transform: uppercase; border-bottom: 1px solid #333; padding-bottom: 10px; font-size: 1.2rem; }
-        
-        .binary-string {
-            font-size: 1.1rem;
-            letter-spacing: 2px;
-            background: #111;
-            padding: 15px;
-            display: block;
-            margin: 20px 0;
-            color: #fff;
-            text-align: center;
-            border: 1px solid #222;
-        }
-
-        .input-group { text-align: center; margin-bottom: 20px; }
-
-        input {
-            background: #000;
-            border: 1px solid var(--main);
-            color: var(--warn);
-            padding: 10px;
-            width: 60px;
-            text-align: center;
-            font-size: 1.1rem;
-            margin: 5px;
-            font-family: inherit;
-        }
-
-        button {
-            background: var(--warn);
-            color: #000;
-            border: none;
-            padding: 15px;
-            font-weight: bold;
-            cursor: pointer;
-            width: 100%;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            transition: 0.3s;
-        }
-
-        button:hover { background: var(--main); box-shadow: 0 0 15px var(--main); }
-
-        #result { margin-top: 20px; font-weight: bold; min-height: 40px; text-align: center; font-size: 0.9rem; line-height: 1.4; }
-        .success { color: #00ff00; border: 1px solid #00ff00; padding: 10px; display: block; }
-        .error { color: #ff0000; }
-        
-        .hint { font-size: 0.7rem; color: #444; margin-top: 20px; text-align: center; border-top: 1px solid #111; padding-top: 10px; }
+        :root { --bg: #0a0a0a; --cyan: #00ffff; --orange: #ff6600; --border: #1a3a3a; }
+        body { margin: 0; font-family: 'Courier New', monospace; background: var(--bg); color: #a0a0a0; display: flex; align-items: center; justify-content: center; height: 100vh; }
+        .terminal-box { background: #0f0f0f; padding: 30px; border: 1px solid var(--border); width: 90%; max-width: 550px; text-align: center; }
+        .binary-stream { font-size: 1.2rem; background: #000; padding: 20px; margin: 20px 0; color: #fff; border: 1px solid var(--cyan); }
+        input { background: #000; border: 1px solid var(--border); color: var(--cyan); padding: 12px; width: 65px; text-align: center; font-size: 1.2rem; margin: 5px; outline: none; }
+        .btn-analyze { background: transparent; color: var(--orange); border: 1px solid var(--orange); padding: 15px; width: 100%; cursor: pointer; text-transform: uppercase; font-weight: bold; }
+        #output { margin-top: 20px; min-height: 50px; font-weight: bold; }
+        .success { color: #00ff41; border: 1px solid #00ff41; padding: 10px; background: rgba(0, 255, 65, 0.05); }
+        .error { color: #ff3131; }
     </style>
 </head>
 <body>
 
-    <div class="terminal">
-        <h2>[ANALISTA: PROF-SILVIO]</h2>
-        <p style="font-size: 0.9rem;">Dump de memória interceptado. Fragmento detectado como <strong>IPv4 Header</strong>.</p>
-        <p style="font-size: 0.9rem; color: #888;">Converta os octetos binários para Decimal para expor o servidor C2.</p>
+    <div class="terminal-box">
+        <h2 style="color: var(--orange);">[ANALYSIS_LAB_02]</h2>
+        <p>Converta os octetos binários abaixo para extrair o IP do servidor C2.</p>
 
-        <div id="challenge-area">
-            <div class="binary-string">11000000 . 10101000 . 00001010 . 01100100</div>
-            
-            <div class="input-group">
-                <input type="text" maxlength="3" id="v1" autocomplete="off"> .
-                <input type="text" maxlength="3" id="v2" autocomplete="off"> .
-                <input type="text" maxlength="3" id="v3" autocomplete="off"> .
-                <input type="text" maxlength="3" id="v4" autocomplete="off">
-            </div>
-            
-            <button onclick="_analyze()">ANALISAR TRAFEGO</button>
-            <div id="result"></div>
+        <div class="binary-stream">11000000 . 10101000 . 00001010 . 01100100</div>
+        
+        <div class="input-wrapper">
+            <input type="text" maxlength="3" id="q1" placeholder="000"> .
+            <input type="text" maxlength="3" id="q2" placeholder="000"> .
+            <input type="text" maxlength="3" id="q3" placeholder="000"> .
+            <input type="text" maxlength="3" id="q4" placeholder="000">
         </div>
-
-        <div class="hint">POTÊNCIAS_DE_2: 128 | 64 | 32 | 16 | 8 | 4 | 2 | 1</div>
+        
+        <button class="btn-analyze" onclick="_run()">Executar Decode</button>
+        <div id="output"></div>
     </div>
 
     <script>
-        function _analyze() {
-            const r = document.getElementById('result');
-            // Pegando os valores
-            const i1 = document.getElementById('v1').value;
-            const i2 = document.getElementById('v2').value;
-            const i3 = document.getElementById('v3').value;
-            const i4 = document.getElementById('v4').value;
+        function _run() {
+            const out = document.getElementById('output');
+            // Captura os valores digitados pelo aluno
+            const v = [
+                document.getElementById('q1').value,
+                document.getElementById('q2').value,
+                document.getElementById('q3').value,
+                document.getElementById('q4').value
+            ];
+            
+            // Transforma em números para o cálculo
+            const n = v.map(x => parseInt(x) || 0);
 
-            // Ofuscação: Verificação por lógica matemática (Gabarito: 192, 168, 10, 100)
-            // 192 + 168 + 10 + 100 = 470
-            // Também verificamos o primeiro e o último especificamente para evitar falsos positivos
-            const s = parseInt(i1) + parseInt(i2) + parseInt(i3) + parseInt(i4);
-            const check = (s === 470 && i1 === "192" && i4 === "100");
+            // Lógica de Checksum (Gabarito: 192, 168, 10, 100)
+            // Peso: 13, 7, 5, 3. Soma esperada: 4022 (0xFB6)
+            // XOR check: 192 ^ 85 = 149 (0x95)
+            const ck = (n[0] * 13) + (n[1] * 7) + (n[2] * 5) + (n[3] * 3);
+            const valid = (ck === 0xFB6 && (n[0] ^ 85) === 149);
 
-            if(check) {
-                r.innerHTML = "<span class='success'>SUCESSO: IP IDENTIFICADO [192.168.10.100]<br>ALERTA DE EXFILTRAÇÃO ENVIADO AO SOC!</span>";
+            if(valid) {
+                // AQUI ESTÁ A MUDANÇA: O IP é montado com o que ele digitou (v[0].v[1]...)
+                // Se ele chegou aqui, é porque os números que ele digitou são os corretos.
+                out.innerHTML = `<div class='success'>DATA_MATCH: IP ${v[0]}.${v[1]}.${v[2]}.${v[3]} IDENTIFICADO.<br>SESSÃO ENCERRADA.</div>`;
             } else {
-                r.innerHTML = "<span class='error'>FALHA: CONVERSÃO INVÁLIDA.<br>O rastro do atacante está desaparecendo...</span>";
+                out.innerHTML = "<div class='error'>CHECKSUM_ERROR: Falha na integridade dos dados.</div>";
             }
         }
 
-        // Impedir letras no input
+        // Bloqueia letras
         document.querySelectorAll('input').forEach(el => {
-            el.addEventListener('input', function() {
-                this.value = this.value.replace(/[^0-9]/g, '');
-            });
+            el.addEventListener('input', function() { this.value = this.value.replace(/[^0-9]/g, ''); });
         });
     </script>
 </body>
