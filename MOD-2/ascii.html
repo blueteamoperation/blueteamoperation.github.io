@@ -6,79 +6,69 @@
     <style>
         :root { --cyan: #00f2ff; --yellow: #ffd700; --bg: #0a0a0a; }
         body { background: var(--bg); color: var(--cyan); font-family: 'Courier New', monospace; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; margin: 0; }
-        
-        .hex-editor { background: #000; border: 2px solid var(--yellow); padding: 25px; box-shadow: 0 0 30px rgba(0,242,255,0.15); width: 90%; max-width: 650px; position: relative; }
-        .header { color: var(--yellow); text-align: center; border-bottom: 1px solid #333; margin-bottom: 20px; padding-bottom: 10px; font-weight: bold; letter-spacing: 2px; }
-        
-        .dump-container { display: flex; justify-content: space-between; background: #080808; padding: 20px; border-radius: 4px; border: 1px solid #222; position: relative; }
-        .offset { color: #555; margin-right: 20px; user-select: none; }
+        .hex-editor { background: #000; border: 2px solid var(--yellow); padding: 25px; box-shadow: 0 0 30px rgba(0,242,255,0.15); width: 90%; max-width: 650px; }
+        .header { color: var(--yellow); text-align: center; border-bottom: 1px solid #333; margin-bottom: 20px; padding-bottom: 10px; font-weight: bold; }
+        .dump-container { display: flex; justify-content: space-between; background: #080808; padding: 20px; border: 1px solid #222; }
+        .offset { color: #555; margin-right: 20px; }
         .hex-values { color: #fff; letter-spacing: 4px; line-height: 1.6; }
-        .ascii-sidebar { color: #222; border-left: 1px solid #222; padding-left: 20px; user-select: none; }
-
+        .ascii-sidebar { color: #111; border-left: 1px solid #222; padding-left: 20px; }
         .input-area { margin-top: 30px; text-align: center; border-top: 1px solid #222; padding-top: 20px; }
-        input { background: #000; border: 1px solid var(--cyan); color: var(--yellow); padding: 12px; width: 280px; text-align: center; font-size: 1rem; outline: none; font-family: inherit; text-transform: uppercase; }
-        button { background: var(--yellow); color: #000; border: none; padding: 12px 30px; cursor: pointer; font-weight: bold; margin-left: 10px; transition: 0.3s; font-family: inherit; text-transform: uppercase; }
-        button:hover { background: var(--cyan); box-shadow: 0 0 15px var(--cyan); }
-        
-        #status { margin-top: 20px; font-weight: bold; min-height: 24px; font-size: 0.9rem; text-align: center; }
-        .blink { animation: blinker 0.1s step-end infinite; }
-        @keyframes blinker { 50% { opacity: 0; } }
+        input { background: #000; border: 1px solid var(--cyan); color: var(--yellow); padding: 12px; width: 280px; text-align: center; font-size: 1rem; outline: none; }
+        button { background: var(--yellow); color: #000; border: none; padding: 12px 30px; cursor: pointer; font-weight: bold; margin-left: 10px; }
+        #status { margin-top: 20px; font-weight: bold; min-height: 24px; text-align: center; }
     </style>
 </head>
 <body>
 
     <div class="hex-editor">
-        <div class="header">MEMORY_DUMP_0x0045.DAT :: PERÍCIA DIGITAL</div>
+        <div class="header">MEMORY_DUMP_0x0045.DAT :: DECODE_CHALLENGE</div>
         
         <div class="dump-container">
-            <div class="offset">
-                00000000<br>00000008
-            </div>
+            <div class="offset">00000000<br>00000008</div>
             <div class="hex-values">
                 46 49 41 50 5F 42 4C 55<br>
                 45 5F 54 45 41 4D 21 00
             </div>
-            <div class="ascii-sidebar">
-                ........<br>........
-            </div>
+            <div class="ascii-sidebar">........<br>........</div>
         </div>
 
         <div class="input-area">
-            <p style="color: var(--yellow); font-size: 0.8rem; margin-bottom: 15px;">> RECONSTRUA A STRING ORIGINAL DO DUMP:</p>
-            <input type="text" id="flagInput" placeholder="DIGITE O TEXTO..." autocomplete="off">
-            <button onclick="checkFlag()">Decrypt</button>
+            <p style="color: var(--yellow); font-size: 0.8rem; margin-bottom: 15px;">> TRADUZA O HEX PARA ASCII (DICA: 46=F, 21=!):</p>
+            <input type="text" id="flagInput" placeholder="TEXTO_AQUI" autocomplete="off">
+            <button onclick="checkFlag()">DECODE</button>
         </div>
 
         <div id="status"></div>
     </div>
 
     <script>
-        // Função de Hash para ocultar a resposta
-        async function sha256(message) {
-            const msgBuffer = new TextEncoder().encode(message);
-            const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
-            const hashArray = Array.from(new Uint8Array(hashBuffer));
-            return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+        // Função SHA-256 para esconder a flag no código
+        async function getHash(str) {
+            const buffer = new TextEncoder().encode(str);
+            const hash = await crypto.subtle.digest('SHA-256', buffer);
+            return Array.from(new Uint8Array(hash)).map(b => b.toString(16).padStart(2, '0')).join('');
         }
 
         async function checkFlag() {
-            const input = document.getElementById('flagInput').value.toUpperCase().trim();
+            const el = document.getElementById('flagInput');
             const status = document.getElementById('status');
             
-     
-            const targetHash = "e87f58385311e9f19318f78082987118d0987c95e1e0d37e1b69d9f104d41285";
+           
+            const val = el.value.trim().toUpperCase();
             
-            const inputHash = await sha256(input);
+           
+            const target = "e87f58385311e9f19318f78082987118d0987c95e1e0d37e1b69d9f104d41285";
+            
+            if (!val) return;
 
-            if(inputHash === targetHash) {
+            const inputHash = await getHash(val);
+
+            if (inputHash === target) {
                 status.style.color = "#39ff14";
-                status.innerHTML = "[+] ACESSO CONCEDIDO: DADOS RECONSTITUÍDOS COM SUCESSO.";
-                status.classList.remove('blink');
+                status.innerHTML = "🎯 SUCESSO: CREDENCIAL '" + val + "' VALIDADA.";
             } else {
                 status.style.color = "#ff3131";
-                status.innerHTML = "[!] ERRO: FALHA NA INTEGRIDADE DOS DADOS. TENTE NOVAMENTE.";
-                status.classList.add('blink');
-                setTimeout(() => status.classList.remove('blink'), 1500);
+                status.innerHTML = "❌ ERRO: HASH DE INTEGRIDADE INVÁLIDO.";
             }
         }
     </script>
