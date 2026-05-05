@@ -117,8 +117,7 @@
             if (d.startsWith("2026") && d.includes("04") && d.endsWith("25")) score++;
             if (g.includes("23") && g.includes("deg") && g.includes("46")) score++;
             
-            // Verificação da FLAG via Checksum simples (Soma dos caracteres ASCII)
-            // METADATA_MASTER_2026 soma 1642
+         
             let checkSum = 0;
             for (let i = 0; i < fl.length; i++) checkSum += fl.charCodeAt(i);
             if (checkSum === 1642 && fl.length === 20) score++;
