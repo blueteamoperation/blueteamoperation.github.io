@@ -2,174 +2,134 @@
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <title>Blue Team Operations - Diagnóstico Simplificado</title>
+    <title>BLUE_TEAM_DIAGNOSTIC_v7</title>
     <style>
-        :root { --blue: #00d4ff; --green: #39ff14; --red: #ff3131; --bg: #05070a; --card: #0d1117; }
-        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); color: #fff; padding: 20px; }
-        
-        .container { max-width: 900px; margin: auto; border: 1px solid #30363d; border-radius: 8px; background: var(--card); overflow: hidden; box-shadow: 0 0 40px rgba(0,0,0,0.8); }
-        
-        .header { background: #161b22; padding: 20px; border-bottom: 2px solid var(--green); display: flex; justify-content: space-between; align-items: center; }
-        .header-title h1 { margin: 0; color: var(--green); font-size: 1.6rem; text-transform: uppercase; }
-        .case-counter { color: var(--green); font-family: monospace; font-size: 1.1rem; }
-
+        :root { --bl: #00d4ff; --gr: #39ff14; --rd: #ff3131; --bg: #05070a; --cd: #0d1117; }
+        body { font-family: 'Courier New', monospace; background: var(--bg); color: #fff; padding: 20px; }
+        .container { max-width: 900px; margin: auto; border: 1px solid #30363d; border-radius: 8px; background: var(--cd); overflow: hidden; box-shadow: 0 0 40px rgba(0,0,0,0.8); }
+        .header { background: #161b22; padding: 20px; border-bottom: 2px solid var(--gr); display: flex; justify-content: space-between; align-items: center; }
+        .header h1 { margin: 0; color: var(--gr); font-size: 1.4rem; text-transform: uppercase; letter-spacing: 2px; }
         .main-content { padding: 25px; }
-
-        .alert-box { background: #000; border: 1px solid #30363d; padding: 20px; border-radius: 6px; margin-bottom: 25px; color: #ffca28; font-family: 'Consolas', monospace; font-size: 1rem; border-left: 5px solid #ffca28; }
-        
-        .question-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 25px; margin-bottom: 25px; }
-        .question-item label { display: block; margin-bottom: 12px; font-weight: bold; font-size: 0.85rem; text-transform: uppercase; color: var(--blue); }
-
-        .options-group { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
-        .opt { background: #21262d; border: 1px solid #30363d; padding: 12px; border-radius: 4px; cursor: pointer; text-align: center; font-size: 0.8rem; transition: 0.2s; }
-        .opt:hover { border-color: var(--green); }
-        .opt.selected { background: var(--green); color: #000; font-weight: bold; border-color: var(--green); }
-
-        .impact-group { grid-template-columns: repeat(3, 1fr); }
-
-        select { width: 100%; padding: 12px; background: #21262d; color: white; border: 1px solid #30363d; border-radius: 4px; outline: none; font-size: 0.9rem; }
-        select:focus { border-color: var(--green); }
-
-        .btn-validate { width: 100%; padding: 18px; background: var(--green); color: #000; border: none; border-radius: 4px; font-weight: bold; cursor: pointer; text-transform: uppercase; font-size: 1rem; margin-top: 20px; }
-        .btn-validate:hover { background: #32e112; box-shadow: 0 0 20px rgba(57, 255, 20, 0.4); }
-
-        #result { margin-top: 20px; padding: 15px; border-radius: 4px; text-align: center; display: none; font-weight: bold; }
+        .alert-box { background: #000; border: 1px solid #333; padding: 20px; border-radius: 6px; margin-bottom: 25px; color: #ffca28; font-size: 0.95rem; border-left: 5px solid #ffca28; min-height: 60px; }
+        .q-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 25px; }
+        label { display: block; margin-bottom: 12px; font-weight: bold; font-size: 0.75rem; color: var(--bl); text-transform: uppercase; }
+        .o-grp { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; }
+        .i-grp { grid-template-columns: repeat(3, 1fr); }
+        .opt { background: #1a1f26; border: 1px solid #333; padding: 12px; border-radius: 4px; cursor: pointer; text-align: center; font-size: 0.75rem; transition: 0.2s; }
+        .opt:hover { border-color: var(--gr); }
+        .opt.sel { background: var(--gr); color: #000; font-weight: bold; }
+        select { width: 100%; padding: 12px; background: #1a1f26; color: white; border: 1px solid #333; border-radius: 4px; font-family: inherit; font-size: 0.85rem; cursor: pointer; }
+        .btn-v { width: 100%; padding: 18px; background: transparent; color: var(--gr); border: 1px solid var(--gr); border-radius: 4px; font-weight: bold; cursor: pointer; text-transform: uppercase; transition: 0.3s; }
+        .btn-v:hover { background: var(--gr); color: #000; box-shadow: 0 0 20px rgba(57, 255, 20, 0.3); }
+        #res { margin-top: 20px; padding: 15px; border-radius: 4px; text-align: center; display: none; font-size: 0.85rem; }
     </style>
 </head>
 <body>
 
 <div class="container">
     <div class="header">
-        <div class="header-title">
-            <h1>Atividade 07</h1>
-            <small>ANÁLISE DE VULNERABILIDADE</small>
-        </div>
-        <div class="case-counter" id="counter">CASO: 1 / 6</div>
+        <h1>VULN_ANALYSIS_V7</h1>
+        <div id="cnt" style="color:var(--gr); font-size: 0.9rem;">CASO: 0 / 0</div>
     </div>
 
     <div class="main-content">
-        <div class="alert-box" id="alert-text">
-            CARREGANDO ALERTA DO SIEM...
-        </div>
+        <div class="alert-box" id="alert-stream">Initializing forensic stream...</div>
 
-        <div class="question-grid">
-            <div class="question-item">
-                <label>1. Tipo da Vulnerabilidade</label>
-                <div class="options-group" id="type-group">
-                    <div class="opt" onclick="sel('type', this)">Configuração</div>
-                    <div class="opt" onclick="sel('type', this)">Código</div>
-                    <div class="opt" onclick="sel('type', this)">Execução Remota</div>
-                    <div class="opt" onclick="sel('type', this)">Elevação de Privilégio</div>
+        <div class="q-grid">
+            <div>
+                <label>01. VULN_TYPE_IDENTIFICATION</label>
+                <div class="o-grp" id="g-type">
+                    <div class="opt" onclick="_s('t', this, 0)">Configuração</div>
+                    <div class="opt" onclick="_s('t', this, 1)">Código</div>
+                    <div class="opt" onclick="_s('t', this, 2)">Execução Remota</div>
+                    <div class="opt" onclick="_s('t', this, 3)">Elevação de Privilégio</div>
                 </div>
             </div>
-
-            <div class="question-item">
-                <label>2. Impacto Potencial</label>
-                <div class="options-group impact-group">
-                    <div class="opt" onclick="sel('impact', this)">Baixo</div>
-                    <div class="opt" onclick="sel('impact', this)">Médio</div>
-                    <div class="opt" onclick="sel('impact', this)">Alto</div>
+            <div>
+                <label>02. IMPACT_SCOPING</label>
+                <div class="o-grp i-grp" id="g-impact">
+                    <div class="opt" onclick="_s('i', this, 0)">Baixo</div>
+                    <div class="opt" onclick="_s('i', this, 1)">Médio</div>
+                    <div class="opt" onclick="_s('i', this, 2)">Alto</div>
                 </div>
             </div>
         </div>
 
-        <div class="question-item">
-            <label>3. Melhor Ação de Mitigação</label>
-            <select id="mitigation">
-                <option value="">Selecione a ação corretiva...</option>
-                <option value="A">Aplicar Patch/Atualização de segurança imediata</option>
-                <option value="B">Resetar senhas para padrão forte e aplicar MFA</option>
-                <option value="C">Corrigir permissões de ACL e isolar segmento</option>
-                <option value="D">Instalar barreiras físicas e monitoramento local</option>
+        <div style="margin-bottom: 25px;">
+            <label>03. MITIGATION_STRATEGY</label>
+            <select id="mit-sel">
+                <option value="-1">-- SELECT ACTION --</option>
+                <option value="0">Aplicar Patch/Atualização de segurança imediata</option>
+                <option value="1">Resetar senhas para padrão forte e aplicar MFA</option>
+                <option value="2">Corrigir permissões de ACL e isolar segmento</option>
+                <option value="3">Instalar barreiras físicas e monitoramento local</option>
             </select>
         </div>
 
-        <button class="btn-validate" onclick="validate()">Validar Diagnóstico</button>
-        <div id="result"></div>
+        <button class="btn-v" onclick="_validate()">VERIFY_DIAGNOSTIC</button>
+        <div id="res"></div>
     </div>
 </div>
 
 <script>
-    const cases = [
-        {
-            alert: '"Servidor Apache Tomcat (WEB-01) desatualizado permitindo execução de código remoto (RCE)."',
-            type: "Execução Remota", impact: "Alto", mitigation: "A"
-        },
-        {
-            alert: '"Banco de Dados (DB-PROD) acessível via internet com usuário admin e senha padrão fábrica."',
-            type: "Configuração", impact: "Alto", mitigation: "B"
-        },
-        {
-            alert: '"Detecção de biblioteca Log4j v2.14 em aplicação crítica de processamento de dados."',
-            type: "Código", impact: "Alto", mitigation: "A"
-        },
-        {
-            alert: '"Usuário de nível estagiário possui permissão de leitura/escrita no diretório raiz do sistema."',
-            type: "Elevação de Privilégio", impact: "Alto", mitigation: "C"
-        },
-        {
-            alert: '"Roteador de borda com protocolo Telnet ativo e sem restrição de IPs de gerência."',
-            type: "Configuração", impact: "Médio", mitigation: "C"
-        },
-        {
-            alert: '"Terminal de autoatendimento físico com portas USB expostas e sem trava de segurança."',
-            type: "Configuração", impact: "Médio", mitigation: "D"
-        }
+(function(){
+    // Casos protegidos por índices numéricos
+    const _DATA = [
+        { q: '"Apache Tomcat (WEB-01) RCE detected via outdated service."', t: 2, i: 2, m: 0 },
+        { q: '"DB-PROD exposed on 0.0.0.0 with default root:root credentials."', t: 0, i: 2, m: 1 },
+        { q: '"Log4j v2.14 JNDI lookup vulnerability in core application."', t: 1, i: 2, m: 0 },
+        { q: '"Non-admin user 'dev_guest' has full sudoers access in root dir."', t: 3, i: 2, m: 2 },
+        { q: '"Edge Router: Telnet enabled on WAN interface without IP ACLs."', t: 0, i: 1, m: 2 },
+        { q: '"Kiosk Terminal: Front-facing USB ports unlocked and active."', t: 0, i: 1, m: 3 }
     ];
 
-    let currentCase = 0;
-    let choices = { type: "", impact: "" };
+    let _idx = 0, _sel = { t: -1, i: -1 };
 
-    function loadCase() {
-        const c = cases[currentCase];
-        document.getElementById('alert-text').innerText = c.alert;
-        document.getElementById('counter').innerText = `CASO: ${currentCase + 1} / ${cases.length}`;
-        document.getElementById('result').style.display = "none";
-        document.getElementById('mitigation').value = "";
-        document.querySelectorAll('.opt').forEach(o => o.classList.remove('selected'));
-        choices = { type: "", impact: "" };
+    function _load() {
+        const c = _DATA[_idx];
+        document.getElementById('alert-stream').innerText = `[ALERT]: ${c.q}`;
+        document.getElementById('cnt').innerText = `CASE: ${_idx + 1} / ${_DATA.length}`;
+        document.getElementById('res').style.display = "none";
+        document.getElementById('mit-sel').value = "-1";
+        document.querySelectorAll('.opt').forEach(o => o.classList.remove('sel'));
+        _sel = { t: -1, i: -1 };
     }
 
-    function sel(cat, el) {
-        el.parentElement.querySelectorAll('.opt').forEach(o => o.classList.remove('selected'));
-        el.classList.add('selected');
-        choices[cat] = el.innerText;
-    }
+    window._s = function(cat, el, val) {
+        el.parentElement.querySelectorAll('.opt').forEach(o => o.classList.remove('sel'));
+        el.classList.add('sel');
+        _sel[cat] = val;
+    };
 
-    function validate() {
-        const mit = document.getElementById('mitigation').value;
-        const res = document.getElementById('result');
-        const c = cases[currentCase];
+    window._validate = function() {
+        const mit = parseInt(document.getElementById('mit-sel').value);
+        const r = document.getElementById('res');
+        const c = _DATA[_idx];
 
-        const isCorrect = 
-            choices.type === c.type && 
-            choices.impact === c.impact && 
-            mit === c.mitigation;
+        const win = (_sel.t === c.t && _sel.i === c.i && mit === c.m);
+        r.style.display = "block";
 
-        res.style.display = "block";
-
-        if(isCorrect) {
-            res.innerHTML = "🎯 DIAGNÓSTICO CORRETO! Procedendo para o próximo alerta...";
-            res.style.color = "var(--green)";
-            res.style.border = "1px solid var(--green)";
+        if(win) {
+            r.innerHTML = ">> STATUS: SUCCESS. DIAGNOSTIC_MATCHED. Loading next buffer...";
+            r.style.color = "var(--gr)";
+            r.style.border = "1px solid var(--gr)";
             
             setTimeout(() => {
-                currentCase++;
-                if(currentCase < cases.length) {
-                    loadCase();
-                } else {
-                    document.querySelector('.main-content').innerHTML = "<h2 style='color:var(--green); text-align:center;'>🏆 EXCELENTE!<br>Você concluiu todas as análises do Blue Team.</h2>";
+                _idx++;
+                if(_idx < _DATA.length) { _load(); } 
+                else {
+                    document.querySelector('.main-content').innerHTML = "<h2 style='color:var(--gr); text-align:center;'>MISSION_COMPLETE<br>System integrity secured by Blue Team.</h2>";
                 }
-            }, 2000);
+            }, 1800);
         } else {
-            res.innerHTML = "❌ ERRO NA ANÁLISE! Reavalie o tipo de ameaça e a mitigação.";
-            res.style.color = "var(--red)";
-            res.style.border = "1px solid var(--red)";
+            r.innerHTML = ">> STATUS: ERROR. MISMATCHED_VULN_DATA. Re-evaluate alert.";
+            r.style.color = "var(--rd)";
+            r.style.border = "1px solid var(--rd)";
         }
-    }
+    };
 
-    loadCase();
+    _load();
+})();
 </script>
-
 </body>
 </html>
