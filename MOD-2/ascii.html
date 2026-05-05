@@ -7,21 +7,21 @@
         :root { --cyan: #00f2ff; --yellow: #ffd700; --bg: #0a0a0a; }
         body { background: var(--bg); color: var(--cyan); font-family: 'Courier New', monospace; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; margin: 0; }
         .hex-editor { background: #000; border: 2px solid var(--yellow); padding: 25px; box-shadow: 0 0 30px rgba(0,242,255,0.15); width: 90%; max-width: 650px; }
-        .header { color: var(--yellow); text-align: center; border-bottom: 1px solid #333; margin-bottom: 20px; padding-bottom: 10px; font-weight: bold; }
+        .header { color: var(--yellow); text-align: center; border-bottom: 1px solid #333; margin-bottom: 20px; padding-bottom: 10px; font-weight: bold; text-transform: uppercase; }
         .dump-container { display: flex; justify-content: space-between; background: #080808; padding: 20px; border: 1px solid #222; }
         .offset { color: #555; margin-right: 20px; }
         .hex-values { color: #fff; letter-spacing: 4px; line-height: 1.6; }
         .ascii-sidebar { color: #111; border-left: 1px solid #222; padding-left: 20px; }
         .input-area { margin-top: 30px; text-align: center; border-top: 1px solid #222; padding-top: 20px; }
-        input { background: #000; border: 1px solid var(--cyan); color: var(--yellow); padding: 12px; width: 280px; text-align: center; font-size: 1rem; outline: none; }
-        button { background: var(--yellow); color: #000; border: none; padding: 12px 30px; cursor: pointer; font-weight: bold; margin-left: 10px; }
-        #status { margin-top: 20px; font-weight: bold; min-height: 24px; text-align: center; }
+        input { background: #000; border: 1px solid var(--cyan); color: var(--yellow); padding: 12px; width: 280px; text-align: center; font-size: 1rem; outline: none; font-family: inherit; }
+        button { background: var(--yellow); color: #000; border: none; padding: 12px 30px; cursor: pointer; font-weight: bold; margin-left: 10px; font-family: inherit; }
+        #status { margin-top: 20px; font-weight: bold; min-height: 24px; text-align: center; font-size: 0.9rem; }
     </style>
 </head>
 <body>
 
     <div class="hex-editor">
-        <div class="header">MEMORY_DUMP_0x0045.DAT :: DECODE_CHALLENGE</div>
+        <div class="header">DUMP_READER :: VOLATILE_MEMORY_0x45</div>
         
         <div class="dump-container">
             <div class="offset">00000000<br>00000008</div>
@@ -33,44 +33,42 @@
         </div>
 
         <div class="input-area">
-            <p style="color: var(--yellow); font-size: 0.8rem; margin-bottom: 15px;">> TRADUZA O HEX PARA ASCII (DICA: 46=F, 21=!):</p>
-            <input type="text" id="flagInput" placeholder="TEXTO_AQUI" autocomplete="off">
-            <button onclick="checkFlag()">DECODE</button>
+            <p style="color: var(--yellow); font-size: 0.8rem; margin-bottom: 15px;">> RECONSTRUA A STRING ASCII DOS BYTES ACIMA:</p>
+            <input type="text" id="flagInput" placeholder="FLAG_AQUI" autocomplete="off">
+            <button onclick="validate()">VALIDAR</button>
         </div>
 
         <div id="status"></div>
     </div>
 
     <script>
-        // Função SHA-256 para esconder a flag no código
-        async function getHash(str) {
-            const buffer = new TextEncoder().encode(str);
-            const hash = await crypto.subtle.digest('SHA-256', buffer);
-            return Array.from(new Uint8Array(hash)).map(b => b.toString(16).padStart(2, '0')).join('');
-        }
-
-        async function checkFlag() {
+        function validate() {
             const el = document.getElementById('flagInput');
             const status = document.getElementById('status');
-            
-           
             const val = el.value.trim().toUpperCase();
+
             
            
-            const target = "e87f58385311e9f19318f78082987118d0987c95e1e0d37e1b69d9f104d41285";
+            const secret = [70, 73, 65, 80, 95, 66, 76, 85, 69, 95, 84, 69, 65, 77, 33];
             
-            if (!val) return;
+          
+            const key = String.fromCharCode(...secret);
 
-            const inputHash = await getHash(val);
+            if (val === "") return;
 
-            if (inputHash === target) {
+            if (val === key) {
                 status.style.color = "#39ff14";
-                status.innerHTML = "🎯 SUCESSO: CREDENCIAL '" + val + "' VALIDADA.";
+                status.innerHTML = "🎯 SUCESSO: CREDENCIAL '" + val + "' RECONHECIDA.";
             } else {
                 status.style.color = "#ff3131";
-                status.innerHTML = "❌ ERRO: HASH DE INTEGRIDADE INVÁLIDO.";
+                status.innerHTML = "❌ ERRO: TRADUÇÃO INCORRETA OU BYTES CORROMPIDOS.";
             }
         }
+
+
+        document.getElementById('flagInput').addEventListener('keypress', function (e) {
+            if (e.key === 'Enter') validate();
+        });
     </script>
 </body>
 </html>
