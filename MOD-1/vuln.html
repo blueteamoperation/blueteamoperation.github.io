@@ -10,7 +10,7 @@
         .header { background: #161b22; padding: 20px; border-bottom: 2px solid var(--gr); display: flex; justify-content: space-between; align-items: center; }
         .header h1 { margin: 0; color: var(--gr); font-size: 1.4rem; text-transform: uppercase; letter-spacing: 2px; }
         .main-content { padding: 25px; }
-        .alert-box { background: #000; border: 1px solid #333; padding: 20px; border-radius: 6px; margin-bottom: 25px; color: #ffca28; font-size: 0.95rem; border-left: 5px solid #ffca28; min-height: 60px; }
+        .alert-box { background: #000; border: 1px solid #333; padding: 20px; border-radius: 6px; margin-bottom: 25px; color: #ffca28; font-size: 0.95rem; border-left: 5px solid #ffca28; min-height: 60px; line-height: 1.4; }
         .q-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 25px; }
         label { display: block; margin-bottom: 12px; font-weight: bold; font-size: 0.75rem; color: var(--bl); text-transform: uppercase; }
         .o-grp { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; }
@@ -18,10 +18,10 @@
         .opt { background: #1a1f26; border: 1px solid #333; padding: 12px; border-radius: 4px; cursor: pointer; text-align: center; font-size: 0.75rem; transition: 0.2s; }
         .opt:hover { border-color: var(--gr); }
         .opt.sel { background: var(--gr); color: #000; font-weight: bold; }
-        select { width: 100%; padding: 12px; background: #1a1f26; color: white; border: 1px solid #333; border-radius: 4px; font-family: inherit; font-size: 0.85rem; cursor: pointer; }
+        select { width: 100%; padding: 12px; background: #1a1f26; color: white; border: 1px solid #333; border-radius: 4px; font-family: inherit; font-size: 0.85rem; cursor: pointer; outline: none; }
         .btn-v { width: 100%; padding: 18px; background: transparent; color: var(--gr); border: 1px solid var(--gr); border-radius: 4px; font-weight: bold; cursor: pointer; text-transform: uppercase; transition: 0.3s; }
         .btn-v:hover { background: var(--gr); color: #000; box-shadow: 0 0 20px rgba(57, 255, 20, 0.3); }
-        #res { margin-top: 20px; padding: 15px; border-radius: 4px; text-align: center; display: none; font-size: 0.85rem; }
+        #res { margin-top: 20px; padding: 15px; border-radius: 4px; text-align: center; display: none; font-size: 0.85rem; font-weight: bold; }
     </style>
 </head>
 <body>
@@ -29,15 +29,17 @@
 <div class="container">
     <div class="header">
         <h1>VULN_ANALYSIS_V7</h1>
-        <div id="cnt" style="color:var(--gr); font-size: 0.9rem;">CASO: 0 / 0</div>
+        <div id="cnt" style="color:var(--gr); font-size: 0.9rem;">CASO: 1 / 6</div>
     </div>
 
     <div class="main-content">
-        <div class="alert-box" id="alert-stream">Initializing forensic stream...</div>
+        <div class="alert-box" id="alert-stream">
+            Iniciando análise de tráfego...
+        </div>
 
         <div class="q-grid">
             <div>
-                <label>01. VULN_TYPE_IDENTIFICATION</label>
+                <label>01. TIPO DA VULNERABILIDADE</label>
                 <div class="o-grp" id="g-type">
                     <div class="opt" onclick="_s('t', this, 0)">Configuração</div>
                     <div class="opt" onclick="_s('t', this, 1)">Código</div>
@@ -46,7 +48,7 @@
                 </div>
             </div>
             <div>
-                <label>02. IMPACT_SCOPING</label>
+                <label>02. IMPACTO POTENCIAL</label>
                 <div class="o-grp i-grp" id="g-impact">
                     <div class="opt" onclick="_s('i', this, 0)">Baixo</div>
                     <div class="opt" onclick="_s('i', this, 1)">Médio</div>
@@ -56,9 +58,9 @@
         </div>
 
         <div style="margin-bottom: 25px;">
-            <label>03. MITIGATION_STRATEGY</label>
+            <label>03. MELHOR AÇÃO DE MITIGAÇÃO</label>
             <select id="mit-sel">
-                <option value="-1">-- SELECT ACTION --</option>
+                <option value="-1">-- SELECIONE A AÇÃO --</option>
                 <option value="0">Aplicar Patch/Atualização de segurança imediata</option>
                 <option value="1">Resetar senhas para padrão forte e aplicar MFA</option>
                 <option value="2">Corrigir permissões de ACL e isolar segmento</option>
@@ -66,68 +68,78 @@
             </select>
         </div>
 
-        <button class="btn-v" onclick="_validate()">VERIFY_DIAGNOSTIC</button>
+        <button class="btn-v" onclick="_validate()">VALIDAR DIAGNÓSTICO</button>
         <div id="res"></div>
     </div>
 </div>
 
 <script>
 (function(){
-    // Casos protegidos por índices numéricos
-    const _DATA = [
-        { q: '"Apache Tomcat (WEB-01) RCE detected via outdated service."', t: 2, i: 2, m: 0 },
-        { q: '"DB-PROD exposed on 0.0.0.0 with default root:root credentials."', t: 0, i: 2, m: 1 },
-        { q: '"Log4j v2.14 JNDI lookup vulnerability in core application."', t: 1, i: 2, m: 0 },
-        { q: '"Non-admin user 'dev_guest' has full sudoers access in root dir."', t: 3, i: 2, m: 2 },
-        { q: '"Edge Router: Telnet enabled on WAN interface without IP ACLs."', t: 0, i: 1, m: 2 },
-        { q: '"Kiosk Terminal: Front-facing USB ports unlocked and active."', t: 0, i: 1, m: 3 }
+    // Base de dados dos casos (Texto puro para evitar erros de renderização)
+    const _D = [
+        { q: "Servidor Apache Tomcat (WEB-01) desatualizado permitindo execução de código remoto (RCE).", t: 2, i: 2, m: 0 },
+        { q: "Banco de Dados (DB-PROD) acessível via internet com usuário admin e senha padrão fábrica.", t: 0, i: 2, m: 1 },
+        { q: "Detecção de biblioteca Log4j v2.14 em aplicação crítica de processamento de dados.", t: 1, i: 2, m: 0 },
+        { q: "Usuário de nível estagiário possui permissão de leitura/escrita no diretório raiz do sistema.", t: 3, i: 2, m: 2 },
+        { q: "Roteador de borda com protocolo Telnet ativo e sem restrição de IPs de gerência.", t: 0, i: 1, m: 2 },
+        { q: "Terminal de autoatendimento físico com portas USB expostas e sem trava de segurança.", t: 0, i: 1, m: 3 }
     ];
 
-    let _idx = 0, _sel = { t: -1, i: -1 };
+    let _idx = 0;
+    let _sel = { t: -1, i: -1 };
 
+    // Função que carrega o caso atual na tela
     function _load() {
-        const c = _DATA[_idx];
-        document.getElementById('alert-stream').innerText = `[ALERT]: ${c.q}`;
-        document.getElementById('cnt').innerText = `CASE: ${_idx + 1} / ${_DATA.length}`;
+        if (_idx >= _D.length) {
+            document.querySelector('.main-content').innerHTML = "<h2 style='color:var(--gr); text-align:center;'>🏆 MISSÃO CONCLUÍDA!<br>Você analisou todas as vulnerabilidades com sucesso.</h2>";
+            return;
+        }
+        const c = _D[_idx];
+        document.getElementById('alert-stream').innerText = `[ALERTA]: "${c.q}"`;
+        document.getElementById('cnt').innerText = `CASO: ${_idx + 1} / ${_D.length}`;
         document.getElementById('res').style.display = "none";
         document.getElementById('mit-sel').value = "-1";
+        
+        // Reseta as cores dos botões
         document.querySelectorAll('.opt').forEach(o => o.classList.remove('sel'));
         _sel = { t: -1, i: -1 };
     }
 
+    // Função para selecionar as opções (tipo e impacto)
     window._s = function(cat, el, val) {
         el.parentElement.querySelectorAll('.opt').forEach(o => o.classList.remove('sel'));
         el.classList.add('sel');
         _sel[cat] = val;
     };
 
+    // Função de validação
     window._validate = function() {
         const mit = parseInt(document.getElementById('mit-sel').value);
         const r = document.getElementById('res');
-        const c = _DATA[_idx];
+        const current = _D[_idx];
 
-        const win = (_sel.t === c.t && _sel.i === c.i && mit === c.m);
+        // Verifica se a escolha numérica do usuário bate com o gabarito numérico
+        const isCorrect = (_sel.t === current.t && _sel.i === current.i && mit === current.m);
+        
         r.style.display = "block";
 
-        if(win) {
-            r.innerHTML = ">> STATUS: SUCCESS. DIAGNOSTIC_MATCHED. Loading next buffer...";
+        if(isCorrect) {
+            r.innerText = "🎯 DIAGNÓSTICO CORRETO! Analisando próximo buffer...";
             r.style.color = "var(--gr)";
             r.style.border = "1px solid var(--gr)";
             
             setTimeout(() => {
                 _idx++;
-                if(_idx < _DATA.length) { _load(); } 
-                else {
-                    document.querySelector('.main-content').innerHTML = "<h2 style='color:var(--gr); text-align:center;'>MISSION_COMPLETE<br>System integrity secured by Blue Team.</h2>";
-                }
-            }, 1800);
+                _load();
+            }, 1500);
         } else {
-            r.innerHTML = ">> STATUS: ERROR. MISMATCHED_VULN_DATA. Re-evaluate alert.";
+            r.innerText = "❌ ERRO NA ANÁLISE! Verifique os detalhes do alerta e a mitigação.";
             r.style.color = "var(--rd)";
             r.style.border = "1px solid var(--rd)";
         }
     };
 
+    // Inicialização
     _load();
 })();
 </script>
