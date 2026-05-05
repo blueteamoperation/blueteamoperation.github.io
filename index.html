@@ -9,10 +9,9 @@
         :root {
             --bg-color: #0a0a0a;
             --container-bg: #0f0f0f;
-            --accent-orange: #ff6600;
+            --accent-cyan: #00ffff; /* Cor Ciano Neon */
             --text-gray: #a0a0a0;
-            --border-color: #222;
-            --terminal-green: #00ff41;
+            --border-color: #1a3a3a;
         }
 
         body {
@@ -23,25 +22,23 @@
             line-height: 1.6;
         }
 
-        /* Scanline Effect (Opcional, estilo monitor antigo) */
         body::before {
             content: " ";
             display: block;
             position: fixed;
             top: 0; left: 0; bottom: 0; right: 0;
-            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), 
-                        linear-gradient(90deg, rgba(255, 0, 0, 0.02), rgba(0, 255, 0, 0.01), rgba(0, 0, 255, 0.02));
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.2) 50%), 
+                        linear-gradient(90deg, rgba(0, 255, 255, 0.02), rgba(0, 255, 0, 0.01), rgba(0, 255, 255, 0.02));
             z-index: 9999;
             pointer-events: none;
             background-size: 100% 4px, 3px 100%;
         }
 
-        /* BANNER */
         .header-banner {
             width: 100%;
             height: 350px;
             overflow: hidden;
-            border-bottom: 3px solid var(--accent-orange);
+            border-bottom: 3px solid var(--accent-cyan);
             position: relative;
         }
 
@@ -49,19 +46,9 @@
             width: 100%;
             height: 100%;
             object-fit: cover;
-            filter: grayscale(100%) contrast(120%) brightness(50%);
+            filter: grayscale(100%) contrast(120%) brightness(40%);
         }
 
-        .header-overlay {
-            position: absolute;
-            bottom: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            text-align: center;
-            width: 100%;
-        }
-
-        /* CONTAINER */
         .container {
             max-width: 900px;
             margin: -50px auto 50px;
@@ -69,22 +56,20 @@
             background: var(--container-bg);
             border: 1px solid var(--border-color);
             position: relative;
-            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+            box-shadow: 0 20px 50px rgba(0,0,0,0.8);
         }
 
-        /* TÍTULO PRINCIPAL */
         h1.main-title {
-            color: var(--accent-orange);
+            color: var(--accent-cyan);
             font-size: 24px;
             text-transform: uppercase;
             letter-spacing: 5px;
             margin-bottom: 5px;
-            text-shadow: 2px 2px 0px rgba(0,0,0,1);
         }
 
         .status-bar {
             font-size: 10px;
-            color: var(--accent-orange);
+            color: var(--accent-cyan);
             border-bottom: 1px solid var(--border-color);
             padding-bottom: 15px;
             margin-bottom: 30px;
@@ -92,44 +77,32 @@
             justify-content: space-between;
         }
 
-        /* SEÇÕES */
         .section {
             margin-bottom: 40px;
         }
 
         .section h2 {
             font-size: 14px;
-            color: var(--accent-orange);
-            background: rgba(255, 102, 0, 0.1);
+            color: var(--accent-cyan);
+            background: rgba(0, 255, 255, 0.05);
             padding: 8px 15px;
-            border-left: 4px solid var(--accent-orange);
+            border-left: 4px solid var(--accent-cyan);
             text-transform: uppercase;
             display: flex;
             justify-content: space-between;
         }
 
-        .section h2::after {
-            content: "[SEC_LEVEL_4]";
-            font-size: 10px;
-            opacity: 0.5;
-        }
-
-        /* LINKS / LISTA */
-        ul {
-            list-style: none;
-            padding: 0;
-            margin-left: 10px;
-        }
+        ul { list-style: none; padding: 0; margin-left: 10px; }
 
         li {
             margin: 12px 0;
-            border-bottom: 1px dashed #1a1a1a;
+            border-bottom: 1px dashed #1a3a3a;
             padding-bottom: 5px;
         }
 
         li::before {
             content: "> ";
-            color: var(--accent-orange);
+            color: var(--accent-cyan);
         }
 
         a {
@@ -140,29 +113,18 @@
         }
 
         a:hover {
-            color: var(--accent-orange);
+            color: var(--accent-cyan);
             padding-left: 10px;
+            text-shadow: 0 0 8px rgba(0, 255, 255, 0.5);
         }
 
-        /* FOOTER */
         .footer {
             text-align: center;
             font-size: 10px;
-            color: #444;
+            color: #333;
             margin-top: 60px;
             letter-spacing: 2px;
-            text-transform: uppercase;
         }
-
-        /* DETALHES FORENSES */
-        .id-badge {
-            font-size: 10px;
-            color: #333;
-            position: absolute;
-            top: 10px;
-            right: 10px;
-        }
-
     </style>
 </head>
 <body>
@@ -172,18 +134,12 @@
 </div>
 
 <div class="container">
-    <div class="id-badge">FILE_ID: BT-OPS-2024</div>
-    
     <h1 class="main-title">BLUE TEAM OPERATION</h1>
     <div class="status-bar">
-        <span>STATUS: EN ANDAMENTO</span>
-        <span>LOCATION: ANALYTICS_LAB_01</span>
-        <span>USER: ANONYMOUS</span>
+        <span>STATUS: ACTIVE_INVESTIGATION</span>
+        <span>SYSTEM: DFIR_TERMINAL</span>
+        <span>ACCESS: ROOT</span>
     </div>
-
-    <p style="font-size: 13px; color: #666; margin-bottom: 30px;">
-        // Repositório central de artefatos e evidências forenses.
-    </p>
 
     <div class="section">
         <h2>Módulo 01 - Fundamentos</h2>
@@ -191,34 +147,13 @@
             <li><a href="https://blueteamoperation.github.io/MOD-1/ri.html" target="_blank">Ciclo de Resposta a Incidentes</a></li>
             <li><a href="https://blueteamoperation.github.io/MOD-1/matriz.html" target="_blank">Análise de Matriz de Risco</a></li>
             <li><a href="https://blueteamoperation.github.io/MOD-1/kill.html" target="_blank">Cyber Kill Chain Analysis</a></li>
-            <li><a href="https://blueteamoperation.github.io/MOD-1/ceh.html" target="_blank">Metodologia C|EH</a></li>
-            <li><a href="https://blueteamoperation.github.io/MOD-1/dfir.html" target="_blank">DFIR em Ação</a></li>
-            <li><a href="https://blueteamoperation.github.io/MOD-1/vetores.html" target="_blank">Mapeamento de Vetores</a></li>
         </ul>
     </div>
 
-    <div class="section">
-        <h2>Módulo 02 - Análise de Dados</h2>
-        <ul>
-            <li><a href="https://blueteamoperation.github.io/MOD-2/conv.html" target="_blank">Conversão de Dados Brutos</a></li>
-            <li><a href="https://blueteamoperation.github.io/MOD-2/endian.html" target="_blank">Endianness & Byte Order</a></li>
-            <li><a href="https://blueteamoperation.github.io/MOD-2/mustang.html" target="_blank">Operação Mustang Vermelho</a></li>
-            <li><a href="https://blueteamoperation.github.io/MOD-2/magic.html" target="_blank">Magic Numbers Discovery</a></li>
-            <li><a href="https://blueteamoperation.github.io/MOD-2/steg.html" target="_blank">Esteganografia: Hidden Data</a></li>
-        </ul>
-    </div>
-
-    <div class="section">
-        <h2>Módulo 03 - Logs & Artifacts</h2>
-        <ul>
-            <li><a href="https://blueteamoperation.github.io/MOD-3/apache.html" target="_blank">Apache Web Logs Analysis</a></li>
-            <li><a href="https://blueteamoperation.github.io/MOD-3/linuxlog.html" target="_blank">Linux System Logs</a></li>
-        </ul>
-    </div>
+    <!-- Adicione os outros módulos aqui seguindo o mesmo padrão -->
 
     <div class="footer">
-        --- END OF FILE --- <br>
-        BlueTeamOps • Digital Forensics & Incident Response
+        --- END OF SESSION ---
     </div>
 </div>
 
