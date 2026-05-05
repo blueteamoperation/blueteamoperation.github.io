@@ -48,7 +48,7 @@
 
 <script>
 (function(){
-    // Array de dados ofuscado
+
     const _0xData = [
         ["NTAwLjAwMCByZXF1aXNpw6fDtWVzIHBvciBzZWd1bmRvIHZpbmRhcyBkZSBJUHMgbXVuZGlhaXMsIGRlcnJ1YmFuZG8gbyBzZXJ2aWRvci4=", "RERvUw=="],
         ["TyB1c3XDoXJpbyByZWNlYmV1IHVtIGUtbWFpbCBpZMOqbnRpY28gYW8gZG8gYmFuY28gcGVkaW5kbyBhdHVhbGl6YcOnw6NvIGRlIHNlbmhhLg==", "UGhpc2hpbmc="],
@@ -64,7 +64,7 @@
 
     let _idx = 0, _hits = 0;
     
-    // Função de decodificação UTF-8
+   
     const _dec = (s) => decodeURIComponent(atob(s).split('').map(c => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2)).join(''));
     const _allAnsw = _0xData.map(x => _dec(x[1]));
 
