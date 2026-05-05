@@ -2,7 +2,7 @@
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <title>Sytem-Security-Check | Magic Numbers</title>
+    <title>Sytem-Security-Check | Forensic Lab</title>
     <style>
         :root { --cyber-blue: #00d4ff; --cyber-yellow: #ffca28; --bg: #05080a; --card: #10141b; }
         body { font-family: 'Consolas', monospace; background: var(--bg); color: #e0e0e0; padding: 20px; display: flex; flex-direction: column; align-items: center; }
@@ -11,9 +11,9 @@
         .header h1 { margin: 0; color: var(--cyber-blue); text-transform: uppercase; letter-spacing: 2px; font-size: 1.3rem; }
         .main-content { padding: 30px; }
         .file-info { display: flex; align-items: center; gap: 20px; background: #1c2128; padding: 15px; border-radius: 8px; margin-bottom: 20px; border-left: 5px solid var(--cyber-yellow); }
-        .hex-viewer { background: #000; color: #00ff00; padding: 20px; border-radius: 6px; font-size: 0.9rem; line-height: 1.5; border: 1px solid #333; margin-bottom: 25px; overflow-x: auto; }
+        .hex-viewer { background: #000; color: #00ff00; padding: 20px; border-radius: 6px; font-size: 0.9rem; line-height: 1.5; border: 1px solid #333; margin-bottom: 25px; }
         .magic-highlight { background: var(--cyber-yellow); color: #000; font-weight: bold; padding: 0 4px; border-radius: 2px; }
-        .options-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 15px; }
+        .options-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
         .opt-btn { background: #161b22; border: 1px solid #30363d; padding: 12px; color: #fff; cursor: pointer; border-radius: 4px; font-family: inherit; transition: 0.2s; }
         .opt-btn:hover { border-color: var(--cyber-blue); }
         .opt-btn.selected { background: var(--cyber-blue); color: #000; font-weight: bold; }
@@ -26,33 +26,33 @@
 <body>
 <div class="container">
     <div class="header">
-        <h1>FORENSIC_HEX_ANALYSIS</h1>
-        <small id="counter" style="color: var(--cyber-yellow)">INIT...</small>
+        <h1>ANALISTA_SOC_L2: MAGIC_NUMBERS</h1>
+        <small id="counter" style="color: var(--cyber-yellow)">LOADING_CASES...</small>
     </div>
     <div class="main-content" id="game-body">
         <div class="file-info">
             <div style="font-size: 2rem;">📄</div>
             <div>
                 <strong>EVIDÊNCIA:</strong> <span id="file-name">---</span><br>
-                <small style="color: #888">DUMP DE MEMÓRIA DO CABEÇALHO DO ARQUIVO</small>
+                <small style="color: #8b949e">ASSINATURA HEXADECIMAL DETECTADA</small>
             </div>
         </div>
         <div class="hex-viewer" id="hex-display"></div>
         <div class="options-grid" id="options"></div>
-        <button class="btn-verify" onclick="check()">VALIDAR ASSINATURA</button>
+        <button class="btn-verify" onclick="_check()">VALIDAR ASSINATURA</button>
         <div id="feedback"></div>
     </div>
 </div>
 
 <script>
 (function(){
-  
+    // Respostas em Base64 para não dar spoiler no código
     const _D = [
-        { n: "imagem_secreta.jpg", h: "89 50 4E 47 0D 0A 1A 0A 00 00 00 0D", m: "89 50 4E 47", t: 236 }, 
-        { n: "documento.pdf", h: "4D 5A 90 00 03 00 00 00 04 00 00 00", m: "4D 5A", t: 224 },       
-        { n: "planilha.xlsx", h: "25 50 44 46 2D 31 2E 34 0A 25 D3 EB", m: "25 50 44 46", t: 214 }, 
-        { n: "musica.mp3", h: "47 49 46 38 39 61 20 00 20 00 F7 00", m: "47 49 46", t: 213 },       
-        { n: "backup.zip", h: "52 61 72 21 1A 07 00 CF 90 73 00 00", m: "52 61 72 21", t: 231 }    
+        { n: "imagem_secreta.jpg", h: "89 50 4E 47 0D 0A 1A 0A 00 00 00 0D", m: "89 50 4E 47", a: "UE5H" }, 
+        { n: "documento.pdf", h: "4D 5A 90 00 03 00 00 00 04 00 00 00", m: "4D 5A", a: "RVhF" },       
+        { n: "planilha.xlsx", h: "25 50 44 46 2D 31 2E 34 0A 25 D3 EB", m: "25 50 44 46", a: "UERG" }, 
+        { n: "musica.mp3", h: "47 49 46 38 39 61 20 00 20 00 F7 00", m: "47 49 46", a: "R0lG" },      
+        { n: "backup.zip", h: "52 61 72 21 1A 07 00 CF 90 73 00 00", m: "52 61 72 21", a: "UkFS" }    
     ];
 
     const types = ["JPEG", "PNG", "PDF", "EXE", "GIF", "ZIP", "RAR", "MP3", "MP4"];
@@ -60,14 +60,13 @@
 
     function render() {
         if (idx >= _D.length) {
-            document.getElementById('game-body').innerHTML = "<h2 style='color:var(--cyber-blue); text-align:center;'>🏆 PERÍCIA CONCLUÍDA!</h2><p style='text-align:center;'>Todas as assinaturas foram identificadas corretamente.</p>";
+            document.getElementById('game-body').innerHTML = "<h2 style='color:var(--cyber-blue); text-align:center;'>🏆 EXAME CONCLUÍDO</h2><p style='text-align:center;'>Todos os arquivos camuflados foram identificados.</p>";
             return;
         }
         const c = _D[idx];
         document.getElementById('file-name').innerText = c.n;
-        document.getElementById('counter').innerText = `NODE: ${idx + 1} / ${_D.length}`;
+        document.getElementById('counter').innerText = `CASE: ${idx + 1} / ${_D.length}`;
         
-        // Renderiza o Hex com destaque no Magic Number
         const hParts = c.h.split(" ");
         const mLen = c.m.split(" ").length;
         document.getElementById('hex-display').innerHTML = `00000000  <span class="magic-highlight">${hParts.slice(0, mLen).join(" ")}</span> ${hParts.slice(mLen).join(" ")}`;
@@ -88,22 +87,19 @@
         document.getElementById('feedback').style.display = "none";
     }
 
-    window.check = function() {
-        const res = document.getElementById('feedback');
+    window._check = function() {
         if(!sel) return;
-
-        // Validação "cega": Calcula o peso da string selecionada
-        let sum = 0;
-        for (let i = 0; i < sel.length; i++) sum += sel.charCodeAt(i);
-
+        const res = document.getElementById('feedback');
         res.style.display = "block";
-        if (sum === _D[idx].t) {
+        
+
+        if (btoa(sel) === _D[idx].a) {
             res.className = "success";
-            res.innerHTML = `✅ IDENTIFICADO! Assinatura compatível com o formato ${sel}.`;
-            setTimeout(() => { idx++; sel = ""; render(); }, 1800);
+            res.innerHTML = `✅ MATCH! Assinatura compatível com o formato ${sel}.`;
+            setTimeout(() => { idx++; sel = ""; render(); }, 1500);
         } else {
             res.className = "error";
-            res.innerText = "❌ FALHA: A assinatura hexadecimal não corresponde ao formato selecionado.";
+            res.innerText = "❌ ERRO: A assinatura não corresponde ao formato selecionado.";
         }
     };
 
