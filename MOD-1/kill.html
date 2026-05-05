@@ -2,32 +2,20 @@
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <title>Desafio Completo: Cyber Kill Chain 7 Etapas</title>
+    <title>Sytem-Integrity-Lab</title>
     <style>
-        :root { --primary: #2ea043; --bg: #0d1117; --card: #161b22; --border: #30363d; --text: #e6edf3; --accent: #58a6ff; }
-        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); padding: 10px; font-size: 14px; }
+        :root { --p: #2ea043; --b: #0d1117; --c: #161b22; --br: #30363d; --t: #e6edf3; --a: #58a6ff; }
+        body { font-family: 'Segoe UI', monospace; background: var(--b); color: var(--text); padding: 10px; font-size: 14px; }
         .container { max-width: 1200px; margin: auto; }
-        
-        .scenario { background: var(--card); border: 1px solid var(--border); padding: 15px; border-radius: 8px; margin-bottom: 20px; border-left: 5px solid var(--accent); line-height: 1.4; }
-        
-        /* Tabela Estilizada */
+        .scenario { background: var(--c); border: 1px solid var(--br); padding: 15px; border-radius: 8px; margin-bottom: 20px; border-left: 5px solid var(--a); line-height: 1.4; color: var(--t); }
         .kill-chain-grid { display: grid; grid-template-columns: 160px 1fr 1fr 1fr; gap: 4px; background: #21262d; padding: 4px; border-radius: 4px; }
-        .t-header { background: #121d14; color: var(--primary); padding: 10px; text-align: center; font-weight: bold; text-transform: uppercase; font-size: 0.75rem; border: 1px solid var(--border); }
-        
-        .phase-name { background: #0d1117; padding: 10px; border: 1px solid var(--border); display: flex; align-items: center; font-weight: bold; color: var(--accent); font-size: 0.85rem; }
-        .drop-zone { background: #161b22; min-height: 50px; border: 1px dashed #444; display: flex; align-items: center; justify-content: center; padding: 5px; text-align: center; transition: 0.3s; }
-        .drop-zone.over { background: #1c2128; border-color: var(--primary); }
-        
-        /* Peças */
-        .bank-section { margin-top: 20px; background: var(--card); padding: 15px; border-radius: 8px; border: 1px solid var(--border); }
-        .items-wrapper { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; }
-        .drag-item { background: #21262d; border: 1px solid var(--border); padding: 6px 10px; border-radius: 4px; cursor: grab; font-size: 0.8rem; width: 180px; text-align: center; }
-        .drag-item:active { cursor: grabbing; }
-
-        .controls { text-align: center; margin: 30px 0; }
-        .btn-check { padding: 15px 60px; background: var(--primary); color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 1rem; }
-        
-        /* Feedback */
+        .t-header { background: #121d14; color: var(--p); padding: 10px; text-align: center; font-weight: bold; text-transform: uppercase; font-size: 0.75rem; border: 1px solid var(--br); }
+        .phase-name { background: #0d1117; padding: 10px; border: 1px solid var(--br); display: flex; align-items: center; font-weight: bold; color: var(--a); font-size: 0.85rem; }
+        .drop-zone { background: #161b22; min-height: 50px; border: 1px dashed #444; display: flex; align-items: center; justify-content: center; padding: 5px; text-align: center; transition: 0.3s; color: #888; }
+        .drop-zone.over { border-color: var(--p); background: #1c2128; }
+        .items-wrapper { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin-top: 20px; padding: 15px; background: var(--c); border: 1px solid var(--br); border-radius: 8px; }
+        .drag-item { background: #21262d; border: 1px solid var(--br); padding: 6px 10px; border-radius: 4px; cursor: grab; font-size: 0.8rem; width: 180px; text-align: center; color: var(--t); }
+        .btn-check { display: block; margin: 30px auto; padding: 15px 60px; background: var(--p); color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; }
         .correct { border: 2px solid #2ea043 !important; background: #122616 !important; }
         .incorrect { border: 2px solid #f85149 !important; background: #2a1215 !important; }
     </style>
@@ -35,33 +23,25 @@
 <body>
 
 <div class="container">
-    <h2 style="text-align:center; color: var(--primary);">Simulador: Cyber Kill Chain (7 Estágios)</h2>
+    <h2 style="text-align:center; color: var(--p);">SIMULATOR: KILL_CHAIN_PROTOCOL</h2>
 
     <div class="scenario">
-        <strong>CENÁRIO DO ATAQUE:</strong> <br>
-        Um grupo APT iniciou um ataque buscando dados financeiros. 1. Pesquisaram IPs da empresa no Shodan. 2. Criaram um script em Python que empacota um Ransomware. 3. O script foi enviado via link em uma mensagem de Teams. 4. Ao clicar, o navegador executou o código devido a um plugin desatualizado. 5. O código baixou e instalou um binário persistente na pasta System32. 6. O malware abriu um túnel DNS com o servidor do invasor. 7. Por fim, todos os servidores de backup foram criptografados.
+        <strong>OPERATIONAL_CASE:</strong> <br>
+        APT detected. 1. Recon via Shodan. 2. Ransomware.py development. 3. Teams link delivery. 4. Browser plugin exploitation. 5. System32 persistence. 6. DNS Beaconing. 7. Backup Encryption.
     </div>
 
-    <div class="kill-chain-grid" id="grid">
-        <div class="t-header">Fase</div>
-        <div class="t-header">Ação do Atacante</div>
-        <div class="t-header">IOC (Indicador)</div>
-        <div class="t-header">Medida de Defesa</div>
-
-        </div>
-
-    <div class="bank-section">
-        <h4 style="margin-top:0; color:var(--accent)">Banco de Elementos (Arraste para a tabela)</h4>
-        <div class="items-wrapper" id="item-bank"></div>
+    <div class="kill-chain-grid" id="main-grid">
+        <div class="t-header">STAGE</div><div class="t-header">ACTION</div><div class="t-header">IOC</div><div class="t-header">DEFENSE</div>
     </div>
 
-    <div class="controls">
-        <button class="btn-check" onclick="verificar()">Validar Operação</button>
-    </div>
+    <div class="items-wrapper" id="bank"></div>
+
+    <button class="btn-check" onclick="validate()">VALIDATE_SYSTEM</button>
 </div>
 
 <script>
-    const phases = [
+(function() {
+    const _P = [
         { n: "1. Reconhecimento", a: "Busca de ativos no Shodan", i: "Logs de varredura externa", d: "Hardening de IPs públicos" },
         { n: "2. Armamento", a: "Desenvolvimento de Ransomware em Python", i: "Alerta de Sandbox (Arquivo gerado)", d: "Análise de ameaças (Threat Intel)" },
         { n: "3. Entrega", a: "Link malicioso via Microsoft Teams", i: "URL suspeita em chat corporativo", d: "Segurança de Mensageria/Web Filter" },
@@ -71,53 +51,61 @@
         { n: "7. Ações sobre Objetivos", a: "Criptografia dos volumes de backup", i: "Aumento súbito de I/O de disco", d: "Backup Offline (Air-gapped)" }
     ];
 
-    const grid = document.getElementById('grid');
-    const bank = document.getElementById('item-bank');
-    let allItems = [];
+    const grid = document.getElementById('main-grid');
+    const bank = document.getElementById('bank');
+    let items = [];
 
-    // Criar a estrutura e misturar itens
-    phases.forEach((p, index) => {
-        // Criar linha na tabela
-        grid.innerHTML += `
-            <div class="phase-name">${p.n}</div>
-            <div class="drop-zone" data-ans="${p.a}"></div>
-            <div class="drop-zone" data-ans="${p.i}"></div>
-            <div class="drop-zone" data-ans="${p.d}"></div>
-        `;
-        // Adicionar itens ao banco (misturados)
-        allItems.push({id: `a${index}`, txt: p.a}, {id: `i${index}`, txt: p.i}, {id: `d${index}`, txt: p.d});
+    // Monta o grid sem expor as respostas no HTML
+    _P.forEach((p, idx) => {
+        grid.innerHTML += `<div class="phase-name">${p.n}</div>
+            <div class="drop-zone" data-r="${idx}-a"></div>
+            <div class="drop-zone" data-r="${idx}-i"></div>
+            <div class="drop-zone" data-r="${idx}-d"></div>`;
+        
+        items.push({id: `${idx}-a`, t: p.a}, {id: `${idx}-i`, t: p.i}, {id: `${idx}-d`, t: p.d});
     });
 
-    // Embaralhar banco
-    allItems.sort(() => Math.random() - 0.5).forEach(item => {
-        bank.innerHTML += `<div class="drag-item" draggable="true" id="${item.id}">${item.txt}</div>`;
+    // Embaralha e gera itens do banco
+    items.sort(() => Math.random() - 0.5).forEach(it => {
+        const d = document.createElement('div');
+        d.className = 'drag-item';
+        d.draggable = true;
+        d.innerText = it.t;
+        d.id = it.id; // O ID do elemento é a chave da resposta
+        d.addEventListener('dragstart', e => { e.dataTransfer.setData('txt', e.target.id); });
+        bank.appendChild(d);
     });
 
-    // Lógica de Drag & Drop
-    let dragged = null;
-    document.addEventListener("dragstart", e => { if(e.target.className === "drag-item") dragged = e.target; });
-    
-    document.querySelectorAll('.drop-zone').forEach(zone => {
-        zone.addEventListener("dragover", e => e.preventDefault());
-        zone.addEventListener("drop", function(e) {
+    // Drag & Drop Handlers
+    document.querySelectorAll('.drop-zone').forEach(z => {
+        z.addEventListener('dragover', e => e.preventDefault());
+        z.addEventListener('dragenter', function() { this.classList.add('over'); });
+        z.addEventListener('dragleave', function() { this.classList.remove('over'); });
+        z.addEventListener('drop', function(e) {
             e.preventDefault();
+            this.classList.remove('over');
+            const dataId = e.dataTransfer.getData('txt');
+            const el = document.getElementById(dataId);
             if(this.children.length > 0) bank.appendChild(this.children[0]);
-            this.appendChild(dragged);
+            this.appendChild(el);
         });
     });
 
-    function verificar() {
-        let corretos = 0;
-        document.querySelectorAll('.drop-zone').forEach(zone => {
-            if(zone.children.length > 0 && zone.innerText === zone.dataset.ans) {
-                zone.className = "drop-zone correct";
-                corretos++;
+    // Validação que não depende de data-ans legível
+    window.validate = function() {
+        let hits = 0;
+        document.querySelectorAll('.drop-zone').forEach(z => {
+            const expected = z.getAttribute('data-r');
+            if(z.children.length > 0 && z.children[0].id === expected) {
+                z.className = "drop-zone correct";
+                hits++;
             } else {
-                zone.className = "drop-zone incorrect";
+                z.className = "drop-zone incorrect";
             }
         });
-        alert(`Você acertou ${corretos} de 21 elementos!`);
-    }
+        alert("SISTEMA_VALIDADO: " + hits + " / 21 ACERTOS.");
+    };
+})();
 </script>
 </body>
 </html>
