@@ -2,138 +2,118 @@
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <title>Desafio: Identificador de Ataques Cibernéticos</title>
+    <title>Sytem-Security-Check</title>
     <style>
-        :root { --neon-green: #39ff14; --neon-blue: #00d4ff; --bg: #05080a; --card: #10141b; }
-        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); color: #e0e0e0; padding: 20px; display: flex; flex-direction: column; align-items: center; }
-        
-        .container { width: 100%; max-width: 900px; background: var(--card); border: 1px solid #30363d; border-radius: 12px; overflow: hidden; box-shadow: 0 0 30px rgba(0,0,0,0.5); }
-        .header { background: #161b22; padding: 20px; border-bottom: 2px solid var(--neon-green); text-align: center; }
-        .header h1 { margin: 0; color: var(--neon-green); text-transform: uppercase; letter-spacing: 2px; font-size: 1.5rem; }
-        
+        :root { --n-g: #39ff14; --n-b: #00d4ff; --bg: #05080a; --cd: #10141b; }
+        body { font-family: 'Consolas', monospace; background: var(--bg); color: #e0e0e0; padding: 20px; display: flex; flex-direction: column; align-items: center; }
+        .container { width: 100%; max-width: 900px; background: var(--cd); border: 1px solid #30363d; border-radius: 12px; overflow: hidden; box-shadow: 0 0 30px rgba(0,0,0,0.5); }
+        .header { background: #161b22; padding: 20px; border-bottom: 2px solid var(--n-g); text-align: center; }
+        .header h1 { margin: 0; color: var(--n-g); text-transform: uppercase; letter-spacing: 2px; font-size: 1.5rem; }
         .game-area { padding: 30px; }
-        .evidence-card { background: #000; border: 1px solid #333; padding: 20px; border-radius: 8px; margin-bottom: 25px; border-left: 5px solid var(--neon-blue); }
-        .evidence-card h3 { margin: 0 0 10px 0; color: var(--neon-blue); font-size: 0.9rem; }
+        .evidence-card { background: #000; border: 1px solid #333; padding: 20px; border-radius: 8px; margin-bottom: 25px; border-left: 5px solid var(--n-b); }
+        .evidence-card h3 { margin: 0 0 10px 0; color: var(--n-b); font-size: 0.8rem; }
         .evidence-text { font-family: 'Consolas', monospace; font-size: 1.1rem; color: #ffca28; }
-
         .options-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
-        .option-btn { background: #1c2128; border: 1px solid #30363d; padding: 15px; border-radius: 6px; color: #fff; cursor: pointer; text-align: left; transition: 0.2s; font-size: 0.9rem; }
-        .option-btn:hover { border-color: var(--neon-green); background: #262c36; }
-        .option-btn.correct { background: rgba(57, 255, 20, 0.2); border-color: var(--neon-green); color: var(--neon-green); }
+        .option-btn { background: #1c2128; border: 1px solid #30363d; padding: 15px; border-radius: 6px; color: #fff; cursor: pointer; transition: 0.2s; }
+        .option-btn:hover:not(:disabled) { border-color: var(--n-g); background: #262c36; }
+        .option-btn.correct { background: rgba(57, 255, 20, 0.2); border-color: var(--n-g); color: var(--n-g); }
         .option-btn.wrong { background: rgba(255, 49, 49, 0.2); border-color: #ff3131; color: #ff3131; }
-
         .progress-bar { width: 100%; height: 6px; background: #222; margin-top: 20px; }
-        .progress-fill { height: 100%; width: 0%; background: var(--neon-green); transition: 0.4s; }
-        
-        .score-board { margin-top: 15px; text-align: right; font-family: monospace; color: var(--neon-green); }
-        #final-screen { text-align: center; display: none; padding: 50px; }
+        .p-f { height: 100%; width: 0%; background: var(--n-g); transition: 0.4s; }
+        .score-board { margin-top: 15px; text-align: right; color: var(--n-g); }
+        #f-s { text-align: center; display: none; padding: 50px; }
     </style>
 </head>
 <body>
-
 <div class="container">
     <div class="header">
-        <h1>Análise de Ameaças - SOC Nível 1</h1>
-        <div id="counter" style="font-size: 0.8rem; color: #8b949e; margin-top: 5px;">Ataque 1 de 10</div>
+        <h1 id="_0x112">---</h1>
+        <div id="cnt" style="font-size: 0.8rem; color: #8b949e;">INIT...</div>
     </div>
-
-    <div class="game-area" id="quiz-area">
+    <div class="game-area" id="qa">
         <div class="evidence-card">
-            <h3>EVIDÊNCIA COLETADA:</h3>
-            <div class="evidence-text" id="evidence">"Carregando evidência..."</div>
+            <h3>DATA_STREAM:</h3>
+            <div class="evidence-text" id="evd">"..."</div>
         </div>
-
-        <div class="options-grid" id="options">
-            </div>
-
-        <div class="progress-bar"><div class="progress-fill" id="progress"></div></div>
-        <div class="score-board" id="score">ACERTOS: 0</div>
+        <div class="options-grid" id="opt"></div>
+        <div class="progress-bar"><div class="p-f" id="pg"></div></div>
+        <div class="score-board" id="sc">RECORDS: 0</div>
     </div>
-
-    <div id="final-screen">
-        <h2 style="color: var(--neon-green)">MISSÃO FINALIZADA!</h2>
-        <p id="final-msg"></p>
-        <button onclick="location.reload()" style="padding: 15px 30px; background: var(--neon-green); border: none; border-radius: 5px; cursor: pointer; font-weight: bold;">REINICIAR MONITORAMENTO</button>
+    <div id="f-s">
+        <h2 style="color: var(--n-g)">ANALYSIS_COMPLETE</h2>
+        <p id="f-m"></p>
+        <button onclick="location.reload()" style="padding: 15px 30px; background: var(--n-g); border: none; border-radius: 5px; cursor: pointer; font-weight: bold;">REBOOT_SYSTEM</button>
     </div>
 </div>
 
 <script>
-    const attacks = [
-        { q: "Recebemos 500.000 requisições por segundo vindas de IPs mundiais, derrubando o servidor de e-commerce.", a: "DDoS" },
-        { q: "O usuário recebeu um e-mail idêntico ao do banco pedindo para 'atualizar a senha' em um link suspeito.", a: "Phishing" },
-        { q: "Arquivos do RH foram bloqueados e há um pedido de 2 Bitcoins para liberar a chave de descriptografia.", a: "Ransomware" },
-        { q: "O atacante inseriu o comando `' OR 1=1 --` no campo de login e conseguiu acesso à lista de usuários.", a: "SQL Injection" },
-        { q: "Um script malicioso foi injetado em um comentário do blog, roubando os cookies de quem visualiza a página.", a: "XSS (Cross-Site Scripting)" },
-        { q: "O invasor está posicionado entre o roteador e o laptop da vítima, lendo todo o tráfego da rede Wi-Fi pública.", a: "Man-in-the-middle (MITM)" },
-        { q: "Um executável oculto foi instalado no sistema para espionar o microfone e capturar capturas de tela.", a: "Malware" },
-        { q: "O criminoso ligou para a secretária fingindo ser do suporte técnico para convencê-la a dizer a senha da rede.", a: "Engenharia Social" },
-        { q: "A empresa foi invadida através de uma falha descoberta hoje, para a qual o fabricante ainda não lançou correção.", a: "Zero-Day" },
-        { q: "Milhares de dispositivos IoT infectados estão sendo controlados remotamente para enviar spam em massa.", a: "Botnet" }
-    ];
+    (function(){
+        const _0x3e2 = [
+            ["UmVjZWJlbW9zIDUwMC4wMDAgcmVxdWlza死Z8O1ZXMgcG9yIHNlZ3VuZG8gdmluZGFzIGRlIElQcyBtdW5kaWFpcy4=", "RERvUw=="],
+            ["TyB1c3XDoXJpbyByZWNlYmV1IHVtIGUtbWFpbCBpZMOqbnRpY28gYW8gZG8gYmFuY28gcGVkaW5kbyBhdHVhbGl6YXIu", "UGhpc2hpbmc="],
+            ["QXJxdWl2b3MgZG8gUkggZm9yYW0gYmxvIHF1ZWFkb3MgZSBow6EgdW0gcGVkaWRvIGRlIDIgQml0Y29pbnMu", "UmFuc29td2FyZQ=="],
+            ["TyBhdGFjYW50ZSBpbnNlcml1IG8gY29tYW5kbyAnIE9SIDE9MSAtLSBubyBjYW1wbyBkZSBsb2dpbi4=", "U1FMIEluamVjdGlvbg=="],
+            ["VW0gc2NyaXB0IG1hbGljaW9zbyBmb2kgaW5qZXRhZG8gZW0gdW0gY29tZW50w6FyaW8gZG8gYmxvZy4=", "WFNT"],
+            ["TyBpbnZhc29yIGVzdMOhIHBvc2ljaW9uYWRvIGVudHJlIG8gcm90ZWFkb3IgZSBlIG8gbGFwdG9wLg==", "TUlUTQ=="],
+            ["VW0gZXhlY3V0w6F2ZWwgb2N1bHRvIGZvaSBpbnN0YWxhZG8gbm8gc2lzdGVtYSBwYXJhIGVzcGlvbmFyLg==", "TWFsd2FyZQ=="],
+            ["TyBjcmltaW5vc28gbGlnb3UgcGFyYSBhIHNlY3JldMOhcmlhIGZpbmdpbmRvIHNlciBkbyBzdXBvcnRlLg==", "RW5nZW5oYXJpYSBTb2NpYWw="],
+            ["QSBlbXByZXNhIGZvaSBpbnZhZGlkYSBhdHJhdsOpcyBkZSB1bWEgZmFsaGEgZGVzY29iZXJ0YSBob2plLg==", "WmVyby1EYXk="],
+            ["TWlsaGFyZXMgZGUgZGlzcG9zaXRpdm9zIElvVCBpbmZlY3RhZG9zIGVzdMOjbyBzZW5kbyBjb250cm9sYWRvcy4=", "Qm90bmV0"]
+        ];
 
-    let current = 0;
-    let acertos = 0;
-    const allAttacksNames = attacks.map(item => item.a);
+        let _0x22 = 0, _0xaa = 0;
+        const _0xde = t => decodeURIComponent(escape(atob(t)));
+        const _0x5b = () => _0x3e2.map(x => _0xde(x[1]));
+        const _0xnm = _0x5b();
 
-    function loadQuestion() {
-        if (current >= attacks.length) {
-            showFinal();
-            return;
-        }
+        window._0xinit = function() {
+            if (_0x22 >= _0x3e2.length) {
+                document.getElementById('qa').style.display = 'none';
+                document.getElementById('f-s').style.display = 'block';
+                document.getElementById('f-m').innerText = `TOTAL_HITS: ${_0xaa} / 10`;
+                return;
+            }
 
-        const question = attacks[current];
-        document.getElementById('evidence').innerText = `"${question.q}"`;
-        document.getElementById('counter').innerText = `Ataque ${current + 1} de 10`;
-        document.getElementById('progress').style.width = `${(current / attacks.length) * 100}%`;
-        
-        const optionsArea = document.getElementById('options');
-        optionsArea.innerHTML = "";
+            const _0xcur = _0x3e2[_0x22];
+            document.getElementById('_0x112').innerText = "SOC_LEVEL_01_ANLYS";
+            document.getElementById('evd').innerText = `"${_0xde(_0xcur[0])}"`;
+            document.getElementById('cnt').innerText = `NODE: ${_0x22 + 1} / 10`;
+            document.getElementById('pg').style.width = (_0x22 * 10) + '%';
 
-        // Gerar 4 opções (1 correta + 3 aleatórias)
-        let choices = [question.a];
-        while (choices.length < 4) {
-            let random = allAttacksNames[Math.floor(Math.random() * allAttacksNames.length)];
-            if (!choices.includes(random)) choices.push(random);
-        }
-        choices.sort(() => Math.random() - 0.5);
+            const _0xop = document.getElementById('opt');
+            _0xop.innerHTML = "";
 
-        choices.forEach(choice => {
-            const btn = document.createElement('button');
-            btn.className = 'option-btn';
-            btn.innerText = choice;
-            btn.onclick = () => checkAnswer(choice, btn);
-            optionsArea.appendChild(btn);
-        });
-    }
+            let _0xch = [_0xde(_0xcur[1])];
+            while (_0xch.length < 4) {
+                let _0xrr = _0xnm[Math.floor(Math.random() * _0xnm.length)];
+                if (!_0xch.includes(_0xrr)) _0xch.push(_0xrr);
+            }
+            _0xch.sort(() => Math.random() - 0.5);
 
-    function checkAnswer(choice, btn) {
-        const correct = attacks[current].a;
-        const buttons = document.querySelectorAll('.option-btn');
-        buttons.forEach(b => b.disabled = true);
-
-        if (choice === correct) {
-            btn.classList.add('correct');
-            acertos++;
-            document.getElementById('score').innerText = `ACERTOS: ${acertos}`;
-        } else {
-            btn.classList.add('wrong');
-            buttons.forEach(b => { if(b.innerText === correct) b.classList.add('correct'); });
-        }
-
-        setTimeout(() => {
-            current++;
-            loadQuestion();
-        }, 1500);
-    }
-
-    function showFinal() {
-        document.getElementById('quiz-area').style.display = "none";
-        const screen = document.getElementById('final-screen');
-        screen.style.display = "block";
-        document.getElementById('final-msg').innerText = `Você identificou corretamente ${acertos} de 10 ameaças cibernéticas.`;
-    }
-
-    loadQuestion();
+            _0xch.forEach(_0xc => {
+                const _0xbt = document.createElement('button');
+                _0xbt.className = 'option-btn';
+                _0xbt.innerText = _0xc;
+                _0xbt.onclick = () => {
+                    const _0xval = _0xde(_0xcur[1]);
+                    const _0xall = document.querySelectorAll('.option-btn');
+                    _0xall.forEach(b => b.disabled = true);
+                    
+                    if (_0xc === _0xval) {
+                        _0xbt.classList.add('correct');
+                        _0xaa++;
+                        document.getElementById('sc').innerText = `RECORDS: ${_0xaa}`;
+                    } else {
+                        _0xbt.classList.add('wrong');
+                        _0xall.forEach(b => { if(b.innerText === _0xval) b.classList.add('correct'); });
+                    }
+                    setTimeout(() => { _0x22++; _0xinit(); }, 1200);
+                };
+                _0xop.appendChild(_0xbt);
+            });
+        };
+        _0xinit();
+    })();
 </script>
 </body>
 </html>
