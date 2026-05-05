@@ -3,11 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SEC_RESPONSE_SIMULATOR</title>
+    <title>SEC_RESPONSE_LAB</title>
     <style>
         :root { --p: #2ea043; --b: #0d1117; --c: #161b22; --br: #30363d; --t: #e6edf3; }
         body { font-family: 'Consolas', monospace; background-color: var(--b); color: var(--t); padding: 20px; }
-        h2 { color: var(--p); text-align: center; text-transform: uppercase; letter-spacing: 2px; }
+        h2 { color: var(--p); text-align: center; text-transform: uppercase; }
         .container { display: flex; gap: 20px; justify-content: center; flex-wrap: wrap; }
         .options { flex: 1; min-width: 250px; background: var(--c); padding: 15px; border-radius: 8px; border: 1px solid var(--br); height: fit-content; position: sticky; top: 20px; }
         .phase-card { background: #21262d; border: 1px solid var(--br); padding: 10px; margin: 8px 0; cursor: grab; border-radius: 4px; text-align: center; font-weight: bold; font-size: 0.85rem; }
@@ -22,82 +22,91 @@
 </head>
 <body>
 
-    <h2>INCIDENT_RESPONSE_LAB</h2>
-    <p style="text-align: center; font-size: 0.8rem; color: #8b949e;">// Classifique os eventos arrastando as fases para os buffers correspondentes.</p>
+    <h2>INCIDENT_RESPONSE_SIMULATOR</h2>
+    <p style="text-align: center; font-size: 0.8rem; color: #8b949e;">// Classifique os eventos arrastando as fases para os campos à direita.</p>
 
     <div class="container">
-        <div class="options" id="_0x_opt"></div>
-        <div class="scenarios" id="_0x_quiz"></div>
+        <div class="options" id="opt-container">
+            <!-- Gerado via JS -->
+        </div>
+        <div class="scenarios" id="quiz-container">
+            <!-- Gerado via JS -->
+        </div>
     </div>
 
-    <button onclick="_0x_verify()">VALIDATE_RESULTS</button>
+    <button id="v-btn">VALIDATE_SYSTEM_INTEGRITY</button>
 
     <script>
     (function(){
-        // Fases e Respostas Ofuscadas em Base64
-        const _0xf = ["UFJFUEFSQcdBTw==", "SURFTlRJRklDQcdBTw==", "Q09OVEVO单位Tw==", "RVJSQURJQ0HHT08=", "UkVDVVBFUkHHT08=", "TEnDh8VFUyBBUFJFTkRJREFT"];
-        const _0xd = [
-            {id: 1, t: "RXF1aXBlIHJlY2ViZSBhbGVydGEgZG8gRURSIGluZGljYW5kbyBjb21wb3J0YW1lbnRvIHN1c3BlaXRvLg==", a: _0xf[1]},
-            {id: 2, t: "TyBhbmFsaXN0YSBpc29sYSBvIHNlcnZpZG9yIGNvbXByb21ldGlkbyBkYSByZWRlLg==", a: _0xf[2]},
-            {id: 3, t: "RXF1aXBlIHJlbW92ZSBvIG1hbHdhcmUgZSBjb250YXMgbWFsaWNpb3NhcyBjcmlhZGFzLg==", a: _0xf[3]},
-            {id: 4, t: "QmFja3VwcyBzw6NvIHJlc3RhdXJhZG9zIGUgb3Mgc2VydmnDp29zIHZhbGlkYWRvcy4=", a: _0xf[4]},
-            {id: 5, t: "T3JnYW5pemHDp8OjbyByZWFsaXphIHRyZWluYW1lbnRvIGRlIGNvbnNjaWVudGl6YcOnw6NvLg==", a: _0xf[5]},
-            {id: 6, t: "RXF1aXBlIGFuYWxpc2EgbG9ncyBlIGNvbmZpcm1hIHF1ZSBzZSB0cmF0YSBkZSBSYW5zb213YXJlLg==", a: _0xf[1]},
-            {id: 7, t: "UmVsYXTDs3JpbyBkZXRhbGhhZG8gc29icmUgbyBpbXBhY3RvIGUgbyBxdWUgcHJlY2lzYSBtZWxob3Jhci4=", a: _0xf[5]},
-            {id: 8, t: "UmVncmFzIGRlIGZpcmV3YWxsIGFwbGljYWRhcyBwYXJhIGJsb3F1ZWFyIElQcyBkbyBhdGFjYW50ZS4=", a: _0xf[2]},
-            {id: 9, t: "VEkgbW9uaXRvcmEgc2lzdGVtYXMgcGFyYSBnYXJhbnRpciBxdWUgbsO6byBhow6EIGF0aXZpZGFkZS4=", a: _0xf[4]},
-            {id: 10, t: "RGVmaW5pY8Onw6NvIGRlIHBhcMOpaXMsIHJlc3BvbnNhYmlsaWRhZGVzIGUgcmV2aXPDo28u", a: _0xf[0]}
+        // Fases reais
+        const _F = ["PREPARAÇÃO", "IDENTIFICAÇÃO", "CONTENÇÃO", "ERRADICAÇÃO", "RECUPERAÇÃO", "LIÇÕES APRENDIDAS"];
+        
+        // Dados das questões (O texto está limpo para evitar erro de encoding, a resposta é o índice da fase acima)
+        const _D = [
+            { id: 1, t: "Equipe recebe alerta do EDR indicando comportamento suspeito.", a: 1 },
+            { id: 2, t: "O analista isola o servidor comprometido da rede.", a: 2 },
+            { id: 3, t: "Equipe remove o malware e contas maliciosas criadas.", a: 3 },
+            { id: 4, t: "Backups são restaurados e os serviços validados.", a: 4 },
+            { id: 5, t: "Organização realiza treinamento de conscientização e atualiza o plano.", a: 5 },
+            { id: 6, t: "Equipe analisa logs e confirma que se trata de Ransomware.", a: 1 },
+            { id: 7, t: "Relatório detalhado sobre o impacto e o que precisa melhorar.", a: 5 },
+            { id: 8, t: "Regras de firewall aplicadas para bloquear IPs do atacante.", a: 2 },
+            { id: 9, t: "TI monitora sistemas para garantir que não há mais atividade maliciosa.", a: 4 },
+            { id: 10, t: "Definição de papéis, responsabilidades e revisão de contatos.", a: 0 }
         ];
 
-        const _0xdec = (s) => decodeURIComponent(atob(s).split('').map(c => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2)).join(''));
-        const _0x_qC = document.getElementById('_0x_quiz');
-        const _0x_oC = document.getElementById('_0x_opt');
+        const oCont = document.getElementById('opt-container');
+        const qCont = document.getElementById('quiz-container');
 
-        // Renderizar Fases
-        _0xf.forEach((ph, i) => {
-            const div = document.createElement('div');
-            div.className = 'phase-card';
-            div.draggable = true;
-            div.dataset.p = ph;
-            div.innerText = `${i+1}. ${_0xdec(ph)}`;
-            div.addEventListener('dragstart', (e) => e.dataTransfer.setData('text', ph));
-            _0x_oC.appendChild(div);
+        // Renderizar opções de fases (Esquerda)
+        _F.forEach((name, index) => {
+            const card = document.createElement('div');
+            card.className = 'phase-card';
+            card.draggable = true;
+            card.innerText = `${index + 1}. ${name}`;
+            card.on dragstart = (e) => e.dataTransfer.setData('idx', index);
+            oCont.appendChild(card);
         });
 
-        // Renderizar Quests
-        _0xd.forEach(it => {
-            const div = document.createElement('div');
-            div.className = 'scenario-item';
-            div.innerHTML = `<span style="font-size:0.9rem;"><strong>${it.id}.</strong> ${_0xdec(it.t)}</span><div class="drop-zone" data-id="${it.id}">BUFFER_EMPTY</div>`;
-            _0x_qC.appendChild(div);
+        // Renderizar cenários (Direita)
+        _D.forEach(item => {
+            const row = document.createElement('div');
+            row.className = 'scenario-item';
+            row.innerHTML = `<span style="font-size:0.9rem;"><strong>${item.id}.</strong> ${item.t}</span>
+                             <div class="drop-zone" data-id="${item.id}">DROP_ZONE</div>`;
+            qCont.appendChild(row);
         });
 
-        document.querySelectorAll('.drop-zone').forEach(z => {
-            z.addEventListener('dragover', (e) => e.preventDefault());
-            z.addEventListener('dragenter', function() { this.classList.add('over'); });
-            z.addEventListener('dragleave', function() { this.classList.remove('over'); });
-            z.addEventListener('drop', function(e) {
+        // Lógica de Drop
+        document.querySelectorAll('.drop-zone').forEach(zone => {
+            zone.ondragover = (e) => e.preventDefault();
+            zone.ondragenter = function() { this.classList.add('over'); };
+            zone.ondragleave = function() { this.classList.remove('over'); };
+            zone.ondrop = function(e) {
                 e.preventDefault();
                 this.classList.remove('over');
-                const p = e.dataTransfer.getData('text');
-                this.innerHTML = `<div class="phase-card" style="margin:0; width:95%;">${_0xdec(p)}</div>`;
-                this.dataset.ans = p;
-            });
+                const phaseIdx = e.dataTransfer.getData('idx');
+                this.innerHTML = `<div class="phase-card" style="margin:0; width:95%; cursor:default;">${_F[phaseIdx]}</div>`;
+                this.dataset.sel = phaseIdx; // Armazena apenas o índice da resposta
+            };
         });
 
-        window._0x_verify = function() {
-            let s = 0;
-            document.querySelectorAll('.drop-zone').forEach(z => {
-                const id = z.dataset.id;
-                const correct = _0xd.find(item => item.id == id).a;
-                if (z.dataset.ans === correct) {
-                    z.parentElement.className = 'scenario-item correct';
-                    s++;
+        // Validação
+        document.getElementById('v-btn').onclick = function() {
+            let hits = 0;
+            document.querySelectorAll('.drop-zone').forEach(zone => {
+                const qId = zone.dataset.id;
+                const correctIdx = _D.find(x => x.id == qId).a;
+                const userIdx = zone.dataset.sel;
+
+                if (userIdx !== undefined && userIdx == correctIdx) {
+                    zone.parentElement.className = 'scenario-item correct';
+                    hits++;
                 } else {
-                    z.parentElement.className = 'scenario-item incorrect';
+                    zone.parentElement.className = 'scenario-item incorrect';
                 }
             });
-            alert(`ANALYSIS_COMPLETE: ${s} / ${_0xd.length} ALIGNED.`);
+            alert(`INTEGRITY_CHECK: ${hits} / ${_D.length} SUCCESS.`);
         };
     })();
     </script>
