@@ -2,36 +2,37 @@
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <title>Sytem-Security-Check</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SEC_LEVEL_01_ANLYS</title>
     <style>
-        :root { --n-g: #39ff14; --n-b: #00d4ff; --bg: #05080a; --cd: #10141b; }
-        body { font-family: 'Consolas', monospace; background: var(--bg); color: #e0e0e0; padding: 20px; display: flex; flex-direction: column; align-items: center; }
-        .container { width: 100%; max-width: 900px; background: var(--cd); border: 1px solid #30363d; border-radius: 12px; overflow: hidden; box-shadow: 0 0 30px rgba(0,0,0,0.5); }
-        .header { background: #161b22; padding: 20px; border-bottom: 2px solid var(--n-g); text-align: center; }
-        .header h1 { margin: 0; color: var(--n-g); text-transform: uppercase; letter-spacing: 2px; font-size: 1.5rem; }
+        :root { --ng: #39ff14; --nb: #00d4ff; --bg: #05080a; --cd: #10141b; }
+        body { font-family: 'Courier New', monospace; background: var(--bg); color: #e0e0e0; padding: 20px; display: flex; flex-direction: column; align-items: center; }
+        .container { width: 100%; max-width: 900px; background: var(--cd); border: 1px solid #30363d; border-radius: 12px; overflow: hidden; box-shadow: 0 0 30px rgba(0,0,0,0.8); }
+        .header { background: #161b22; padding: 20px; border-bottom: 2px solid var(--ng); text-align: center; }
+        .header h1 { margin: 0; color: var(--ng); text-transform: uppercase; letter-spacing: 2px; font-size: 1.4rem; }
         .game-area { padding: 30px; }
-        .evidence-card { background: #000; border: 1px solid #333; padding: 20px; border-radius: 8px; margin-bottom: 25px; border-left: 5px solid var(--n-b); }
-        .evidence-text { font-family: 'Consolas', monospace; font-size: 1.1rem; color: #ffca28; min-height: 50px; }
+        .evidence-card { background: #000; border: 1px solid #333; padding: 20px; border-radius: 8px; margin-bottom: 25px; border-left: 5px solid var(--nb); }
+        .evidence-text { font-size: 1.1rem; color: #ffca28; min-height: 50px; line-height: 1.4; }
         .options-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
         .option-btn { background: #1c2128; border: 1px solid #30363d; padding: 15px; border-radius: 6px; color: #fff; cursor: pointer; transition: 0.2s; font-family: inherit; }
-        .option-btn:hover:not(:disabled) { border-color: var(--n-g); background: #262c36; }
-        .option-btn.correct { background: rgba(57, 255, 20, 0.2); border-color: var(--n-g); color: var(--n-g); }
+        .option-btn:hover:not(:disabled) { border-color: var(--ng); background: #262c36; }
+        .option-btn.correct { background: rgba(57, 255, 20, 0.2); border-color: var(--ng); color: var(--ng); }
         .option-btn.wrong { background: rgba(255, 49, 49, 0.2); border-color: #ff3131; color: #ff3131; }
         .progress-bar { width: 100%; height: 6px; background: #222; margin-top: 20px; }
-        .p-f { height: 100%; width: 0%; background: var(--n-g); transition: 0.4s; }
-        .score-board { margin-top: 15px; text-align: right; color: var(--n-g); font-size: 0.9rem; }
+        .p-f { height: 100%; width: 0%; background: var(--ng); transition: 0.4s; }
+        .score-board { margin-top: 15px; text-align: right; color: var(--ng); font-size: 0.8rem; }
         #f-s { text-align: center; display: none; padding: 50px; }
     </style>
 </head>
 <body>
 <div class="container">
     <div class="header">
-        <h1>SOC_LEVEL_01_ANLYS</h1>
-        <div id="cnt" style="font-size: 0.8rem; color: #8b949e;">INIT_CORE...</div>
+        <h1 id="_sys_t">INIT_SOC_INTERFACE</h1>
+        <div id="cnt" style="font-size: 0.7rem; color: #8b949e;">DECRYPTING_NODE...</div>
     </div>
     <div class="game-area" id="qa">
         <div class="evidence-card">
-            <h3 style="color:var(--n-b); font-size:0.7rem; margin:0 0 10px 0;">EVIDENCE_STREAM:</h3>
+            <h3 style="color:var(--nb); font-size:0.7rem; margin:0 0 10px 0;">INCOMING_LOG:</h3>
             <div class="evidence-text" id="evd"></div>
         </div>
         <div class="options-grid" id="opt"></div>
@@ -39,16 +40,16 @@
         <div class="score-board" id="sc">HITS: 0</div>
     </div>
     <div id="f-s">
-        <h2 style="color: var(--n-g)">MISSION_ACCOMPLISHED</h2>
-        <p id="f-m"></p>
-        <button onclick="location.reload()" style="padding: 15px 30px; background: var(--n-g); border: none; border-radius: 5px; cursor: pointer; font-weight: bold; text-transform: uppercase;">Restart_System</button>
+        <h2 style="color: var(--ng)">SYSTEM_ANALYSIS_COMPLETE</h2>
+        <p id="f-m" style="font-size: 0.9rem;"></p>
+        <button onclick="location.reload()" style="padding: 15px 30px; background: var(--ng); border: none; border-radius: 5px; cursor: pointer; font-weight: bold; text-transform: uppercase; color: #000;">Re-Init_Session</button>
     </div>
 </div>
 
 <script>
 (function(){
-    // Base64 corrigido para suportar acentuação PT-BR
-    const _0xdb = [
+    // Matriz de dados encriptada (UTF-8 safe)
+    const _0xM = [
         ["NTAwLjAwMCByZXF1aXNpw6fDtWVzIHBvciBzZWd1bmRvIHZpbmRhcyBkZSBJUHMgbXVuZGlhaXMsIGRlcnJ1YmFuZG8gbyBzZXJ2aWRvci4=", "RERvUw=="],
         ["TyB1c3XDoXJpbyByZWNlYmV1IHVtIGUtbWFpbCBpZMOqbnRpY28gYW8gZG8gYmFuY28gcGVkaW5kbyBhdHVhbGl6YcOnw6NvIGRlIHNlbmhhLg==", "UGhpc2hpbmc="],
         ["QXJxdWl2b3MgZG8gUkggZm9yYW0gYmxvIHF1ZWFkb3MgZSBow6EgdW0gcGVkaWRvIGRlIDIgQml0Y29pbnMu", "UmFuc29td2FyZQ=="],
@@ -56,69 +57,64 @@
         ["VW0gc2NyaXB0IG1hbGljaW9zbyBmb2kgaW5qZXRhZG8gZW0gdW0gY29tZW50w6FyaW8gZG8gYmxvZy4=", "WFNT"],
         ["TyBpbnZhc29yIGVzdMOhIHBvc2ljaW9uYWRvIGVudHJlIG8gcm90ZWFkb3IgZSBlIG8gbGFwdG9wLg==", "TUlUTQ=="],
         ["VW0gZXhlY3V0w6F2ZWwgb2N1bHRvIGZvaSBpbnN0YWxhZG8gbm8gc2lzdGVtYSBwYXJhIGVzcGlvbmFyLg==", "TWFsd2FyZQ=="],
-        ["TyBjcmltaW5vc28gbGlnb3UgcGFyYSBhIHNlY3JldMOhcmlhIGZpbmdpbmRvIHNlciBkbyBzdXBvcnRlLg==", "RW5nZW5oYXJpYSBTb2NpYWw="],
+        ["TyBjcmltaW5vc28gbGlnb3UgcGFyYSBhIHNlY3JldMOhcmlhIGZpbmdpbmRvIHNlciBk doBzdXBvcnRlLg==", "RW5nZW5oYXJpYSBTb2NpYWw="],
         ["QSBlbXByZXNhIGZvaSBpbnZhZGlkYSBhdHJhdsOpcyBkZSB1bWEgZmFsaGEgZGVzY29iZXJ0YSBob2plLg==", "WmVyby1EYXk="],
         ["TWlsaGFyZXMgZGUgZGlzcG9zaXRpdm9zIElvVCBpbmZlY3RhZG9zIGVzdMOjbyBzZW5kbyBjb250cm9sYWRvcy4=", "Qm90bmV0"]
     ];
 
-    let _0xidx = 0, _0xhits = 0;
+    let _0xi = 0, _0xh = 0;
+    const _dec = (s) => decodeURIComponent(atob(s).split('').map(c => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2)).join(''));
+    const _all = _0xM.map(x => _dec(x[1]));
 
-    // Função de decodificação UTF-8 robusta
-    const _0xdec = (str) => {
-        return decodeURIComponent(atob(str).split('').map(function(c) {
-            return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
-        }).join(''));
-    };
-
-    const _0xallNames = _0xdb.map(i => _0xdec(i[1]));
-
-    function _0xrender() {
-        if (_0xidx >= _0xdb.length) {
+    function _draw() {
+        if (_0xi >= _0xM.length) {
             document.getElementById('qa').style.display = 'none';
-            document.getElementById('f-s').style.display = 'block';
-            document.getElementById('f-m').innerText = `RESULT: ${_0xhits} / 10 SECURITY_MATCHES.`;
+            const fs = document.getElementById('f-s');
+            fs.style.display = 'block';
+            document.getElementById('f-m').innerText = `TOTAL_RECORDS_PROCESSED: ${_0xh} / ${_0xM.length}`;
             return;
         }
 
-        const _0xdata = _0xdb[_0xidx];
-        document.getElementById('evd').innerText = `"${_0xdec(_0xdata[0])}"`;
-        document.getElementById('cnt').innerText = `THREAT_NODE: ${_0xidx + 1} / 10`;
-        document.getElementById('pg').style.width = ((_0xidx / _0xdb.length) * 100) + '%';
+        document.getElementById('_sys_t').innerText = "SOC_ANALYST_L1";
+        const cur = _0xM[_0xi];
+        document.getElementById('evd').innerText = `"${_dec(cur[0])}"`;
+        document.getElementById('cnt').innerText = `NODE_POINT: ${_0xi + 1} / ${_0xM.length}`;
+        document.getElementById('pg').style.width = ((_0xi / _0xM.length) * 100) + '%';
 
-        const _0xbox = document.getElementById('opt');
-        _0xbox.innerHTML = "";
+        const box = document.getElementById('opt');
+        box.innerHTML = "";
 
-        let _0xopts = [_0xdec(_0xdata[1])];
-        while (_0xopts.length < 4) {
-            let _0xrnd = _0xallNames[Math.floor(Math.random() * _0xallNames.length)];
-            if (!_0xopts.includes(_0xrnd)) _0xopts.push(_0xrnd);
+        let opts = [_dec(cur[1])];
+        while (opts.length < 4) {
+            let rnd = _all[Math.floor(Math.random() * _all.length)];
+            if (!opts.includes(rnd)) opts.push(rnd);
         }
-        _0xopts.sort(() => Math.random() - 0.5);
+        opts.sort(() => Math.random() - 0.5);
 
-        _0xopts.forEach(_0xtxt => {
-            const _0xbtn = document.createElement('button');
-            _0xbtn.className = 'option-btn';
-            _0xbtn.innerText = _0xtxt;
-            _0xbtn.onclick = () => {
-                const _0xans = _0xdec(_0xdata[1]);
-                const _0xbtns = document.querySelectorAll('.option-btn');
-                _0xbtns.forEach(b => b.disabled = true);
+        opts.forEach(t => {
+            const b = document.createElement('button');
+            b.className = 'option-btn';
+            b.innerText = t;
+            b.onclick = function() {
+                const ans = _dec(cur[1]);
+                const btns = document.querySelectorAll('.option-btn');
+                btns.forEach(btn => btn.disabled = true);
 
-                if (_0xtxt === _0xans) {
-                    _0xbtn.classList.add('correct');
-                    _0xhits++;
-                    document.getElementById('sc').innerText = `HITS: ${_0xhits}`;
+                if (this.innerText === ans) {
+                    this.classList.add('correct');
+                    _0xh++;
+                    document.getElementById('sc').innerText = `HITS: ${_0xh}`;
                 } else {
-                    _0xbtn.classList.add('wrong');
-                    _0xbtns.forEach(b => { if(b.innerText === _0xans) b.classList.add('correct'); });
+                    this.classList.add('wrong');
+                    btns.forEach(btn => { if(btn.innerText === ans) btn.classList.add('correct'); });
                 }
-                setTimeout(() => { _0xidx++; _0xrender(); }, 1500);
+                setTimeout(() => { _0xi++; _draw(); }, 1200);
             };
-            _0xbox.appendChild(_0xbtn);
+            box.appendChild(b);
         });
     }
 
-    _0xrender();
+    _draw();
 })();
 </script>
 </body>
