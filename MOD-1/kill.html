@@ -5,25 +5,53 @@
     <title>Sytem-Integrity-Lab</title>
     <style>
         :root { --p: #2ea043; --b: #0d1117; --c: #161b22; --br: #30363d; --t: #e6edf3; --a: #58a6ff; }
-        body { font-family: 'Segoe UI', monospace; background: var(--b); color: var(--text); padding: 10px; font-size: 14px; }
+        body { font-family: 'Segoe UI', monospace; background: var(--b); color: var(--t); padding: 10px; font-size: 14px; }
         .container { max-width: 1200px; margin: auto; }
+        
         .scenario { background: var(--c); border: 1px solid var(--br); padding: 15px; border-radius: 8px; margin-bottom: 20px; border-left: 5px solid var(--a); line-height: 1.4; color: var(--t); }
-        .kill-chain-grid { display: grid; grid-template-columns: 160px 1fr 1fr 1fr; gap: 4px; background: #21262d; padding: 4px; border-radius: 4px; }
-        .t-header { background: #121d14; color: var(--p); padding: 10px; text-align: center; font-weight: bold; text-transform: uppercase; font-size: 0.75rem; border: 1px solid var(--br); }
-        .phase-name { background: #0d1117; padding: 10px; border: 1px solid var(--br); display: flex; align-items: center; font-weight: bold; color: var(--a); font-size: 0.85rem; }
-        .drop-zone { background: #161b22; min-height: 50px; border: 1px dashed #444; display: flex; align-items: center; justify-content: center; padding: 5px; text-align: center; transition: 0.3s; color: #888; }
+        
+        /* AJUSTE AQUI: max-content garante que o nome da fase não quebre linha */
+        .kill-chain-grid { 
+            display: grid; 
+            grid-template-columns: max-content 1fr 1fr 1fr; 
+            gap: 4px; 
+            background: #21262d; 
+            padding: 4px; 
+            border-radius: 4px; 
+        }
+
+        .t-header { background: #121d14; color: var(--p); padding: 12px 20px; text-align: center; font-weight: bold; text-transform: uppercase; font-size: 0.75rem; border: 1px solid var(--br); }
+        
+        .phase-name { 
+            background: #0d1117; 
+            padding: 10px 20px; 
+            border: 1px solid var(--br); 
+            display: flex; 
+            align-items: center; 
+            font-weight: bold; 
+            color: var(--a); 
+            font-size: 0.85rem; 
+            white-space: nowrap; /* Impede quebra de linha forçada */
+        }
+
+        .drop-zone { background: #161b22; min-height: 60px; border: 1px dashed #444; display: flex; align-items: center; justify-content: center; padding: 8px; text-align: center; transition: 0.3s; color: #555; font-size: 0.75rem; }
         .drop-zone.over { border-color: var(--p); background: #1c2128; }
+        
         .items-wrapper { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin-top: 20px; padding: 15px; background: var(--c); border: 1px solid var(--br); border-radius: 8px; }
-        .drag-item { background: #21262d; border: 1px solid var(--br); padding: 6px 10px; border-radius: 4px; cursor: grab; font-size: 0.8rem; width: 180px; text-align: center; color: var(--t); }
-        .btn-check { display: block; margin: 30px auto; padding: 15px 60px; background: var(--p); color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; }
-        .correct { border: 2px solid #2ea043 !important; background: #122616 !important; }
-        .incorrect { border: 2px solid #f85149 !important; background: #2a1215 !important; }
+        
+        .drag-item { background: #21262d; border: 1px solid var(--br); padding: 8px 12px; border-radius: 4px; cursor: grab; font-size: 0.8rem; width: 190px; text-align: center; color: var(--t); display: flex; align-items: center; justify-content: center; min-height: 40px; }
+        .drag-item:active { cursor: grabbing; }
+
+        .btn-check { display: block; margin: 30px auto; padding: 15px 60px; background: var(--p); color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; text-transform: uppercase; letter-spacing: 1px; }
+        
+        .correct { border: 2px solid #2ea043 !important; background: #122616 !important; color: #fff !important; }
+        .incorrect { border: 2px solid #f85149 !important; background: #2a1215 !important; color: #fff !important; }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <h2 style="text-align:center; color: var(--p);">SIMULATOR: KILL_CHAIN_PROTOCOL</h2>
+    <h2 style="text-align:center; color: var(--p);">SIMULATOR: KILL_CHAIN_PROTOCOL_V4</h2>
 
     <div class="scenario">
         <strong>OPERATIONAL_CASE:</strong> <br>
@@ -31,12 +59,15 @@
     </div>
 
     <div class="kill-chain-grid" id="main-grid">
-        <div class="t-header">STAGE</div><div class="t-header">ACTION</div><div class="t-header">IOC</div><div class="t-header">DEFENSE</div>
+        <div class="t-header">Fase</div>
+        <div class="t-header">Ação do Atacante</div>
+        <div class="t-header">IOC (Indicador)</div>
+        <div class="t-header">Medida de Defesa</div>
     </div>
 
     <div class="items-wrapper" id="bank"></div>
 
-    <button class="btn-check" onclick="validate()">VALIDATE_SYSTEM</button>
+    <button class="btn-check" onclick="validate()">Validar Operação</button>
 </div>
 
 <script>
@@ -55,7 +86,6 @@
     const bank = document.getElementById('bank');
     let items = [];
 
-    // Monta o grid sem expor as respostas no HTML
     _P.forEach((p, idx) => {
         grid.innerHTML += `<div class="phase-name">${p.n}</div>
             <div class="drop-zone" data-r="${idx}-a"></div>
@@ -65,18 +95,16 @@
         items.push({id: `${idx}-a`, t: p.a}, {id: `${idx}-i`, t: p.i}, {id: `${idx}-d`, t: p.d});
     });
 
-    // Embaralha e gera itens do banco
     items.sort(() => Math.random() - 0.5).forEach(it => {
         const d = document.createElement('div');
         d.className = 'drag-item';
         d.draggable = true;
         d.innerText = it.t;
-        d.id = it.id; // O ID do elemento é a chave da resposta
+        d.id = it.id;
         d.addEventListener('dragstart', e => { e.dataTransfer.setData('txt', e.target.id); });
         bank.appendChild(d);
     });
 
-    // Drag & Drop Handlers
     document.querySelectorAll('.drop-zone').forEach(z => {
         z.addEventListener('dragover', e => e.preventDefault());
         z.addEventListener('dragenter', function() { this.classList.add('over'); });
@@ -91,7 +119,6 @@
         });
     });
 
-    // Validação que não depende de data-ans legível
     window.validate = function() {
         let hits = 0;
         document.querySelectorAll('.drop-zone').forEach(z => {
