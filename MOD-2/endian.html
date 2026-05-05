@@ -2,44 +2,62 @@
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <title>FIAP :: Little to Big Endian Challenge</title>
+    <title>FIAP :: Endianness Forensic Challenge</title>
     <style>
-        body { background: #0a0a0a; color: #00f2ff; font-family: monospace; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
-        .box { border: 2px solid #ffd700; padding: 30px; background: #000; box-shadow: 0 0 15px #00f2ff; text-align: center; max-width: 500px; }
-        h2 { color: #ffd700; }
-        .hex-data { font-size: 1.5rem; background: #222; padding: 10px; margin: 20px 0; border: 1px dashed #ffd700; }
-        input { background: #111; border: 1px solid #00f2ff; color: #ffd700; padding: 10px; width: 80%; margin-bottom: 20px; text-align: center; }
-        button { background: #ffd700; color: #000; border: none; padding: 10px 20px; cursor: pointer; font-weight: bold; width: 80%; }
-        #msg { margin-top: 20px; font-weight: bold; }
+        :root { --cyan: #00f2ff; --gold: #ffd700; --bg: #0a0a0a; }
+        body { background: var(--bg); color: var(--cyan); font-family: 'Courier New', monospace; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
+        .box { border: 2px solid var(--gold); padding: 30px; background: #000; box-shadow: 0 0 20px rgba(0, 242, 255, 0.2); text-align: center; max-width: 500px; position: relative; }
+        h2 { color: var(--gold); letter-spacing: 2px; margin-top: 0; }
+        .hex-data { font-size: 1.8rem; background: #111; padding: 15px; margin: 20px 0; border: 1px dashed var(--gold); color: #fff; }
+        input { background: #000; border: 1px solid var(--cyan); color: var(--gold); padding: 12px; width: 80%; margin-bottom: 20px; text-align: center; font-size: 1.1rem; outline: none; }
+        button { background: var(--gold); color: #000; border: none; padding: 12px 20px; cursor: pointer; font-weight: bold; width: 85%; text-transform: uppercase; transition: 0.3s; }
+        button:hover { background: var(--cyan); box-shadow: 0 0 10px var(--cyan); }
+        #msg { margin-top: 20px; font-weight: bold; min-height: 24px; font-size: 0.9rem; }
+        .hint { font-size: 0.7rem; color: #444; margin-top: 15px; }
     </style>
 </head>
 <body>
     <div class="box">
-        <h2>DESAFIO: FILE SIZE HEADER</h2>
-        <p>Um arquivo malicioso tem o seguinte campo de tamanho (4 bytes) em <b>Little-Endian</b>:</p>
-        <div class="hex-data">A0 0F 00 00</div>
-        <p>Qual o tamanho do arquivo em <b>Decimal</b>?</p>
+        <h2>[FILE_SIZE_FORENSICS]</h2>
+        <p>Um cabeçalho malicioso indica o tamanho do arquivo (4 bytes) em <b>Little-Endian</b>:</p>
         
-        <input type="number" id="ans" placeholder="Digite o valor decimal...">
-        <button onclick="verificar()">VALIDAR INTEGRIDADE</button>
+        <div class="hex-data">A0 0F 00 00</div>
+        
+        <p>Converta para o valor <b>Decimal</b> real:</p>
+        
+        <input type="text" id="ans" placeholder="DIGITE O VALOR..." autocomplete="off">
+        <button onclick="_verify()">Validar Integridade</button>
+        
         <div id="msg"></div>
+        <div class="hint">DICA: Inverta a ordem dos bytes antes de converter o Hex para Dec.</div>
     </div>
 
     <script>
-        function verificar() {
-            const resposta = document.getElementById('ans').value;
+        function _verify() {
+            const input = document.getElementById('ans');
             const msg = document.getElementById('msg');
+            const val = parseInt(input.value) || 0;
+
+       
             
-            // L-E: A0 0F 00 00 -> B-E: 00 00 0F A0
-            // 0xFA0 em decimal é 4000
-            if(resposta == 4000) {
-                msg.style.color = "#00ff00";
-                msg.innerHTML = "SUCESSO! O tamanho real é 4000 bytes (0x0FA0).";
+            const checkA = (val >> 0x5) === 0x7D; 
+            const checkB = (val * 0x2 + 0x64) === 0x1FA4;
+
+            if(checkA && checkB) {
+                msg.style.color = "#39ff14";
+                msg.innerHTML = "INTEGRIDADE CONFIRMADA! Tamanho de " + val + " bytes extraído com sucesso.";
+                input.style.borderColor = "#39ff14";
             } else {
-                msg.style.color = "#ff0000";
-                msg.innerHTML = "ERRO! Você esqueceu de inverter os bytes ou errou o cálculo.";
+                msg.style.color = "#ff3131";
+                msg.innerHTML = "ERRO: Valor decimal não corresponde ao Header Little-Endian.";
+                input.style.borderColor = "#ff3131";
             }
         }
+
+        // Bloqueia letras no input
+        document.getElementById('ans').addEventListener('input', function() {
+            this.value = this.value.replace(/[^0-9]/g, '');
+        });
     </script>
 </body>
 </html>
