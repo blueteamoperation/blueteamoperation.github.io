@@ -2,119 +2,141 @@
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SEC_LEVEL_01_ANLYS</title>
+    <title>BLUE_TEAM_DIAGNOSTIC_v7_FIXED</title>
     <style>
-        :root { --ng: #39ff14; --nb: #00d4ff; --bg: #05080a; --cd: #10141b; }
-        body { font-family: 'Courier New', monospace; background: var(--bg); color: #e0e0e0; padding: 20px; display: flex; flex-direction: column; align-items: center; }
-        .container { width: 100%; max-width: 900px; background: var(--cd); border: 1px solid #30363d; border-radius: 12px; overflow: hidden; box-shadow: 0 0 30px rgba(0,0,0,0.8); }
-        .header { background: #161b22; padding: 20px; border-bottom: 2px solid var(--ng); text-align: center; }
-        .header h1 { margin: 0; color: var(--ng); text-transform: uppercase; letter-spacing: 2px; font-size: 1.4rem; }
-        .game-area { padding: 30px; }
-        .evidence-card { background: #000; border: 1px solid #333; padding: 20px; border-radius: 8px; margin-bottom: 25px; border-left: 5px solid var(--nb); }
-        .evidence-text { font-size: 1.1rem; color: #ffca28; min-height: 50px; line-height: 1.4; }
-        .options-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
-        .option-btn { background: #1c2128; border: 1px solid #30363d; padding: 15px; border-radius: 6px; color: #fff; cursor: pointer; transition: 0.2s; font-family: inherit; }
-        .option-btn:hover:not(:disabled) { border-color: var(--ng); background: #262c36; }
-        .option-btn.correct { background: rgba(57, 255, 20, 0.2); border-color: var(--ng); color: var(--ng); }
-        .option-btn.wrong { background: rgba(255, 49, 49, 0.2); border-color: #ff3131; color: #ff3131; }
-        .progress-bar { width: 100%; height: 6px; background: #222; margin-top: 20px; }
-        .p-f { height: 100%; width: 0%; background: var(--ng); transition: 0.4s; }
-        .score-board { margin-top: 15px; text-align: right; color: var(--ng); font-size: 0.8rem; }
-        #f-s { text-align: center; display: none; padding: 50px; }
+        :root { --bl: #00d4ff; --gr: #39ff14; --rd: #ff3131; --bg: #05070a; --cd: #0d1117; }
+        body { font-family: 'Courier New', monospace; background: var(--bg); color: #fff; padding: 20px; }
+        .container { max-width: 900px; margin: auto; border: 1px solid #30363d; border-radius: 8px; background: var(--cd); overflow: hidden; box-shadow: 0 0 40px rgba(0,0,0,0.8); }
+        .header { background: #161b22; padding: 20px; border-bottom: 2px solid var(--gr); display: flex; justify-content: space-between; align-items: center; }
+        .header h1 { margin: 0; color: var(--gr); font-size: 1.4rem; text-transform: uppercase; letter-spacing: 2px; }
+        .main-content { padding: 25px; }
+        .alert-box { background: #000; border: 1px solid #333; padding: 20px; border-radius: 6px; margin-bottom: 25px; color: #ffca28; font-size: 0.95rem; border-left: 5px solid #ffca28; min-height: 60px; line-height: 1.4; }
+        .q-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 25px; }
+        label { display: block; margin-bottom: 12px; font-weight: bold; font-size: 0.75rem; color: var(--bl); text-transform: uppercase; }
+        .o-grp { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; }
+        .i-grp { grid-template-columns: repeat(3, 1fr); }
+        .opt { background: #1a1f26; border: 1px solid #333; padding: 12px; border-radius: 4px; cursor: pointer; text-align: center; font-size: 0.75rem; transition: 0.2s; }
+        .opt:hover { border-color: var(--gr); }
+        .opt.sel { background: var(--gr); color: #000; font-weight: bold; }
+        select { width: 100%; padding: 12px; background: #1a1f26; color: white; border: 1px solid #333; border-radius: 4px; font-family: inherit; font-size: 0.85rem; cursor: pointer; outline: none; }
+        .btn-v { width: 100%; padding: 18px; background: transparent; color: var(--gr); border: 1px solid var(--gr); border-radius: 4px; font-weight: bold; cursor: pointer; text-transform: uppercase; transition: 0.3s; }
+        .btn-v:hover { background: var(--gr); color: #000; box-shadow: 0 0 20px rgba(57, 255, 20, 0.3); }
+        #res { margin-top: 20px; padding: 15px; border-radius: 4px; text-align: center; display: none; font-size: 0.85rem; font-weight: bold; }
     </style>
 </head>
 <body>
+
 <div class="container">
     <div class="header">
-        <h1 id="_sys_t">INIT_SOC_INTERFACE</h1>
-        <div id="cnt" style="font-size: 0.7rem; color: #8b949e;">DECRYPTING_NODE...</div>
+        <h1>VULN_ANALYSIS_V7</h1>
+        <div id="cnt" style="color:var(--gr); font-size: 0.9rem;">CASO: 1 / 6</div>
     </div>
-    <div class="game-area" id="qa">
-        <div class="evidence-card">
-            <h3 style="color:var(--nb); font-size:0.7rem; margin:0 0 10px 0;">INCOMING_LOG:</h3>
-            <div class="evidence-text" id="evd"></div>
+
+    <div class="main-content" id="game-body">
+        <div class="alert-box" id="alert-stream">Iniciando sistemas...</div>
+
+        <div class="q-grid">
+            <div>
+                <label>01. TIPO DA VULNERABILIDADE</label>
+                <div class="o-grp" id="g-type">
+                    <div class="opt" onclick="_s('t', this, 0)">Configuração</div>
+                    <div class="opt" onclick="_s('t', this, 1)">Código</div>
+                    <div class="opt" onclick="_s('t', this, 2)">Execução Remota</div>
+                    <div class="opt" onclick="_s('t', this, 3)">Elevação de Privilégio</div>
+                </div>
+            </div>
+            <div>
+                <label>02. IMPACTO POTENCIAL</label>
+                <div class="o-grp i-grp" id="g-impact">
+                    <div class="opt" onclick="_s('i', this, 0)">Baixo</div>
+                    <div class="opt" onclick="_s('i', this, 1)">Médio</div>
+                    <div class="opt" onclick="_s('i', this, 2)">Alto</div>
+                </div>
+            </div>
         </div>
-        <div class="options-grid" id="opt"></div>
-        <div class="progress-bar"><div class="p-f" id="pg"></div></div>
-        <div class="score-board" id="sc">HITS: 0</div>
-    </div>
-    <div id="f-s">
-        <h2 style="color: var(--ng)">SYSTEM_ANALYSIS_COMPLETE</h2>
-        <p id="f-m" style="font-size: 0.9rem;"></p>
-        <button onclick="location.reload()" style="padding: 15px 30px; background: var(--ng); border: none; border-radius: 5px; cursor: pointer; font-weight: bold; text-transform: uppercase; color: #000;">Re-Init_Session</button>
+
+        <div style="margin-bottom: 25px;">
+            <label>03. MELHOR AÇÃO DE MITIGAÇÃO</label>
+            <select id="mit-sel">
+                <option value="-1">-- SELECIONE A AÇÃO --</option>
+                <option value="0">Aplicar Patch/Atualização de segurança imediata</option>
+                <option value="1">Resetar senhas para padrão forte e aplicar MFA</option>
+                <option value="2">Corrigir permissões de ACL e isolar segmento</option>
+                <option value="3">Instalar barreiras físicas e monitoramento local</option>
+            </select>
+        </div>
+
+        <button class="btn-v" onclick="_validate()">VALIDAR DIAGNÓSTICO</button>
+        <div id="res"></div>
     </div>
 </div>
 
 <script>
 (function(){
-    // Matriz de dados encriptada (UTF-8 safe)
-    const _0xM = [
-        ["NTAwLjAwMCByZXF1aXNpw6fDtWVzIHBvciBzZWd1bmRvIHZpbmRhcyBkZSBJUHMgbXVuZGlhaXMsIGRlcnJ1YmFuZG8gbyBzZXJ2aWRvci4=", "RERvUw=="],
-        ["TyB1c3XDoXJpbyByZWNlYmV1IHVtIGUtbWFpbCBpZMOqbnRpY28gYW8gZG8gYmFuY28gcGVkaW5kbyBhdHVhbGl6YcOnw6NvIGRlIHNlbmhhLg==", "UGhpc2hpbmc="],
-        ["QXJxdWl2b3MgZG8gUkggZm9yYW0gYmxvIHF1ZWFkb3MgZSBow6EgdW0gcGVkaWRvIGRlIDIgQml0Y29pbnMu", "UmFuc29td2FyZQ=="],
-        ["TyBhdGFjYW50ZSBpbnNlcml1IG8gY29tYW5kbyAnIE9SIDE9MSAtLSBubyBjYW1wbyBkZSBsb2dpbi4=", "U1FMIEluamVjdGlvbg=="],
-        ["VW0gc2NyaXB0IG1hbGljaW9zbyBmb2kgaW5qZXRhZG8gZW0gdW0gY29tZW50w6FyaW8gZG8gYmxvZy4=", "WFNT"],
-        ["TyBpbnZhc29yIGVzdMOhIHBvc2ljaW9uYWRvIGVudHJlIG8gcm90ZWFkb3IgZSBlIG8gbGFwdG9wLg==", "TUlUTQ=="],
-        ["VW0gZXhlY3V0w6F2ZWwgb2N1bHRvIGZvaSBpbnN0YWxhZG8gbm8gc2lzdGVtYSBwYXJhIGVzcGlvbmFyLg==", "TWFsd2FyZQ=="],
-        ["TyBjcmltaW5vc28gbGlnb3UgcGFyYSBhIHNlY3JldMOhcmlhIGZpbmdpbmRvIHNlciBk doBzdXBvcnRlLg==", "RW5nZW5oYXJpYSBTb2NpYWw="],
-        ["QSBlbXByZXNhIGZvaSBpbnZhZGlkYSBhdHJhdsOpcyBkZSB1bWEgZmFsaGEgZGVzY29iZXJ0YSBob2plLg==", "WmVyby1EYXk="],
-        ["TWlsaGFyZXMgZGUgZGlzcG9zaXRpdm9zIElvVCBpbmZlY3RhZG9zIGVzdMOjbyBzZW5kbyBjb250cm9sYWRvcy4=", "Qm90bmV0"]
+    // Banco de dados fixo com 6 casos
+    const _D = [
+        { q: "Servidor Apache Tomcat (WEB-01) desatualizado permitindo execução de código remoto (RCE).", t: 2, i: 2, m: 0 },
+        { q: "Banco de Dados (DB-PROD) acessível via internet com usuário admin e senha padrão fábrica.", t: 0, i: 2, m: 1 },
+        { q: "Detecção de biblioteca Log4j v2.14 em aplicação crítica de processamento de dados.", t: 1, i: 2, m: 0 },
+        { q: "Usuário de nível estagiário possui permissão de leitura/escrita no diretório raiz do sistema.", t: 3, i: 2, m: 2 },
+        { q: "Roteador de borda com protocolo Telnet ativo e sem restrição de IPs de gerência.", t: 0, i: 1, m: 2 },
+        { q: "Terminal de autoatendimento físico com portas USB expostas e sem trava de segurança.", t: 0, i: 1, m: 3 }
     ];
 
-    let _0xi = 0, _0xh = 0;
-    const _dec = (s) => decodeURIComponent(atob(s).split('').map(c => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2)).join(''));
-    const _all = _0xM.map(x => _dec(x[1]));
+    let _idx = 0;
+    let _sel = { t: -1, i: -1 };
 
-    function _draw() {
-        if (_0xi >= _0xM.length) {
-            document.getElementById('qa').style.display = 'none';
-            const fs = document.getElementById('f-s');
-            fs.style.display = 'block';
-            document.getElementById('f-m').innerText = `TOTAL_RECORDS_PROCESSED: ${_0xh} / ${_0xM.length}`;
-            return;
+    function _load() {
+        // Verifica se ainda existem casos antes de tentar carregar
+        if (_idx < _D.length) {
+            const c = _D[_idx];
+            document.getElementById('alert-stream').innerText = `[ALERTA]: "${c.q}"`;
+            document.getElementById('cnt').innerText = `CASO: ${_idx + 1} / ${_D.length}`;
+            document.getElementById('res').style.display = "none";
+            document.getElementById('mit-sel').value = "-1";
+            document.querySelectorAll('.opt').forEach(o => o.classList.remove('sel'));
+            _sel = { t: -1, i: -1 };
+        } else {
+            // Se passar do último, mostra tela final
+            document.getElementById('game-body').innerHTML = "<h2 style='color:var(--gr); text-align:center; padding: 40px;'>🏆 MISSÃO CONCLUÍDA!<br><br><span style='font-size: 1rem; color: #fff;'>Você analisou todas as vulnerabilidades com sucesso. Sistema Protegido.</span></h2>";
         }
-
-        document.getElementById('_sys_t').innerText = "SOC_ANALYST_L1";
-        const cur = _0xM[_0xi];
-        document.getElementById('evd').innerText = `"${_dec(cur[0])}"`;
-        document.getElementById('cnt').innerText = `NODE_POINT: ${_0xi + 1} / ${_0xM.length}`;
-        document.getElementById('pg').style.width = ((_0xi / _0xM.length) * 100) + '%';
-
-        const box = document.getElementById('opt');
-        box.innerHTML = "";
-
-        let opts = [_dec(cur[1])];
-        while (opts.length < 4) {
-            let rnd = _all[Math.floor(Math.random() * _all.length)];
-            if (!opts.includes(rnd)) opts.push(rnd);
-        }
-        opts.sort(() => Math.random() - 0.5);
-
-        opts.forEach(t => {
-            const b = document.createElement('button');
-            b.className = 'option-btn';
-            b.innerText = t;
-            b.onclick = function() {
-                const ans = _dec(cur[1]);
-                const btns = document.querySelectorAll('.option-btn');
-                btns.forEach(btn => btn.disabled = true);
-
-                if (this.innerText === ans) {
-                    this.classList.add('correct');
-                    _0xh++;
-                    document.getElementById('sc').innerText = `HITS: ${_0xh}`;
-                } else {
-                    this.classList.add('wrong');
-                    btns.forEach(btn => { if(btn.innerText === ans) btn.classList.add('correct'); });
-                }
-                setTimeout(() => { _0xi++; _draw(); }, 1200);
-            };
-            box.appendChild(b);
-        });
     }
 
-    _draw();
+    window._s = function(cat, el, val) {
+        el.parentElement.querySelectorAll('.opt').forEach(o => o.classList.remove('sel'));
+        el.classList.add('sel');
+        _sel[cat] = val;
+    };
+
+    window._validate = function() {
+        const mit = parseInt(document.getElementById('mit-sel').value);
+        const r = document.getElementById('res');
+        
+        // Proteção para não validar se o jogo já acabou
+        if (_idx >= _D.length) return;
+
+        const current = _D[_idx];
+        const isCorrect = (_sel.t === current.t && _sel.i === current.i && mit === current.m);
+        
+        r.style.display = "block";
+
+        if(isCorrect) {
+            r.innerText = "🎯 DIAGNÓSTICO CORRETO! Analisando próximo alerta...";
+            r.style.color = "var(--gr)";
+            r.style.border = "1px solid var(--gr)";
+            
+            setTimeout(() => {
+                _idx++;
+                _load();
+            }, 1200);
+        } else {
+            r.innerText = "❌ ERRO NA ANÁLISE! Verifique os detalhes do alerta.";
+            r.style.color = "var(--rd)";
+            r.style.border = "1px solid var(--rd)";
+        }
+    };
+
+    _load();
 })();
 </script>
 </body>
