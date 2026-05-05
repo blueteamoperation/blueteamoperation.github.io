@@ -1,144 +1,117 @@
 <!DOCTYPE html>
-<html lang="pt-br"> 
+<html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <title>Desafio: Vetores de Ataque</title>
+    <title>Infiltration_Simulator_v9</title>
     <style>
-        :root { --neon-green: #00ff9d; --neon-blue: #00d4ff; --dark-bg: #050a0e; }
-        body { font-family: 'Segoe UI', sans-serif; background: var(--dark-bg); color: #fff; display: flex; flex-direction: column; align-items: center; padding: 20px; }
+        :root { --n-g: #00ff9d; --n-b: #00d4ff; --bg: #050a0e; --c-bg: #1a242d; }
+        body { font-family: 'Courier New', monospace; background: var(--bg); color: #fff; display: flex; flex-direction: column; align-items: center; padding: 20px; }
         
-        .game-header { text-align: center; border: 1px solid var(--neon-blue); padding: 20px; border-radius: 10px; width: 100%; max-width: 800px; background: rgba(0, 212, 255, 0.05); }
-        .game-header h1 { margin: 0; color: var(--neon-blue); text-transform: uppercase; letter-spacing: 3px; }
+        .header-box { text-align: center; border: 1px solid var(--n-b); padding: 20px; border-radius: 10px; width: 100%; max-width: 850px; background: rgba(0, 212, 255, 0.05); }
+        .header-box h1 { margin: 0; color: var(--n-b); letter-spacing: 4px; font-size: 1.4rem; }
         
-        .mission-box { margin: 20px 0; padding: 20px; background: #101820; border-left: 5px solid var(--neon-green); border-radius: 4px; width: 100%; max-width: 800px; }
+        .mission-log { margin: 20px 0; padding: 20px; background: #0c1218; border-left: 5px solid var(--n-g); width: 100%; max-width: 850px; font-size: 0.9rem; line-height: 1.5; }
         
-        .grid-vectors { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 15px; width: 100%; max-width: 800px; margin-top: 20px; }
+        .vectors-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 12px; width: 100%; max-width: 850px; margin-top: 10px; }
         
-        .vector-card { background: #1a242d; border: 1px solid #334; padding: 15px; border-radius: 8px; text-align: center; cursor: pointer; transition: 0.3s; position: relative; overflow: hidden; }
-        .vector-card:hover { border-color: var(--neon-green); transform: translateY(-5px); background: #232d36; }
-        .vector-card.selected { border-color: var(--neon-green); box-shadow: 0 0 15px var(--neon-green); }
-        .vector-card i { display: block; font-size: 2rem; margin-bottom: 10px; }
+        .v-card { background: var(--c-bg); border: 1px solid #2a343d; padding: 15px; border-radius: 4px; text-align: center; cursor: pointer; transition: 0.2s; }
+        .v-card:hover { border-color: var(--n-g); background: #232d36; }
+        .v-card.sel { border-color: var(--n-g); box-shadow: 0 0 10px rgba(0, 255, 157, 0.3); background: #0c1218; }
+        .v-card strong { color: var(--n-g); display: block; margin-bottom: 5px; font-size: 0.8rem; }
+        .v-card small { color: #888; font-size: 0.7rem; }
 
-        .status-bar { width: 100%; max-width: 800px; height: 10px; background: #222; border-radius: 5px; margin-top: 30px; }
-        .progress { height: 100%; width: 0%; background: var(--neon-green); border-radius: 5px; transition: 0.5s; }
+        .s-bar { width: 100%; max-width: 850px; height: 4px; background: #111; border-radius: 2px; margin-top: 30px; }
+        .fill { height: 100%; width: 0%; background: var(--n-g); transition: 0.6s; box-shadow: 0 0 10px var(--n-g); }
 
-        .btn-action { margin-top: 30px; padding: 15px 50px; background: var(--neon-green); color: #000; border: none; border-radius: 5px; font-weight: bold; cursor: pointer; text-transform: uppercase; }
-        .btn-action:disabled { background: #444; cursor: not-allowed; }
+        .btn-exe { margin-top: 30px; padding: 15px 60px; background: transparent; color: var(--n-g); border: 1px solid var(--n-g); border-radius: 3px; font-weight: bold; cursor: pointer; font-family: inherit; transition: 0.3s; }
+        .btn-exe:hover:not(:disabled) { background: var(--n-g); color: #000; }
+        .btn-exe:disabled { color: #333; border-color: #222; cursor: not-allowed; }
 
-        #log { margin-top: 20px; font-family: 'Consolas', monospace; color: var(--neon-green); font-size: 0.9rem; min-height: 50px; text-align: center; }
+        #console-msg { margin-top: 20px; font-size: 0.8rem; height: 20px; color: #666; }
     </style>
 </head>
 <body>
 
-<div class="game-header">
-    <h1>Infiltration Path Simulator</h1>
-    <p>Escolha o vetor de ataque correto para superar as defesas.</p>
+<div class="header-box">
+    <h1>INF_VECTOR_SIMULATOR_V.9</h1>
+    <p style="font-size:0.7rem; color: #555;">// Selecione o vetor de intrusão apropriado para o cenário.</p>
 </div>
 
-<div class="mission-box" id="mission-display">
-    <strong>OBJETIVO ATUAL:</strong> <span id="objective">Acessar a rede interna. Você encontrou um roteador Wi-Fi desatualizado na recepção da empresa.</span>
+<div class="mission-log" id="_m_box">
+    <span style="color:var(--n-g)">[OBJETIVO_ATUAL]:</span> <span id="_target">Iniciando conexão...</span>
 </div>
 
-<div class="grid-vectors" id="vectors-container">
-    </div>
+<div class="vectors-grid" id="_v_grid"></div>
 
-<div class="status-bar"><div class="progress" id="progress-bar"></div></div>
-
-<div id="log">Aguardando início da operação...</div>
-
-<button class="btn-action" id="action-btn" onclick="processChoice()" disabled>Executar Ataque</button>
+<div class="s-bar"><div class="fill" id="_prog"></div></div>
+<div id="console-msg">Aguardando entrada de comando...</div>
+<button class="btn-exe" id="_exec" onclick="_proc()" disabled>EXECUTE_ATTACK</button>
 
 <script>
-    const vectors = [
-        { id: 1, name: "Phishing", desc: "E-mails ou sites falsos" },
-        { id: 2, name: "Malware", desc: "Vírus, Trojans e Spywares" },
-        { id: 3, name: "Exploração de Vulnerabilidade", desc: "Falhas em sistemas/apps" },
-        { id: 4, name: "Engenharia Social", desc: "Manipulação psicológica" },
-        { id: 5, name: "Credenciais Vulneráveis", desc: "Senhas fracas ou vazadas" },
-        { id: 6, name: "Ataques Aplicacionais", desc: "SQL Injection e XSS" },
-        { id: 7, name: "Rede e Comunicação", desc: "MITM e Wi-Fi não seguro" },
-        { id: 8, name: "Dispositivos Removíveis", desc: "Pendrives infectados (BadUSB)" },
-        { id: 9, name: "Ameaças Internas", desc: "Funcionário mal-intencionado" },
-        { id: 10, name: "Ataques Físicos", desc: "Roubo ou acesso local" }
+(function(){
+    // Vetores e Cenários protegidos por referência de índice
+    const _V = [
+        ["Phishing", "E-mails/sites fraudulentos"], ["Malware", "Código malicioso/Payloads"], 
+        ["Vulnerabilidade", "Exploração de falhas de SO"], ["Engenharia Social", "Manipulação de usuários"],
+        ["Credenciais", "Brute Force/Senhas fracas"], ["Web Attack", "SQLi / XSS"],
+        ["Rede/Comunicação", "MITM / Wi-Fi Vulnerável"], ["Removíveis", "BadUSB / Pendrives"],
+        ["Insider Threat", "Ameaças internas"], ["Físico", "Acesso local/Hardware"]
     ];
 
-    const stages = [
-        { 
-            text: "OBJETIVO 1: O roteador Wi-Fi do escritório usa um protocolo de criptografia antigo (WEP). Qual vetor você usa?", 
-            correct: 7, 
-            log: "Sucesso! Você interceptou o tráfego da rede e obteve as primeiras credenciais."
-        },
-        { 
-            text: "OBJETIVO 2: Agora dentro da rede, você precisa entrar no Servidor de Arquivos, mas ele pede login. Você descobriu que o administrador usa a senha 'empresa123'.", 
-            correct: 5, 
-            log: "Acesso concedido! A política de senhas fracas permitiu sua entrada."
-        },
-        { 
-            text: "OBJETIVO 3: Para expandir seu controle, você precisa que um gerente execute um arquivo no computador dele. Você deixa um pendrive 'perdido' na mesa dele.", 
-            correct: 8, 
-            log: "O gerente conectou o pendrive! Malware instalado com sucesso."
-        },
-        { 
-            text: "OBJETIVO FINAL: O Banco de Dados principal só aceita comandos via formulário web, mas o formulário não filtra caracteres como aspas simples (').", 
-            correct: 6, 
-            log: "SQL Injection executado! Dados exfiltrados. Missão cumprida."
-        }
+    const _S = [
+        { t: "OBJETIVO 1: O roteador da recepção utiliza criptografia WEP obsoleta. Qual o vetor de entrada?", c: 6, l: "NETWORK_BREACH_SUCCESS: Tráfego capturado." },
+        { t: "OBJETIVO 2: Servidor interno localizado. O login do admin é 'admin' e a senha 'admin123'. Qual o vetor?", c: 4, l: "AUTH_BYPASS_SUCCESS: Credenciais fracas identificadas." },
+        { t: "OBJETIVO 3: Necessário infectar a estação de um VIP isolado. Você planta um drive USB na mesa dele.", c: 7, l: "PAYLOAD_DELIVERY_SUCCESS: Dispositivo montado no host." },
+        { t: "OBJETIVO FINAL: O banco de dados não valida a entrada em campos de pesquisa (aspas simples permitidas).", c: 5, l: "DATA_EXFILTRATION_COMPLETE: SQL_Injection executado." }
     ];
 
-    let currentStage = 0;
-    let selectedVectorId = null;
+    let _curr = 0, _sel = null;
+    const g = document.getElementById('_v_grid');
+    const msg = document.getElementById('console-msg');
 
-    function initGame() {
-        const container = document.getElementById('vectors-container');
-        vectors.forEach(v => {
-            const card = document.createElement('div');
-            card.className = 'vector-card';
-            card.innerHTML = `<strong>${v.id}. ${v.name}</strong><br><small>${v.desc}</small>`;
-            card.onclick = () => selectCard(v.id, card);
-            container.appendChild(card);
-        });
-    }
+    // Init Grid
+    _V.forEach((v, i) => {
+        const c = document.createElement('div');
+        c.className = 'v-card';
+        c.innerHTML = `<strong>${v[0]}</strong><small>${v[1]}</small>`;
+        c.onclick = () => {
+            document.querySelectorAll('.v-card').forEach(x => x.classList.remove('sel'));
+            c.classList.add('sel');
+            _sel = i;
+            document.getElementById('_exec').disabled = false;
+        };
+        g.appendChild(c);
+    });
 
-    function selectCard(id, element) {
-        document.querySelectorAll('.vector-card').forEach(c => c.classList.remove('selected'));
-        element.classList.add('selected');
-        selectedVectorId = id;
-        document.getElementById('action-btn').disabled = false;
-    }
+    document.getElementById('_target').innerText = _S[0].t;
 
-    function processChoice() {
-        const log = document.getElementById('log');
-        const stage = stages[currentStage];
+    window._proc = function() {
+        const s = _S[_curr];
+        if (_sel === s.c) {
+            _curr++;
+            msg.innerText = `>> ${s.l}`;
+            msg.style.color = "var(--n-g)";
+            document.getElementById('_prog').style.width = (_curr / _S.length) * 100 + "%";
 
-        if (selectedVectorId === stage.correct) {
-            currentStage++;
-            const progress = (currentStage / stages.length) * 100;
-            document.getElementById('progress-bar').style.width = progress + "%";
-            log.innerText = stage.log;
-            log.style.color = "var(--neon-green)";
-
-            if (currentStage < stages.length) {
+            if (_curr < _S.length) {
                 setTimeout(() => {
-                    document.getElementById('objective').innerText = stages[currentStage].text;
-                    resetSelection();
-                }, 1500);
+                    document.getElementById('_target').innerText = _S[_curr].t;
+                    _sel = null;
+                    document.querySelectorAll('.v-card').forEach(x => x.classList.remove('sel'));
+                    document.getElementById('_exec').disabled = true;
+                    msg.innerText = "Aguardando novo vetor...";
+                    msg.style.color = "#666";
+                }, 1200);
             } else {
-                document.getElementById('mission-display').innerHTML = "<h2>🏆 SISTEMA TOTALMENTE COMPROMETIDO!</h2>";
-                document.getElementById('action-btn').style.display = "none";
+                document.getElementById('_m_box').innerHTML = "<h2 style='color:var(--n-g); text-align:center;'>[!!!] SISTEMA TOTALMENTE COMPROMETIDO [!!!]</h2>";
+                document.getElementById('_exec').style.display = "none";
             }
         } else {
-            log.innerText = "ERRO: O sistema de defesa bloqueou este vetor. Tente outra abordagem.";
-            log.style.color = "#ff4444";
+            msg.innerText = ">> DETECTION_ERROR: Vetor bloqueado pelo Firewall/IDS.";
+            msg.style.color = "#ff4444";
         }
-    }
-
-    function resetSelection() {
-        selectedVectorId = null;
-        document.querySelectorAll('.vector-card').forEach(c => c.classList.remove('selected'));
-        document.getElementById('action-btn').disabled = true;
-    }
-
-    initGame();
+    };
+})();
 </script>
 </body>
 </html>
