@@ -3,121 +3,103 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Desafio: Resposta a Incidentes</title>
+    <title>SEC_RESPONSE_SIMULATOR</title>
     <style>
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #0d1117; color: #e6edf3; padding: 20px; }
-        h2 { color: #2ea043; text-align: center; }
+        :root { --p: #2ea043; --b: #0d1117; --c: #161b22; --br: #30363d; --t: #e6edf3; }
+        body { font-family: 'Consolas', monospace; background-color: var(--b); color: var(--t); padding: 20px; }
+        h2 { color: var(--p); text-align: center; text-transform: uppercase; letter-spacing: 2px; }
         .container { display: flex; gap: 20px; justify-content: center; flex-wrap: wrap; }
-        
-        /* Coluna de Opções */
-        .options { flex: 1; min-width: 250px; background: #161b22; padding: 15px; border-radius: 8px; border: 1px solid #30363d; height: fit-content; position: sticky; top: 20px; }
-        .phase-card { background: #21262d; border: 1px solid #30363d; padding: 10px; margin: 8px 0; cursor: grab; border-radius: 4px; text-align: center; font-weight: bold; transition: 0.2s; }
-        .phase-card:hover { border-color: #2ea043; background: #262c36; }
-
-        /* Coluna de Cenários */
+        .options { flex: 1; min-width: 250px; background: var(--c); padding: 15px; border-radius: 8px; border: 1px solid var(--br); height: fit-content; position: sticky; top: 20px; }
+        .phase-card { background: #21262d; border: 1px solid var(--br); padding: 10px; margin: 8px 0; cursor: grab; border-radius: 4px; text-align: center; font-weight: bold; font-size: 0.85rem; }
         .scenarios { flex: 2; min-width: 400px; }
-        .scenario-item { background: #161b22; margin-bottom: 12px; padding: 15px; border-radius: 8px; border: 1px solid #30363d; display: flex; align-items: center; justify-content: space-between; }
-        .scenario-text { flex: 1; font-size: 0.95rem; margin-right: 15px; }
-        
-        /* Espaço para soltar */
-        .drop-zone { width: 180px; min-height: 40px; border: 2px dashed #30363d; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 0.8rem; color: #8b949e; background: #0d1117; }
-        .drop-zone.over { border-color: #2ea043; background: #1c2128; }
-        .drop-zone .phase-card { margin: 0; width: 90%; cursor: default; }
-
-        button { display: block; margin: 30px auto; padding: 12px 30px; background: #238636; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 1rem; }
-        button:hover { background: #2ea043; }
-        .correct { border-color: #2ea043 !important; background: #122616 !important; }
+        .scenario-item { background: var(--c); margin-bottom: 12px; padding: 15px; border-radius: 8px; border: 1px solid var(--br); display: flex; align-items: center; justify-content: space-between; transition: 0.3s; }
+        .drop-zone { width: 180px; min-height: 40px; border: 2px dashed #444; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 0.7rem; color: #555; background: var(--b); }
+        .drop-zone.over { border-color: var(--p); background: #1c2128; }
+        button { display: block; margin: 30px auto; padding: 12px 40px; background: #238636; color: white; border: none; border-radius: 6px; cursor: pointer; font-family: inherit; font-weight: bold; }
+        .correct { border-color: var(--p) !important; background: #122616 !important; }
         .incorrect { border-color: #f85149 !important; background: #2a1215 !important; }
     </style>
 </head>
 <body>
 
-    <h2>Treinamento: Ciclo de Resposta a Incidentes</h2>
-    <p style="text-align: center;">Arraste as fases da esquerda e solte-as no cenário correspondente à direita.</p>
+    <h2>INCIDENT_RESPONSE_LAB</h2>
+    <p style="text-align: center; font-size: 0.8rem; color: #8b949e;">// Classifique os eventos arrastando as fases para os buffers correspondentes.</p>
 
     <div class="container">
-        <div class="options" id="phases">
-            <div class="phase-card" draggable="true" data-phase="PREPARAÇÃO">1. PREPARAÇÃO</div>
-            <div class="phase-card" draggable="true" data-phase="IDENTIFICAÇÃO">2. IDENTIFICAÇÃO</div>
-            <div class="phase-card" draggable="true" data-phase="CONTENÇÃO">3. CONTENÇÃO</div>
-            <div class="phase-card" draggable="true" data-phase="ERRADICAÇÃO">4. ERRADICAÇÃO</div>
-            <div class="phase-card" draggable="true" data-phase="RECUPERAÇÃO">5. RECUPERAÇÃO</div>
-            <div class="phase-card" draggable="true" data-phase="LIÇÕES APRENDIDAS">6. LIÇÕES APRENDIDAS</div>
-        </div>
-
-        <div class="scenarios" id="quiz">
-            </div>
+        <div class="options" id="_0x_opt"></div>
+        <div class="scenarios" id="_0x_quiz"></div>
     </div>
 
-    <button onclick="checkAnswers()">Verificar Respostas</button>
+    <button onclick="_0x_verify()">VALIDATE_RESULTS</button>
 
     <script>
-        const data = [
-            { id: 1, text: "Equipe recebe alerta do EDR indicando comportamento suspeito.", answer: "IDENTIFICAÇÃO" },
-            { id: 2, text: "O analista isola o servidor comprometido da rede.", answer: "CONTENÇÃO" },
-            { id: 3, text: "Equipe remove o malware e contas maliciosas criadas.", answer: "ERRADICAÇÃO" },
-            { id: 4, text: "Backups são restaurados e os serviços validados.", answer: "RECUPERAÇÃO" },
-            { id: 5, text: "Organização realiza treinamento de conscientização e atualiza o plano.", answer: "LIÇÕES APRENDIDAS" },
-            { id: 6, text: "Equipe analisa logs e confirma que se trata de Ransomware.", answer: "IDENTIFICAÇÃO" },
-            { id: 7, text: "Relatório detalhado sobre o impacto e o que precisa melhorar.", answer: "LIÇÕES APRENDIDAS" },
-            { id: 8, text: "Regras de firewall aplicadas para bloquear IPs do atacante.", answer: "CONTENÇÃO" },
-            { id: 9, text: "TI monitora sistemas para garantir que não há mais atividade maliciosa.", answer: "RECUPERAÇÃO" },
-            { id: 10, text: "Definição de papéis, responsabilidades e revisão de contatos.", answer: "PREPARAÇÃO" }
+    (function(){
+        // Fases e Respostas Ofuscadas em Base64
+        const _0xf = ["UFJFUEFSQcdBTw==", "SURFTlRJRklDQcdBTw==", "Q09OVEVO单位Tw==", "RVJSQURJQ0HHT08=", "UkVDVVBFUkHHT08=", "TEnDh8VFUyBBUFJFTkRJREFT"];
+        const _0xd = [
+            {id: 1, t: "RXF1aXBlIHJlY2ViZSBhbGVydGEgZG8gRURSIGluZGljYW5kbyBjb21wb3J0YW1lbnRvIHN1c3BlaXRvLg==", a: _0xf[1]},
+            {id: 2, t: "TyBhbmFsaXN0YSBpc29sYSBvIHNlcnZpZG9yIGNvbXByb21ldGlkbyBkYSByZWRlLg==", a: _0xf[2]},
+            {id: 3, t: "RXF1aXBlIHJlbW92ZSBvIG1hbHdhcmUgZSBjb250YXMgbWFsaWNpb3NhcyBjcmlhZGFzLg==", a: _0xf[3]},
+            {id: 4, t: "QmFja3VwcyBzw6NvIHJlc3RhdXJhZG9zIGUgb3Mgc2VydmnDp29zIHZhbGlkYWRvcy4=", a: _0xf[4]},
+            {id: 5, t: "T3JnYW5pemHDp8OjbyByZWFsaXphIHRyZWluYW1lbnRvIGRlIGNvbnNjaWVudGl6YcOnw6NvLg==", a: _0xf[5]},
+            {id: 6, t: "RXF1aXBlIGFuYWxpc2EgbG9ncyBlIGNvbmZpcm1hIHF1ZSBzZSB0cmF0YSBkZSBSYW5zb213YXJlLg==", a: _0xf[1]},
+            {id: 7, t: "UmVsYXTDs3JpbyBkZXRhbGhhZG8gc29icmUgbyBpbXBhY3RvIGUgbyBxdWUgcHJlY2lzYSBtZWxob3Jhci4=", a: _0xf[5]},
+            {id: 8, t: "UmVncmFzIGRlIGZpcmV3YWxsIGFwbGljYWRhcyBwYXJhIGJsb3F1ZWFyIElQcyBkbyBhdGFjYW50ZS4=", a: _0xf[2]},
+            {id: 9, t: "VEkgbW9uaXRvcmEgc2lzdGVtYXMgcGFyYSBnYXJhbnRpciBxdWUgbsO6byBhow6EIGF0aXZpZGFkZS4=", a: _0xf[4]},
+            {id: 10, t: "RGVmaW5pY8Onw6NvIGRlIHBhcMOpaXMsIHJlc3BvbnNhYmlsaWRhZGVzIGUgcmV2aXPDo28u", a: _0xf[0]}
         ];
 
-        const quizContainer = document.getElementById('quiz');
+        const _0xdec = (s) => decodeURIComponent(atob(s).split('').map(c => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2)).join(''));
+        const _0x_qC = document.getElementById('_0x_quiz');
+        const _0x_oC = document.getElementById('_0x_opt');
 
-        // Criar cenários no HTML
-        data.forEach(item => {
+        // Renderizar Fases
+        _0xf.forEach((ph, i) => {
+            const div = document.createElement('div');
+            div.className = 'phase-card';
+            div.draggable = true;
+            div.dataset.p = ph;
+            div.innerText = `${i+1}. ${_0xdec(ph)}`;
+            div.addEventListener('dragstart', (e) => e.dataTransfer.setData('text', ph));
+            _0x_oC.appendChild(div);
+        });
+
+        // Renderizar Quests
+        _0xd.forEach(it => {
             const div = document.createElement('div');
             div.className = 'scenario-item';
-            div.innerHTML = `
-                <span class="scenario-text"><strong>${item.id}.</strong> ${item.text}</span>
-                <div class="drop-zone" data-id="${item.id}">Arraste aqui</div>
-            `;
-            quizContainer.appendChild(div);
+            div.innerHTML = `<span style="font-size:0.9rem;"><strong>${it.id}.</strong> ${_0xdec(it.t)}</span><div class="drop-zone" data-id="${it.id}">BUFFER_EMPTY</div>`;
+            _0x_qC.appendChild(div);
         });
 
-        // Lógica de Drag and Drop
-        let draggedElement = null;
-
-        document.querySelectorAll('.phase-card').forEach(card => {
-            card.addEventListener('dragstart', (e) => {
-                draggedElement = card;
-                e.dataTransfer.setData('text', card.dataset.phase);
-            });
-        });
-
-        document.querySelectorAll('.drop-zone').forEach(zone => {
-            zone.addEventListener('dragover', (e) => e.preventDefault());
-            zone.addEventListener('dragenter', function() { this.classList.add('over'); });
-            zone.addEventListener('dragleave', function() { this.classList.remove('over'); });
-
-            zone.addEventListener('drop', function(e) {
+        document.querySelectorAll('.drop-zone').forEach(z => {
+            z.addEventListener('dragover', (e) => e.preventDefault());
+            z.addEventListener('dragenter', function() { this.classList.add('over'); });
+            z.addEventListener('dragleave', function() { this.classList.remove('over'); });
+            z.addEventListener('drop', function(e) {
                 e.preventDefault();
                 this.classList.remove('over');
-                const phase = e.dataTransfer.getData('text');
-                this.innerHTML = `<div class="phase-card">${phase}</div>`;
-                this.dataset.userAnswer = phase;
+                const p = e.dataTransfer.getData('text');
+                this.innerHTML = `<div class="phase-card" style="margin:0; width:95%;">${_0xdec(p)}</div>`;
+                this.dataset.ans = p;
             });
         });
 
-        function checkAnswers() {
-            let score = 0;
-            document.querySelectorAll('.drop-zone').forEach(zone => {
-                const scenarioId = zone.dataset.id;
-                const correctAnswer = data.find(d => d.id == scenarioId).answer;
-                const userAnswer = zone.dataset.userAnswer;
-
-                if (userAnswer === correctAnswer) {
-                    zone.parentElement.className = 'scenario-item correct';
-                    score++;
+        window._0x_verify = function() {
+            let s = 0;
+            document.querySelectorAll('.drop-zone').forEach(z => {
+                const id = z.dataset.id;
+                const correct = _0xd.find(item => item.id == id).a;
+                if (z.dataset.ans === correct) {
+                    z.parentElement.className = 'scenario-item correct';
+                    s++;
                 } else {
-                    zone.parentElement.className = 'scenario-item incorrect';
+                    z.parentElement.className = 'scenario-item incorrect';
                 }
             });
-            alert(`Você acertou ${score} de ${data.length}!`);
-        }
+            alert(`ANALYSIS_COMPLETE: ${s} / ${_0xd.length} ALIGNED.`);
+        };
+    })();
     </script>
 </body>
 </html>
