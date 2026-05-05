@@ -2,126 +2,113 @@
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <title>Desafio: Magic Numbers - Forense Digital</title>
+    <title>Sytem-Security-Check | Magic Numbers</title>
     <style>
         :root { --cyber-blue: #00d4ff; --cyber-yellow: #ffca28; --bg: #05080a; --card: #10141b; }
-        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); color: #e0e0e0; padding: 20px; display: flex; flex-direction: column; align-items: center; }
-        
+        body { font-family: 'Consolas', monospace; background: var(--bg); color: #e0e0e0; padding: 20px; display: flex; flex-direction: column; align-items: center; }
         .container { width: 100%; max-width: 900px; background: var(--card); border: 1px solid #30363d; border-radius: 12px; overflow: hidden; box-shadow: 0 0 30px rgba(0, 212, 255, 0.2); }
         .header { background: #161b22; padding: 20px; border-bottom: 2px solid var(--cyber-blue); text-align: center; }
-        .header h1 { margin: 0; color: var(--cyber-blue); text-transform: uppercase; letter-spacing: 2px; }
-        
+        .header h1 { margin: 0; color: var(--cyber-blue); text-transform: uppercase; letter-spacing: 2px; font-size: 1.3rem; }
         .main-content { padding: 30px; }
         .file-info { display: flex; align-items: center; gap: 20px; background: #1c2128; padding: 15px; border-radius: 8px; margin-bottom: 20px; border-left: 5px solid var(--cyber-yellow); }
-        .file-icon { font-size: 2.5rem; }
-        
-        /* Hex Viewer Estilizado */
-        .hex-viewer { background: #000; color: #00ff00; padding: 20px; border-radius: 6px; font-family: 'Consolas', 'Monaco', monospace; font-size: 0.9rem; line-height: 1.5; border: 1px solid #333; margin-bottom: 25px; overflow-x: auto; }
-        .magic-highlight { background: #ffca28; color: #000; font-weight: bold; padding: 0 2px; border-radius: 2px; }
-
-        .options-title { margin-bottom: 15px; font-weight: bold; color: var(--cyber-blue); text-transform: uppercase; font-size: 0.8rem; }
-        .options-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
-        .opt-btn { background: #161b22; border: 1px solid #30363d; padding: 12px; color: #fff; cursor: pointer; border-radius: 4px; transition: 0.2s; }
-        .opt-btn:hover { border-color: var(--cyber-blue); background: #1c2128; }
-        .opt-btn.selected { background: var(--cyber-blue); color: #000; font-weight: bold; border-color: var(--cyber-blue); }
-
-        .btn-verify { width: 100%; padding: 18px; background: var(--cyber-blue); color: #000; border: none; border-radius: 4px; font-weight: bold; cursor: pointer; text-transform: uppercase; margin-top: 30px; font-size: 1rem; }
-        .btn-verify:hover { background: #00b8e6; box-shadow: 0 0 15px rgba(0, 212, 255, 0.4); }
-
-        #feedback { margin-top: 20px; padding: 15px; border-radius: 4px; text-align: center; display: none; font-weight: bold; border: 1px solid transparent; }
-        .success { background: rgba(0, 255, 128, 0.1); border-color: #00ff80 !important; color: #00ff80; }
-        .error { background: rgba(255, 49, 49, 0.1); border-color: #ff3131 !important; color: #ff3131; }
+        .hex-viewer { background: #000; color: #00ff00; padding: 20px; border-radius: 6px; font-size: 0.9rem; line-height: 1.5; border: 1px solid #333; margin-bottom: 25px; overflow-x: auto; }
+        .magic-highlight { background: var(--cyber-yellow); color: #000; font-weight: bold; padding: 0 4px; border-radius: 2px; }
+        .options-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 15px; }
+        .opt-btn { background: #161b22; border: 1px solid #30363d; padding: 12px; color: #fff; cursor: pointer; border-radius: 4px; font-family: inherit; transition: 0.2s; }
+        .opt-btn:hover { border-color: var(--cyber-blue); }
+        .opt-btn.selected { background: var(--cyber-blue); color: #000; font-weight: bold; }
+        .btn-verify { width: 100%; padding: 18px; background: var(--cyber-blue); color: #000; border: none; border-radius: 4px; font-weight: bold; cursor: pointer; text-transform: uppercase; margin-top: 30px; font-family: inherit; }
+        #feedback { margin-top: 20px; padding: 15px; border-radius: 4px; text-align: center; display: none; font-weight: bold; }
+        .success { border: 1px solid #00ff80; color: #00ff80; background: rgba(0,255,128,0.05); }
+        .error { border: 1px solid #ff3131; color: #ff3131; background: rgba(255,49,49,0.05); }
     </style>
 </head>
 <body>
-
 <div class="container">
     <div class="header">
-        <h1>Análise de Magic Numbers</h1>
-        <small id="counter">CASO: 1 / 5</small>
+        <h1>FORENSIC_HEX_ANALYSIS</h1>
+        <small id="counter" style="color: var(--cyber-yellow)">INIT...</small>
     </div>
-
-    <div class="main-content">
+    <div class="main-content" id="game-body">
         <div class="file-info">
-            <div class="file-icon" id="file-ext-icon">📄</div>
+            <div style="font-size: 2rem;">📄</div>
             <div>
-                <strong>Arquivo Suspeito:</strong> <span id="file-name">foto_ferias.jpg</span><br>
-                <span>O Analista desconfia que a extensão não condiz com o conteúdo.</span>
+                <strong>EVIDÊNCIA:</strong> <span id="file-name">---</span><br>
+                <small style="color: #888">DUMP DE MEMÓRIA DO CABEÇALHO DO ARQUIVO</small>
             </div>
         </div>
-
-        <div class="options-title">Visualização Hexadecimal (Primeiros 16 Bytes):</div>
-        <div class="hex-viewer" id="hex-display">
-            00000000  <span class="magic-highlight">FF D8 FF E0</span> 00 10 4A 46 49 46 00 01 01 01 00 60
-        </div>
-
-        <div class="options-title">Qual é o formato REAL deste arquivo?</div>
-        <div class="options-grid" id="options">
-            </div>
-
-        <button class="btn-verify" onclick="verify()">Analisar Assinatura Oculta</button>
+        <div class="hex-viewer" id="hex-display"></div>
+        <div class="options-grid" id="options"></div>
+        <button class="btn-verify" onclick="check()">VALIDAR ASSINATURA</button>
         <div id="feedback"></div>
     </div>
 </div>
 
 <script>
-    const cases = [
-        { name: "imagem_secreta.jpg", hex: "89 50 4E 47 0D 0A 1A 0A 00 00 00 0D 49 48 44 52", magic: "89 50 4E 47", ans: "PNG" },
-        { name: "documento.pdf", hex: "4D 5A 90 00 03 00 00 00 04 00 00 00 FF FF 00 00", magic: "4D 5A", ans: "EXE" },
-        { name: "planilha.xlsx", hex: "25 50 44 46 2D 31 2E 34 0A 25 D3 EB E9 E1 0A 32", magic: "25 50 44 46", ans: "PDF" },
-        { name: "musica.mp3", hex: "47 49 46 38 39 61 20 00 20 00 F7 00 00 00 00 00", magic: "47 49 46", ans: "GIF" },
-        { name: "backup.zip", hex: "52 61 72 21 1A 07 00 CF 90 73 00 00 0D 00 00 00", magic: "52 61 72 21", ans: "RAR" }
+(function(){
+  
+    const _D = [
+        { n: "imagem_secreta.jpg", h: "89 50 4E 47 0D 0A 1A 0A 00 00 00 0D", m: "89 50 4E 47", t: 236 }, 
+        { n: "documento.pdf", h: "4D 5A 90 00 03 00 00 00 04 00 00 00", m: "4D 5A", t: 224 },       
+        { n: "planilha.xlsx", h: "25 50 44 46 2D 31 2E 34 0A 25 D3 EB", m: "25 50 44 46", t: 214 }, 
+        { n: "musica.mp3", h: "47 49 46 38 39 61 20 00 20 00 F7 00", m: "47 49 46", t: 213 },       
+        { n: "backup.zip", h: "52 61 72 21 1A 07 00 CF 90 73 00 00", m: "52 61 72 21", t: 231 }    
     ];
 
-    const allTypes = ["JPEG", "PNG", "PDF", "EXE", "GIF", "ZIP", "RAR", "MP3", "MP4"];
-    let current = 0;
-    let selected = "";
+    const types = ["JPEG", "PNG", "PDF", "EXE", "GIF", "ZIP", "RAR", "MP3", "MP4"];
+    let idx = 0, sel = "";
 
-    function load() {
-        const c = cases[current];
-        document.getElementById('file-name').innerText = c.name;
-        document.getElementById('counter').innerText = `CASO: ${current + 1} / ${cases.length}`;
+    function render() {
+        if (idx >= _D.length) {
+            document.getElementById('game-body').innerHTML = "<h2 style='color:var(--cyber-blue); text-align:center;'>🏆 PERÍCIA CONCLUÍDA!</h2><p style='text-align:center;'>Todas as assinaturas foram identificadas corretamente.</p>";
+            return;
+        }
+        const c = _D[idx];
+        document.getElementById('file-name').innerText = c.n;
+        document.getElementById('counter').innerText = `NODE: ${idx + 1} / ${_D.length}`;
         
-        // Formata o Hex com o destaque no Magic Number
-        const parts = c.hex.split(" ");
-        const magicLen = c.magic.split(" ").length;
-        let formattedHex = `<span class="magic-highlight">${parts.slice(0, magicLen).join(" ")}</span> ` + parts.slice(magicLen).join(" ");
-        document.getElementById('hex-display').innerHTML = `00000000  ${formattedHex}`;
+        // Renderiza o Hex com destaque no Magic Number
+        const hParts = c.h.split(" ");
+        const mLen = c.m.split(" ").length;
+        document.getElementById('hex-display').innerHTML = `00000000  <span class="magic-highlight">${hParts.slice(0, mLen).join(" ")}</span> ${hParts.slice(mLen).join(" ")}`;
         
         const grid = document.getElementById('options');
         grid.innerHTML = "";
-        allTypes.forEach(t => {
-            const btn = document.createElement('button');
-            btn.className = 'opt-btn';
-            btn.innerText = t;
-            btn.onclick = () => {
-                document.querySelectorAll('.opt-btn').forEach(b => b.classList.remove('selected'));
-                btn.classList.add('selected');
-                selected = t;
+        types.forEach(t => {
+            const b = document.createElement('button');
+            b.className = 'opt-btn';
+            b.innerText = t;
+            b.onclick = () => {
+                document.querySelectorAll('.opt-btn').forEach(btn => btn.classList.remove('selected'));
+                b.classList.add('selected');
+                sel = t;
             };
-            grid.appendChild(btn);
+            grid.appendChild(b);
         });
         document.getElementById('feedback').style.display = "none";
     }
 
-    function verify() {
+    window.check = function() {
         const res = document.getElementById('feedback');
+        if(!sel) return;
+
+        // Validação "cega": Calcula o peso da string selecionada
+        let sum = 0;
+        for (let i = 0; i < sel.length; i++) sum += sel.charCodeAt(i);
+
         res.style.display = "block";
-        if (selected === cases[current].ans) {
+        if (sum === _D[idx].t) {
             res.className = "success";
-            res.innerHTML = `✅ CORRETO! A assinatura ${cases[current].magic} revela um arquivo ${cases[current].ans}.`;
-            setTimeout(() => {
-                current++;
-                if (current < cases.length) load();
-                else document.querySelector('.main-content').innerHTML = "<h2>🏆 PERITO FORENSE!</h2><p>Você identificou todos os arquivos camuflados com sucesso.</p>";
-            }, 2000);
+            res.innerHTML = `✅ IDENTIFICADO! Assinatura compatível com o formato ${sel}.`;
+            setTimeout(() => { idx++; sel = ""; render(); }, 1800);
         } else {
             res.className = "error";
-            res.innerText = "❌ ASSINATURA INCORRETA. Verifique a tabela de Magic Numbers no infográfico.";
+            res.innerText = "❌ FALHA: A assinatura hexadecimal não corresponde ao formato selecionado.";
         }
-    }
+    };
 
-    load();
+    render();
+})();
 </script>
 </body>
 </html>
