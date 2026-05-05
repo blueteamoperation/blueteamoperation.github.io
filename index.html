@@ -1,161 +1,225 @@
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
-<meta charset="UTF-8">
-<title>BlueTeamOps</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BlueTeamOps | Digital Forensics</title>
 
-<style>
-body {
-    margin: 0;
-    font-family: monospace;
-    background: #0b0f14;
-    color: #c7d1db;
-}
+    <style>
+        :root {
+            --bg-color: #0a0a0a;
+            --container-bg: #0f0f0f;
+            --accent-orange: #ff6600;
+            --text-gray: #a0a0a0;
+            --border-color: #222;
+            --terminal-green: #00ff41;
+        }
 
-/* BANNER */
-.banner img {
-    width: 100%;
-    border-bottom: 1px solid #1f2933;
-}
+        body {
+            margin: 0;
+            font-family: 'Courier New', Courier, monospace;
+            background: var(--bg-color);
+            color: var(--text-gray);
+            line-height: 1.6;
+        }
 
-/* CONTAINER */
-.container {
-    max-width: 900px;
-    margin: auto;
-    padding: 30px;
-}
+        /* Scanline Effect (Opcional, estilo monitor antigo) */
+        body::before {
+            content: " ";
+            display: block;
+            position: fixed;
+            top: 0; left: 0; bottom: 0; right: 0;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), 
+                        linear-gradient(90deg, rgba(255, 0, 0, 0.02), rgba(0, 255, 0, 0.01), rgba(0, 0, 255, 0.02));
+            z-index: 9999;
+            pointer-events: none;
+            background-size: 100% 4px, 3px 100%;
+        }
 
-/* TÍTULO */
-h1 {
-    color: #00f0ff;
-    font-size: 28px;
-}
+        /* BANNER */
+        .header-banner {
+            width: 100%;
+            height: 350px;
+            overflow: hidden;
+            border-bottom: 3px solid var(--accent-orange);
+            position: relative;
+        }
 
-/* SEÇÕES */
-.section {
-    margin-top: 30px;
-}
+        .header-banner img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            filter: grayscale(100%) contrast(120%) brightness(50%);
+        }
 
-.section h2 {
-    font-size: 18px;
-    border-bottom: 1px solid #1f2933;
-    padding-bottom: 5px;
-    color: #7aa2f7;
-}
+        .header-overlay {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            text-align: center;
+            width: 100%;
+        }
 
-/* LINKS */
-ul {
-    list-style: none;
-    padding: 0;
-}
+        /* CONTAINER */
+        .container {
+            max-width: 900px;
+            margin: -50px auto 50px;
+            padding: 40px;
+            background: var(--container-bg);
+            border: 1px solid var(--border-color);
+            position: relative;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+        }
 
-li {
-    margin: 8px 0;
-}
+        /* TÍTULO PRINCIPAL */
+        h1.main-title {
+            color: var(--accent-orange);
+            font-size: 24px;
+            text-transform: uppercase;
+            letter-spacing: 5px;
+            margin-bottom: 5px;
+            text-shadow: 2px 2px 0px rgba(0,0,0,1);
+        }
 
-a {
-    text-decoration: none;
-    color: #9ece6a;
-}
+        .status-bar {
+            font-size: 10px;
+            color: var(--accent-orange);
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 15px;
+            margin-bottom: 30px;
+            display: flex;
+            justify-content: space-between;
+        }
 
-a:hover {
-    text-decoration: underline;
-}
+        /* SEÇÕES */
+        .section {
+            margin-bottom: 40px;
+        }
 
-/* RODAPÉ */
-.footer {
-    margin-top: 40px;
-    font-size: 12px;
-    opacity: 0.5;
-}
-</style>
+        .section h2 {
+            font-size: 14px;
+            color: var(--accent-orange);
+            background: rgba(255, 102, 0, 0.1);
+            padding: 8px 15px;
+            border-left: 4px solid var(--accent-orange);
+            text-transform: uppercase;
+            display: flex;
+            justify-content: space-between;
+        }
 
+        .section h2::after {
+            content: "[SEC_LEVEL_4]";
+            font-size: 10px;
+            opacity: 0.5;
+        }
+
+        /* LINKS / LISTA */
+        ul {
+            list-style: none;
+            padding: 0;
+            margin-left: 10px;
+        }
+
+        li {
+            margin: 12px 0;
+            border-bottom: 1px dashed #1a1a1a;
+            padding-bottom: 5px;
+        }
+
+        li::before {
+            content: "> ";
+            color: var(--accent-orange);
+        }
+
+        a {
+            text-decoration: none;
+            color: #eee;
+            transition: 0.3s;
+            font-size: 14px;
+        }
+
+        a:hover {
+            color: var(--accent-orange);
+            padding-left: 10px;
+        }
+
+        /* FOOTER */
+        .footer {
+            text-align: center;
+            font-size: 10px;
+            color: #444;
+            margin-top: 60px;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+
+        /* DETALHES FORENSES */
+        .id-badge {
+            font-size: 10px;
+            color: #333;
+            position: absolute;
+            top: 10px;
+            right: 10px;
+        }
+
+    </style>
 </head>
-
 <body>
 
-<!-- BANNER -->
-
-    <div style="width:100%; height:800px; overflow:hidden; border-bottom:2px solid #00ffcc;">
-  <img src="https://raw.githubusercontent.com/blueteamoperation/blueteamoperation.github.io/refs/heads/main/header.png" style="width:100%; object-fit:cover;">
+<div class="header-banner">
+    <img src="https://raw.githubusercontent.com/blueteamoperation/blueteamoperation.github.io/refs/heads/main/header.png" alt="Forensic Header">
 </div>
- 
 
 <div class="container">
-
-       <h2>BLUE TEAM OPERATION</h2>
-    <p>Repositório de artefatos, labs e análise forense.</p>
-
-    <div class="section">
-        <h2>📂 Módulo - 1</h2>
-        <ul>
-            <li><a href="https://blueteamoperation.github.io/MOD-1/ri.html" target="_blank" >Atividade 1 -  Ciclo de Resposta a Incidentes. </a></li>
-              <li><a href="https://blueteamoperation.github.io/MOD-1/matriz.html" target="_blank" >Atividade 2 -  Matriz de Risco.</a></li>
-                <li><a href="https://blueteamoperation.github.io/MOD-1/kill.html" target="_blank" >Atividade 3 -  Kill Chain. </a></li>
-           <li><a href="https://blueteamoperation.github.io/MOD-1/ceh.html" target="_blank" >Atividade 4 -  Fases de um Ataque Metodologia C|EH. </a></li>
-              <li><a href="https://blueteamoperation.github.io/MOD-1/dfir.html" target="_blank" >Atividade 5 -  DFIR em Ação. </a></li>
-                 <li><a href="https://blueteamoperation.github.io/MOD-1/vetores.html" target="_blank" >Atividade 6 -  Vetores de Ataques. </a></li>
-                 <li><a href="https://blueteamoperation.github.io/MOD-1/vuln.html" target="_blank" >Atividade 7 -  Analisando Vulnerablidades. </a></li>
-              <li><a href="https://blueteamoperation.github.io/MOD-1/ataques.html" target="_blank" >Atividade 8 -  Analisando Ataques. </a></li>
-        </ul>
-    </div>
+    <div class="id-badge">FILE_ID: BT-OPS-2024</div>
     
+    <h1 class="main-title">BLUE TEAM OPERATION</h1>
+    <div class="status-bar">
+        <span>STATUS: EN ANDAMENTO</span>
+        <span>LOCATION: ANALYTICS_LAB_01</span>
+        <span>USER: ANONYMOUS</span>
+    </div>
 
-    <!-- SEÇÃO 1 -->
+    <p style="font-size: 13px; color: #666; margin-bottom: 30px;">
+        // Repositório central de artefatos e evidências forenses.
+    </p>
+
     <div class="section">
-        <h2>📂 Módulo - 2</h2>
+        <h2>Módulo 01 - Fundamentos</h2>
         <ul>
-              <li><a href="https://blueteamoperation.github.io/MOD-2/conv.html" target="_blank" >Atividade 1 -  Convertendo Dados. </a></li>
-                <li><a href="https://blueteamoperation.github.io/MOD-2/endian.html" target="_blank" >Atividade 2 -  Ordem dos Endianess. </a></li>
-             <li><a href="https://blueteamoperation.github.io/MOD-2/ascii.html" target="_blank" >Atividade 3 -  ASCII. </a></li>
-                    <li><a href="https://blueteamoperation.github.io/MOD-2/mustang.html" target="_blank" >Atividade 4 -  Mustang Vermelho. </a></li> 
-          <li><a href="https://blueteamoperation.github.io/MOD-2/cadeia.html" target="_blank" >Atividade 5 -  Cadeia de Custódia. </a></li> 
-                      <li><a href="https://blueteamoperation.github.io/MOD-2/magic.html" target="_blank" >Atividade 6 -  Magic Numbers. </a></li> 
-             <li><a href="https://blueteamoperation.github.io/MOD-2/steg.html" target="_blank" >Atividade 7 -  Hidden. </a></li> 
-             <li><a href="https://blueteamoperation.github.io/MOD-2/payload.html" target="_blank" >Atividade 8 -  Master Payload. </a></li> 
-        </ul>
-    </div>
- <div class="section">
-    <h2>📂 Módulo - 3</h2>
-        <ul>
-              <li><a href="https://blueteamoperation.github.io/MOD-3/apache.html" target="_blank" >Atividade 1 -  Apache Master. </a></li>
-                <li><a href="https://blueteamoperation.github.io/MOD-3/linuxlog.html" target="_blank" >Atividade 2 - Linux LOGs. </a></li>
-        
+            <li><a href="https://blueteamoperation.github.io/MOD-1/ri.html" target="_blank">Ciclo de Resposta a Incidentes</a></li>
+            <li><a href="https://blueteamoperation.github.io/MOD-1/matriz.html" target="_blank">Análise de Matriz de Risco</a></li>
+            <li><a href="https://blueteamoperation.github.io/MOD-1/kill.html" target="_blank">Cyber Kill Chain Analysis</a></li>
+            <li><a href="https://blueteamoperation.github.io/MOD-1/ceh.html" target="_blank">Metodologia C|EH</a></li>
+            <li><a href="https://blueteamoperation.github.io/MOD-1/dfir.html" target="_blank">DFIR em Ação</a></li>
+            <li><a href="https://blueteamoperation.github.io/MOD-1/vetores.html" target="_blank">Mapeamento de Vetores</a></li>
         </ul>
     </div>
 
-   <!-- 
     <div class="section">
-        <h2>🧪 Labs</h2>
+        <h2>Módulo 02 - Análise de Dados</h2>
         <ul>
-            <li><a href="#">Lab DFIR 01</a></li>
-            <li><a href="#">Lab Threat Hunting</a></li>
+            <li><a href="https://blueteamoperation.github.io/MOD-2/conv.html" target="_blank">Conversão de Dados Brutos</a></li>
+            <li><a href="https://blueteamoperation.github.io/MOD-2/endian.html" target="_blank">Endianness & Byte Order</a></li>
+            <li><a href="https://blueteamoperation.github.io/MOD-2/mustang.html" target="_blank">Operação Mustang Vermelho</a></li>
+            <li><a href="https://blueteamoperation.github.io/MOD-2/magic.html" target="_blank">Magic Numbers Discovery</a></li>
+            <li><a href="https://blueteamoperation.github.io/MOD-2/steg.html" target="_blank">Esteganografia: Hidden Data</a></li>
         </ul>
     </div>
 
-    <!-- SEÇÃO 3 
     <div class="section">
-        <h2>🔧 Ferramentas</h2>
+        <h2>Módulo 03 - Logs & Artifacts</h2>
         <ul>
-            <li><a href="#">Volatility</a></li>
-            <li><a href="#">Wireshark</a></li>
-            <li><a href="#">Autopsy</a></li>
+            <li><a href="https://blueteamoperation.github.io/MOD-3/apache.html" target="_blank">Apache Web Logs Analysis</a></li>
+            <li><a href="https://blueteamoperation.github.io/MOD-3/linuxlog.html" target="_blank">Linux System Logs</a></li>
         </ul>
     </div>
 
-    <!-- SEÇÃO 4 
-    <div class="section">
-        <h2>📖 Writeups</h2>
-        <ul>
-            <li><a href="#">Análise de Malware</a></li>
-            <li><a href="#">Investigação de Incidente</a></li>
-        </ul>
-    </div> 
-
-    <div class="footer"> -->
-        BlueTeamOps • DFIR • Cyber Defense
+    <div class="footer">
+        --- END OF FILE --- <br>
+        BlueTeamOps • Digital Forensics & Incident Response
     </div>
-
 </div>
 
 </body>
