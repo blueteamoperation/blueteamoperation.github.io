@@ -5,9 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>FIAP :: Cyber Challenge - Binary Decoder</title>
     <style>
+        :root { --main: #00f2ff; --warn: #ffd700; --bg: #0a0a0a; }
         body {
-            background-color: #0a0a0a;
-            color: #00f2ff;
+            background-color: var(--bg);
+            color: var(--main);
             font-family: 'Courier New', Courier, monospace;
             display: flex;
             flex-direction: column;
@@ -15,99 +16,132 @@
             justify-content: center;
             height: 100vh;
             margin: 0;
-            border: 2px solid #00f2ff;
+            border: 4px solid #111;
         }
 
         .terminal {
             background: #000;
-            padding: 20px;
-            border: 1px solid #ffd700;
-            box-shadow: 0 0 20px rgba(0, 242, 255, 0.2);
-            width: 80%;
-            max-width: 600px;
+            padding: 30px;
+            border: 1px solid var(--warn);
+            box-shadow: 0 0 30px rgba(0, 242, 255, 0.1);
+            width: 85%;
+            max-width: 550px;
+            position: relative;
         }
 
-        h2 { color: #ffd700; text-transform: uppercase; border-bottom: 1px solid #ffd700; padding-bottom: 10px; }
+        .terminal::before {
+            content: "SECURE_SESSION_ACTIVE";
+            position: absolute;
+            top: -10px;
+            right: 10px;
+            background: var(--bg);
+            padding: 0 5px;
+            font-size: 10px;
+            color: var(--warn);
+        }
+
+        h2 { color: var(--warn); text-transform: uppercase; border-bottom: 1px solid #333; padding-bottom: 10px; font-size: 1.2rem; }
         
         .binary-string {
-            font-size: 1.2rem;
+            font-size: 1.1rem;
             letter-spacing: 2px;
             background: #111;
-            padding: 10px;
-            display: inline-block;
-            margin: 10px 0;
+            padding: 15px;
+            display: block;
+            margin: 20px 0;
             color: #fff;
+            text-align: center;
+            border: 1px solid #222;
         }
 
+        .input-group { text-align: center; margin-bottom: 20px; }
+
         input {
-            background: #111;
-            border: 1px solid #00f2ff;
-            color: #ffd700;
+            background: #000;
+            border: 1px solid var(--main);
+            color: var(--warn);
             padding: 10px;
-            width: 50px;
+            width: 60px;
             text-align: center;
-            font-size: 1rem;
+            font-size: 1.1rem;
             margin: 5px;
+            font-family: inherit;
         }
 
         button {
-            background: #ffd700;
+            background: var(--warn);
             color: #000;
             border: none;
-            padding: 10px 20px;
+            padding: 15px;
             font-weight: bold;
             cursor: pointer;
-            margin-top: 20px;
             width: 100%;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: 0.3s;
         }
 
-        button:hover { background: #00f2ff; }
+        button:hover { background: var(--main); box-shadow: 0 0 15px var(--main); }
 
-        #result { margin-top: 20px; font-weight: bold; min-height: 24px; }
-        .success { color: #00ff00; }
+        #result { margin-top: 20px; font-weight: bold; min-height: 40px; text-align: center; font-size: 0.9rem; line-height: 1.4; }
+        .success { color: #00ff00; border: 1px solid #00ff00; padding: 10px; display: block; }
         .error { color: #ff0000; }
         
-        .hint { font-size: 0.8rem; color: #555; margin-top: 10px; }
+        .hint { font-size: 0.7rem; color: #444; margin-top: 20px; text-align: center; border-top: 1px solid #111; padding-top: 10px; }
     </style>
 </head>
 <body>
 
     <div class="terminal">
         <h2>[ANALISTA: PROF-SILVIO]</h2>
-        <p>Detectamos um dump de memória suspeito. O fragmento abaixo parece ser um endereço IP (IPv4) codificado em binário.</p>
-        <p>Converta cada bloco para decimal para identificar o IP do servidor de C2 (Command & Control).</p>
+        <p style="font-size: 0.9rem;">Dump de memória interceptado. Fragmento detectado como <strong>IPv4 Header</strong>.</p>
+        <p style="font-size: 0.9rem; color: #888;">Converta os octetos binários para Decimal para expor o servidor C2.</p>
 
         <div id="challenge-area">
             <div class="binary-string">11000000 . 10101000 . 00001010 . 01100100</div>
-            <br>
-            <input type="number" id="byte1" placeholder="0"> .
-            <input type="number" id="byte2" placeholder="0"> .
-            <input type="number" id="byte3" placeholder="0"> .
-            <input type="number" id="byte4" placeholder="0">
             
-            <button onclick="checkIp()">ANALISAR TRAFEGO</button>
+            <div class="input-group">
+                <input type="text" maxlength="3" id="v1" autocomplete="off"> .
+                <input type="text" maxlength="3" id="v2" autocomplete="off"> .
+                <input type="text" maxlength="3" id="v3" autocomplete="off"> .
+                <input type="text" maxlength="3" id="v4" autocomplete="off">
+            </div>
+            
+            <button onclick="_analyze()">ANALISAR TRAFEGO</button>
             <div id="result"></div>
         </div>
 
-        <div class="hint">Dica do Analista: Lembre-se das potências de 2 (128, 64, 32, 16, 8, 4, 2, 1).</div>
+        <div class="hint">POTÊNCIAS_DE_2: 128 | 64 | 32 | 16 | 8 | 4 | 2 | 1</div>
     </div>
 
     <script>
-        function checkIp() {
-            const b1 = document.getElementById('byte1').value;
-            const b2 = document.getElementById('byte2').value;
-            const b3 = document.getElementById('byte3').value;
-            const b4 = document.getElementById('byte4').value;
-            
-            const resultDiv = document.getElementById('result');
+        function _analyze() {
+            const r = document.getElementById('result');
+            // Pegando os valores
+            const i1 = document.getElementById('v1').value;
+            const i2 = document.getElementById('v2').value;
+            const i3 = document.getElementById('v3').value;
+            const i4 = document.getElementById('v4').value;
 
-            // Gabarito: 192.168.10.100
-            if(b1 == 192 && b2 == 168 && b3 == 10 && b4 == 100) {
-                resultDiv.innerHTML = "<span class='success'>ACESSO CONCEDIDO: IP IDENTIFICADO [192.168.10.100] - ALERTA DE EXFILTRAÇÃO ENVIADO!</span>";
+            // Ofuscação: Verificação por lógica matemática (Gabarito: 192, 168, 10, 100)
+            // 192 + 168 + 10 + 100 = 470
+            // Também verificamos o primeiro e o último especificamente para evitar falsos positivos
+            const s = parseInt(i1) + parseInt(i2) + parseInt(i3) + parseInt(i4);
+            const check = (s === 470 && i1 === "192" && i4 === "100");
+
+            if(check) {
+                r.innerHTML = "<span class='success'>SUCESSO: IP IDENTIFICADO [192.168.10.100]<br>ALERTA DE EXFILTRAÇÃO ENVIADO AO SOC!</span>";
             } else {
-                resultDiv.innerHTML = "<span class='error'>ERRO DE CONVERSÃO: IP INCORRETO. O ATACANTE PODE ESCAPAR!</span>";
+                r.innerHTML = "<span class='error'>FALHA: CONVERSÃO INVÁLIDA.<br>O rastro do atacante está desaparecendo...</span>";
             }
         }
+
+        // Impedir letras no input
+        document.querySelectorAll('input').forEach(el => {
+            el.addEventListener('input', function() {
+                this.value = this.value.replace(/[^0-9]/g, '');
+            });
+        });
     </script>
 </body>
 </html>
