@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>TERMINAL_LOG_FORENSICS_V6</title>
+    <style>
+        :root { --neon-green: #00ff41; --bg-black: #050505; --panel: #111; }
+        body { background: var(--bg-black); color: var(--neon-green); font-family: 'Courier New', monospace; padding: 20px; display: flex; flex-direction: column; align-items: center; }
+        .container { width: 98%; max-width: 1200px; display: grid; grid-template-columns: 1fr 400px; gap: 20px; }
+        .terminal-section { background: var(--panel); border: 1px solid #333; padding: 20px; border-radius: 5px; box-shadow: 0 0 20px rgba(0, 255, 65, 0.1); }
+        .log-view { background: #000; height: 300px; overflow-y: auto; padding: 10px; border: 1px solid #222; font-size: 11px; color: #777; white-space: pre; margin-bottom: 15px; }
+        .input-line { display: flex; background: #000; padding: 12px; border: 1px solid var(--neon-green); }
+        .prompt { margin-right: 10px; font-weight: bold; color: #fff; }
+        input#cmdInput { background: transparent; border: none; color: var(--neon-green); flex: 1; font-family: inherit; outline: none; font-size: 16px; }
+        .results-area { background: #000; min-height: 200px; max-height: 400px; overflow-y: auto; margin-top: 15px; padding: 10px; border: 1px solid #333; color: #fff; font-size: 13px; white-space: pre; border-left: 3px solid var(--neon-green); }
+        .missions-section { background: #0d0d0d; padding: 20px; border: 1px solid #444; border-radius: 5px; height: 85vh; }
+        .mission-card { border-bottom: 1px solid #222; padding: 12px 5px; font-size: 13px; color: #666; }
+        .active-mission { color: #fff; font-weight: bold; border-left: 3px solid var(--neon-green); padding-left: 10px; background: rgba(0,255,65,0.05); }
+        .completed { text-decoration: line-through; color: #225522; }
+        .btn-check { width: 100%; margin-top: 15px; background: var(--neon-green); color: #000; border: none; padding: 12px; font-weight: bold; cursor: pointer; text-transform: uppercase; }
+        h2 { margin-top: 0; font-size: 1rem; color: #fff; border-bottom: 1px solid #333; padding-bottom: 10px; }
+    </style>
+</head>
+<body>
+
+<h1 style="text-shadow: 0 0 10px var(--neon-green);">[ LINUX_AUTH_FORENSICS_LAB ]</h1>
+
+<div class="container">
+    <div class="terminal-section">
+        <h2>/var/log/auth.log - Investigação</h2>
+        <div class="log-view" id="logRaw"></div>
+        <div class="input-line">
+            <span class="prompt">analyst@soc-station:~$</span>
+            <input type="text" id="cmdInput" placeholder="Ex: grep -i 'failed' | wc -l" autocomplete="off">
+        </div>
+        <div class="results-area" id="output">Aguardando comando...</div>
+    </div>
+
+    <div class="missions-section">
+        <h2>Relatório de Incidente</h2>
+        <div id="missionList"></div>
+        <div style="margin-top: 20px; border-top: 1px solid #333; padding-top: 15px;">
+            <label style="font-size: 11px; color: #888;">SUBMETER EVIDÊNCIA:</label>
+            <input type="text" id="missionAnswer" placeholder="Resposta..." style="width:100%; padding:10px; background:#000; border:1px solid #444; color:#fff; margin-top:5px;">
+            <button class="btn-check" onclick="checkMission()">Validar No Sistema</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Gerando 100 linhas de log estáticas para garantir precisão
+    const authLogs = [
+        'May 07 08:00:01 srv sshd[1001]: Failed password for root from 192.168.1.50 port 44312 ssh2',
+        'May 07 08:00:05 srv sshd[1001]: Failed password for root from 192.168.1.50 port 44312 ssh2',
+        'May 07 08:01:10 srv sshd[1002]: Failed password for admin from 10.0.0.15 port 38221 ssh2',
+        ...Array(40).fill('May 07 08:05:00 srv sshd[1010]: Failed password for invalid user bot from 45.33.12.5 port 51122 ssh2'),
+        'May 07 08:15:22 srv sshd[1050]: Accepted password for lsilva from 192.168.1.10 port 55600 ssh2',
+        'May 07 08:20:01 srv sudo: lsilva : TTY=pts/0 ; USER=root ; COMMAND=/usr/bin/apt update',
+        ...Array(25).fill('May 07 08:30:00 srv sshd[1060]: Failed password for invalid user guest from 172.16.0.44 port 41200 ssh2'),
+        'May 07 08:45:00 srv sshd[1080]: Failed password for root from 192.168.1.50 port 44312 ssh2',
+        'May 07 08:45:02 srv sshd[1080]: Accepted password for root from 192.168.1.50 port 44312 ssh2',
+        ...Array(20).fill('May 07 09:00:00 srv sshd[1100]: Failed password for invalid user test from 8.8.4.4 port 1024 ssh2'),
+        'May 07 09:10:00 srv sshd[1120]: Accepted password for kfernandes from 192.168.1.12 port 33412 ssh2',
+        'May 07 09:12:00 srv sudo: kfernandes : TTY=pts/1 ; USER=root ; COMMAND=/bin/cat /etc/shadow',
+        'May 07 09:15:00 srv sshd[1130]: Failed password for root from 192.168.1.50 port 44312 ssh2',
+        'May 07 09:15:05 srv sshd[1130]: Failed password for root from 192.168.1.50 port 44312 ssh2',
+        'May 07 09:15:10 srv sshd[1130]: Failed password for root from 192.168.1.50 port 44312 ssh2'
+    ].flat();
+
+   
+    const missions = [
+        { q: "1. Total de falhas (Failed password) no log?", a: "OTI=" }, 
+        { q: "2. Qual o IP que atacou o usuário 'bot'?", a: "NDUuMzMuMTIuNQ==" }, 
+        { q: "3. Quantas vezes o IP 172.16.0.44 aparece?", a: "MjU=" }, 
+        { q: "4. Qual o comando sudo executado por 'kfernandes'?", a: "L2Jpbi9jYXQgL2V0Yy9zaGFkb3c=" }, 
+        { q: "5. Qual a porta de origem da conexão de 'lsilva'?", a: "NTU2MDA=" }, 
+        { q: "6. Quantos usuários diferentes (Accepted) acessaram o servidor?", a: "Mw==" } 
+    ];
+
+    let currentMission = 0;
+
+    function executeCommand(input) {
+        let lines = [...authLogs];
+        const pipes = input.split('|').map(p => p.trim());
+
+        pipes.forEach(pipe => {
+            const parts = pipe.split(/\s+/);
+            const cmd = parts[0].toLowerCase();
+            const arg = pipe.replace(/^[a-z0-9]+\s+/i, '').replace(/['"]/g, "").trim();
+
+            if (cmd === 'grep') {
+                const isIgnore = pipe.includes(' -i');
+                const pattern = arg.replace('-i ', '').trim();
+                lines = lines.filter(l => isIgnore ? l.toLowerCase().includes(pattern.toLowerCase()) : l.includes(pattern));
+            } 
+            else if (cmd === 'egrep') {
+                const regex = new RegExp(arg, 'i');
+                lines = lines.filter(l => regex.test(l));
+            }
+            else if (cmd === 'wc' && pipe.includes('-l')) {
+                lines = [lines.length.toString()];
+            }
+            else if (cmd === 'cut') {
+                const d = pipe.match(/-d\s*'(.*?)'/) ? pipe.match(/-d\s*'(.*?)'/)[1] : " ";
+                const fMatch = pipe.match(/-f\s*(\d+)/);
+                if (fMatch) {
+                    const f = parseInt(fMatch[1]) - 1;
+                    lines = lines.map(l => l.split(d)[f] || "");
+                }
+            }
+            else if (cmd === 'sort') {
+                lines.sort();
+                if (pipe.includes('-r')) lines.reverse();
+                if (pipe.includes('-n')) lines.sort((a, b) => parseFloat(a) - parseFloat(b));
+            }
+        });
+
+        document.getElementById('output').textContent = lines.join('\n') || "0";
+    }
+
+    function checkMission() {
+        const val = document.getElementById('missionAnswer').value.trim();
+        if (!val) return;
+
+        if (btoa(val) === missions[currentMission].a) {
+            currentMission++;
+            document.getElementById('missionAnswer').value = "";
+            updateMissions();
+            if (currentMission >= missions.length) alert("PERÍCIA CONCLUÍDA! SISTEMA INTEGRADO.");
+        } else {
+            alert("NEGADO: Evidência Inconsistente.");
+        }
+    }
+
+    function updateMissions() {
+        const list = document.getElementById('missionList');
+        list.innerHTML = "";
+        missions.forEach((m, i) => {
+            let div = document.createElement('div');
+            div.className = `mission-card ${i === currentMission ? 'active-mission' : ''} ${i < currentMission ? 'completed' : ''}`;
+            div.textContent = m.q;
+            list.appendChild(div);
+        });
+    }
+
+    document.getElementById('cmdInput').addEventListener('keyup', e => { if(e.key==='Enter') executeCommand(e.target.value); });
+    document.getElementById('logRaw').textContent = authLogs.join('\n');
+    updateMissions();
+</script>
+</body>
+</html>
