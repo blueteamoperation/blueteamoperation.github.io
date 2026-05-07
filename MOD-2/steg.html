@@ -69,7 +69,7 @@ payload = <span class="string">"61 6e 74 69 66 6f 72 65 6e 73 65"</span>
 
 <div class="input-panel">
     <div class="instruction">
-        <strong>DESAFIO:</strong> O código acima utiliza esteganografia para ocultar informações. No dicionário de Cibersegurança, técnicas usadas para dificultar, impedir ou destruir evidências digitais são chamadas de:
+        <strong>DESAFIO:</strong> O código acima utiliza esteganografia para ocultar informações. No dicionário de Cibersegurança, técnicas usadas para dificultar, impedir ou destruir evidências digitais, diante do exposto encontre a flag.
     </div>
     <div style="display: flex; gap: 10px;">
         <input type="text" id="answer" placeholder="DIGITE O TERMO TÉCNICO AQUI..." autocomplete="off">
@@ -94,7 +94,7 @@ payload = <span class="string">"61 6e 74 69 66 6f 72 65 6e 73 65"</span>
         const target = "8a21350a417e295e86ba52f36f9175735160ef53702e52467b7e28b17b686256";
 
         if (hashHex === target) {
-            feedback.innerHTML = "✅ ACESSO CONCEDIDO! Técnica identificada com sucesso.";
+            feedback.innerHTML = "✅ ACESSO CONCEDIDO! Flag identificada com sucesso.";
             feedback.className = "correct";
             document.querySelector('.terminal-container').style.boxShadow = "0 0 40px var(--green)";
         } else {
