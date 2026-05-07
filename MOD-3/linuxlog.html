@@ -2,7 +2,7 @@
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <title>LINUX_AUTH_FORENSICS_V5_SECURE</title>
+    <title>LINUX_AUTH_FORENSICS_V5.2</title>
     <style>
         :root { --neon-yellow: #f4d03f; --bg: #050505; --panel: #111; }
         body { background: var(--bg); color: var(--neon-yellow); font-family: 'Courier New', monospace; padding: 20px; display: flex; flex-direction: column; align-items: center; }
@@ -22,36 +22,36 @@
 </head>
 <body>
 
-<h1 style="text-shadow: 0 0 10px var(--neon-yellow);">[ SSH_AUTH_EXTENDED_FORENSICS_V5 ]</h1>
+<h1 style="text-shadow: 0 0 10px var(--neon-yellow);">[ SSH_AUTH_FORENSICS_V5.2 ]</h1>
 
 <div class="container">
     <div class="terminal-section">
-        <h2>Console: /var/log/auth.log (100 Entries)</h2>
+        <h2>Console: /var/log/auth.log</h2>
         <div class="log-view" id="logRaw"></div>
         <div class="input-line">
             <span class="prompt">root@soc-server:~#</span>
-            <input type="text" id="cmdInput" placeholder="Ex: grep 'Failed' | wc -l" autocomplete="off">
+            <input type="text" id="cmdInput" placeholder="grep 'Failed' | wc -l" autocomplete="off">
         </div>
-        <div class="results-area" id="output">Investigação iniciada...</div>
+        <div class="results-area" id="output">Terminal pronto para análise...</div>
     </div>
 
     <div class="missions-section" id="missionPanel">
         <h2>Threat Intel Report</h2>
         <div id="missionList"></div>
         <div style="margin-top: 20px; position: sticky; bottom: 0; background: #0d0d0d; padding-top: 10px;">
-            <label style="font-size: 11px; color: #fff;">EVIDÊNCIA ENCONTRADA:</label>
+            <label style="font-size: 11px; color: #fff;">SUBMETER VALOR:</label>
             <input type="text" id="missionAnswer" style="border: 1px solid var(--neon-yellow); margin-bottom:10px; width: 100%; box-sizing: border-box; background: #000; color: #fff; padding: 8px;">
-            <button class="btn-check" onclick="checkMission()">Validar Evidência</button>
+            <button class="btn-check" onclick="checkMission()">Validar No Sistema</button>
         </div>
     </div>
 </div>
 
 <script>
-    const baseLogs = [
-        'Apr 26 14:00:01 srv sshd[100]: pam_unix(sshd:auth): authentication failure; rhost=192.168.1.50 user=root',
+    // Gerando o log com 92 falhas totais, mas apenas 30 para o usuário 'test'
+    const finalLogs = [
+        'Apr 26 14:00:01 srv sshd[100]: Failed password for root from 192.168.1.50 port 55432 ssh2',
         'Apr 26 14:00:03 srv sshd[100]: Failed password for root from 192.168.1.50 port 55432 ssh2',
         'Apr 26 14:00:05 srv sshd[100]: Failed password for root from 192.168.1.50 port 55432 ssh2',
-        'Apr 26 14:00:08 srv sshd[100]: Failed password for root from 192.168.1.50 port 55432 ssh2',
         'Apr 26 14:02:10 srv sshd[105]: Failed password for admin from 10.0.0.15 port 42111 ssh2',
         'Apr 26 14:02:12 srv sshd[105]: Failed password for admin from 10.0.0.15 port 42111 ssh2',
         'Apr 26 14:05:01 srv sshd[110]: Failed password for invalid user guest from 172.16.5.5 port 33001 ssh2',
@@ -62,36 +62,26 @@
         'Apr 26 14:12:00 srv sshd[125]: Failed password for root from 192.168.1.50 port 55432 ssh2',
         'Apr 26 14:12:02 srv sshd[125]: Failed password for root from 192.168.1.50 port 55432 ssh2',
         'Apr 26 14:12:04 srv sshd[125]: Accepted password for root from 192.168.1.50 port 55432 ssh2',
-        'Apr 26 14:12:05 srv sshd[125]: pam_unix(sshd:session): session opened for user root by (uid=0)',
-        'Apr 26 14:15:00 srv sudo: mrocha : TTY=pts/0 ; PWD=/home/mrocha ; USER=root ; COMMAND=/usr/bin/tail -f /var/log/syslog'
-    ];
-
-    // Gerando o log de 100 linhas (Ataques massivos simulados)
-    const attack1 = Array(30).fill('Apr 26 14:20:00 srv sshd[130]: Failed password for invalid user support from 45.12.33.1 port 51100 ssh2');
-    const attack2 = Array(5).fill('Apr 26 14:30:00 srv sshd[140]: Failed password for admin from 10.0.0.15 port 42111 ssh2');
-    const attack3 = Array(5).fill('Apr 26 14:40:00 srv sshd[150]: Failed password for root from 192.168.1.50 port 55432 ssh2');
-    const attack4 = Array(30).fill('Apr 26 14:50:00 srv sshd[160]: Failed password for invalid user test from 8.8.8.8 port 12345 ssh2');
-    
-    const finalLogs = [
-        ...baseLogs, ...attack1, ...attack2, ...attack3, ...attack4,
+        ...Array(40).fill('Apr 26 14:20:00 srv sshd[130]: Failed password for invalid user support from 45.12.33.1 port 51100 ssh2'), // 40 p/ support
+        ...Array(5).fill('Apr 26 14:30:00 srv sshd[140]: Failed password for admin from 10.0.0.15 port 42111 ssh2'), // Total admin = 7
+        ...Array(30).fill('Apr 26 14:50:00 srv sshd[160]: Failed password for invalid user test from 8.8.8.8 port 12345 ssh2'), // EXATOS 30 p/ test
+        ...Array(8).fill('Apr 26 15:10:00 srv sshd[180]: Failed password for root from 192.168.1.50 port 55432 ssh2'),
         'Apr 26 15:00:01 srv sshd[170]: Accepted password for rbatista from 192.168.1.20 port 33441 ssh2',
-        'Apr 26 15:05:00 srv sudo: rbatista : TTY=pts/1 ; PWD=/var/www/html ; USER=root ; COMMAND=/usr/bin/vim index.php',
-        'Apr 26 15:15:00 srv sshd[190]: Accepted password for root from 192.168.1.50 port 55432 ssh2',
-        ...Array(11).fill('Apr 26 15:20:00 srv sshd[200]: Failed password for root from 192.168.1.50 port 55432 ssh2')
-    ].slice(0, 100);
+        'Apr 26 15:05:00 srv sudo: rbatista : COMMAND=/usr/bin/vim index.php',
+        'Apr 26 15:15:00 srv sshd[190]: Accepted password for root from 192.168.1.50 port 55432 ssh2'
+    ].flat();
 
-  
     const missions = [
-        { q: "1. Quantas falhas totais (Failed password) existem no log?", a: [56, 53] }, 
-        { q: "2. Qual o IP que atacou massivamente o usuário 'support'?", a: [52, 53, 46, 49, 50, 46, 51, 51, 46, 49] }, 
-        { q: "3. Qual o usuário 'inválido' (invalid user) que aparece 30 vezes?", a: [116, 101, 115, 116] },
-        { q: "4. Qual IP realizou tentativas falhas contra o usuário 'admin'?", a: [49, 48, 46, 48, 46, 48, 46, 49, 53] }, 
-        { q: "5. Qual usuário legítimo (Accepted) acessou o servidor às 14:10:15?", a: [109, 114, 111, 99, 104, 97] }, 
-        { q: "6. Qual comando o usuário 'rbatista' executou usando sudo?", a: [47, 117, 115, 114, 47, 98, 105, 110, 47, 118, 105, 109, 32, 105, 110, 100, 101, 120, 46, 112, 104, 112] }, // /usr/bin/vim index.php
-        { q: "7. Quantas vezes o termo 'session opened' aparece no log?", a: [51] }, 
-        { q: "8. Qual a porta de conexão utilizada pelo IP 192.168.1.20?", a: [51, 51, 52, 52, 49] }, 
-        { q: "9. Quantas falhas o IP 172.16.5.5 gerou antes de desistir?", a: [52] }, 
-        { q: "10. Qual IP conseguiu acesso root às 15:15:00?", a: [49, 57, 50, 46, 49, 54, 56, 46, 49, 46, 53, 48] } 
+        { q: "1. Quantas falhas totais (Failed password) existem no log?", a: [57, 50] }, 
+        { q: "2. Qual o IP que atacou massivamente o usuário 'support'?", a: [52, 53, 46, 49, 50, 46, 51, 51, 46, 49] },
+        { q: "3. Qual o usuário 'inválido' que aparece 30 vezes?", a: [116, 101, 115, 116] }, 
+        { q: "4. Qual IP realizou 7 tentativas falhas no total contra 'admin'?", a: [49, 48, 46, 48, 46, 48, 46, 49, 53] },
+        { q: "5. Qual usuário legítimo acessou às 14:10:15?", a: [109, 114, 111, 99, 104, 97] },
+        { q: "6. Qual comando 'rbatista' executou usando sudo?", a: [47, 117, 115, 114, 47, 98, 105, 110, 47, 118, 105, 109, 32, 105, 110, 100, 101, 120, 46, 112, 104, 112] },
+        { q: "7. Qual a porta utilizada pelo IP 192.168.1.20?", a: [51, 51, 52, 52, 49] },
+        { q: "8. Quantas falhas o IP 172.16.5.5 gerou?", a: [52] },
+        { q: "9. Quantos Accepted password existem no total?", a: [51] },
+        { q: "10. Qual IP conseguiu acesso root por último às 15:15:00?", a: [49, 57, 50, 46, 49, 54, 56, 46, 49, 46, 53, 48] }
     ];
 
     let currentMission = 0;
@@ -103,26 +93,27 @@
             const parts = pipe.split(' ');
             const cmd = parts[0];
             const arg = parts.slice(1).join(' ').replace(/['"]/g, "");
-            if (cmd === 'grep') lines = lines.filter(l => l.includes(arg));
-            else if (cmd === 'wc' && arg.includes('-l')) lines = [lines.filter(l=>l.trim()!=='').length.toString()];
+            if (cmd === 'grep') {
+                const isIgnore = pipe.includes('-i');
+                lines = lines.filter(l => isIgnore ? l.toLowerCase().includes(arg.toLowerCase()) : l.includes(arg));
+            }
+            else if (cmd === 'wc' && arg.includes('-l')) lines = [lines.length.toString()];
         });
-        document.getElementById('output').textContent = lines.join('\n') || "Sem resultados.";
+        document.getElementById('output').textContent = lines.join('\n') || "0";
     }
 
     function checkMission() {
         const val = document.getElementById('missionAnswer').value.trim();
         const target = missions[currentMission].a;
-        
-        const isCorrect = val.length === target.length && 
-                          val.split('').every((char, i) => char.charCodeAt(0) === target[i]);
+        const isCorrect = val.length === target.length && val.split('').every((char, i) => char.charCodeAt(0) === target[i]);
 
         if (isCorrect) {
             currentMission++;
             document.getElementById('missionAnswer').value = "";
             updateMissions();
-            if (currentMission >= missions.length) alert("OBJETIVO COMPLETO: Analista Forense Nível 2!");
+            if (currentMission >= missions.length) alert("SISTEMA DOMINADO!");
         } else {
-            alert("NEGADO: Evidência incorreta.");
+            alert("NEGADO: Valor incorreto.");
         }
     }
 
