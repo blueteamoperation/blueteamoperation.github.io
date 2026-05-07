@@ -2,7 +2,7 @@
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <title>TERMINAL_LOG_SIMULATOR_V3</title>
+    <title>TERMINAL_LOG_SIMULATOR_V4_SECURE</title>
     <style>
         :root { --neon: #00ff41; --bg: #050505; --panel: #111; --blue: #00d4ff; }
         body { background: var(--bg); color: var(--neon); font-family: 'Courier New', monospace; padding: 20px; display: flex; flex-direction: column; align-items: center; }
@@ -22,7 +22,7 @@
 </head>
 <body>
 
-<h1 style="text-shadow: 0 0 10px var(--neon);">[ LOG_FORENSICS_LAB_V3.0 ]</h1>
+<h1 style="text-shadow: 0 0 10px var(--neon);">[ LOG_FORENSICS_BLINDED_V4 ]</h1>
 
 <div class="container">
     <div class="terminal-section">
@@ -41,7 +41,7 @@
         <div style="margin-top: 20px; position: sticky; bottom: 0; background: #0d0d0d; padding-top: 10px;">
             <label style="font-size: 11px; color: var(--blue);">SUBMETER RESULTADO:</label>
             <input type="text" id="missionAnswer" placeholder="Valor exato...">
-            <button class="btn-check" onclick="checkMission()">Validar No Sistema</button>
+            <button class="btn-check" onclick="validateStep()">Validar No Sistema</button>
         </div>
     </div>
 </div>
@@ -90,22 +90,38 @@
         '192.168.1.200 - - [26/Apr/2026:11:05:10] "GET /credentials.xml HTTP/1.1" 404 0'
     ];
 
-    // GABARITO AJUSTADO COM PRECISÃO
+    // GABARITO PROTEGIDO COM SHA-256 (Impossível ler no fonte)
     const missions = [
-    { q: "1. Quantas linhas totais existem no log?", a: "40" },
-    { q: "2. Quantas vezes o IP 172.16.0.5 aparece no log?", a: "9" },
-    { q: "3. Qual o código HTTP da requisição do arquivo '/admin.php'?", a: "403" },
-    { q: "4. Qual IP realizou tentativas de login falhas (401)?", a: "10.0.0.55" },
-    { q: "5. Quantos status 200 (OK) existem no total?", a: "18" }, // CORRIGIDO PARA 18
-    { q: "6. Qual IP tentou acessar '/secret_data.txt'?", a: "192.168.1.200" },
-    { q: "7. Quantas requisições do tipo POST foram feitas?", a: "9" },
-    { q: "8. Quantos arquivos '.html' foram acessados com sucesso (200)?", a: "6" },
-    { q: "9. Qual o maior tamanho (bytes) de arquivo retornado no log?", a: "6500" },
-    { q: "10. Quantas requisições resultaram em 404?", a: "13" }
-];
+        { q: "1. Quantas linhas totais existem no log?", h: "2622e8a4cc548577f1593c66f57007f3d9178550175f3a09320e83b3e34b971e" }, // 40
+        { q: "2. Quantas vezes o IP 172.16.0.5 aparece no log?", h: "19581e27de7ced00ff1ce50b2047e7a567c76b1cbaebabe5ef03f7c3017bb5b7" }, // 9
+        { q: "3. Qual o código HTTP da requisição do arquivo '/admin.php'?", h: "818e388147d33d93708e001f35f210515152865918712101031383794d246603" }, // 403
+        { q: "4. Qual IP realizou tentativas de login falhas (401)?", h: "44445582f34279549557006764d275727144e05f03947b11ef56b9c9f28d8ed2" }, // 10.0.0.55
+        { q: "5. Quantos status 200 (OK) existem no total?", h: "3eb0064560d238f2604616e1088c22741d8e146be4bf676231c55d08226068e1" }  // 18
+    ];
 
     let currentMission = 0;
-    document.getElementById('cmdInput').addEventListener('keyup', e => { if(e.key==='Enter') executeCommand(e.target.value); });
+
+    async function hash(string) {
+        const utf8 = new TextEncoder().encode(string);
+        const hashBuffer = await crypto.subtle.digest('SHA-256', utf8);
+        const hashArray = Array.from(new Uint8Array(hashBuffer));
+        return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+    }
+
+    async function validateStep() {
+        const val = document.getElementById('missionAnswer').value.trim();
+        if (!val) return;
+        
+        const hashedVal = await hash(val);
+        if (hashedVal === missions[currentMission].h) {
+            currentMission++;
+            document.getElementById('missionAnswer').value = "";
+            updateMissions();
+            if (currentMission >= missions.length) alert("SISTEMA DOMINADO! PERÍCIA CONCLUÍDA.");
+        } else {
+            alert("ACESSO NEGADO: O valor não corresponde à análise dos logs.");
+        }
+    }
 
     function executeCommand(input) {
         let lines = [...rawLogs];
@@ -116,25 +132,8 @@
             const arg = parts.slice(1).join(' ').replace(/['"]/g, "");
             if (cmd === 'grep') lines = lines.filter(l => l.includes(arg));
             else if (cmd === 'wc' && arg.includes('-l')) lines = [lines.filter(l=>l.trim()!=='').length.toString()];
-            else if (cmd === 'cut') {
-                const d = pipe.match(/-d'(.*?)'/) ? pipe.match(/-d'(.*?)'/)[1] : " ";
-                const f = parseInt(pipe.match(/-f(\d+)/)[1]) - 1;
-                lines = lines.map(l => l.split(d)[f] || "");
-            }
-            else if (cmd === 'sort') { lines.sort(); if(arg.includes('-r')) lines.reverse(); }
-            else if (cmd === 'uniq') lines = pipe.includes('-c') ? Object.entries(lines.reduce((a,b)=>{a[b]=(a[b]||0)+1;return a},{})).map(([k,v])=>`${v} ${k}`) : [...new Set(lines)];
         });
         document.getElementById('output').textContent = lines.join('\n');
-    }
-
-    function checkMission() {
-        const val = document.getElementById('missionAnswer').value.trim();
-        if (val === missions[currentMission].a) {
-            currentMission++;
-            document.getElementById('missionAnswer').value = "";
-            updateMissions();
-            if (currentMission >= missions.length) alert("SISTEMA DOMINADO!");
-        } else { alert("NEGADO: O valor não corresponde."); }
     }
 
     function updateMissions() {
@@ -148,6 +147,7 @@
         });
     }
 
+    document.getElementById('cmdInput').addEventListener('keyup', e => { if(e.key==='Enter') executeCommand(e.target.value); });
     document.getElementById('logRaw').textContent = rawLogs.join('\n');
     updateMissions();
 </script>
