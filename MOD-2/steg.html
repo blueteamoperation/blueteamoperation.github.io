@@ -79,18 +79,18 @@ payload = <span class="string">"61 6e 74 69 66 6f 72 65 6e 73 65"</span>
 </div>
 
 <script>
-    // Função para gerar o hash da resposta e comparar
+ 
     async function checkAnswer() {
         const userAns = document.getElementById('answer').value.trim().toUpperCase();
         const feedback = document.getElementById('feedback');
         
-        // Gerar hash SHA-256 do input do usuário
+
         const msgBuffer = new TextEncoder().encode(userAns);
         const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
         const hashArray = Array.from(new Uint8Array(hashBuffer));
         const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
 
-        // Hash de "ANTIFORENSE"
+
         const target = "8a21350a417e295e86ba52f36f9175735160ef53702e52467b7e28b17b686256";
 
         if (hashHex === target) {
