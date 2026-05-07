@@ -41,9 +41,10 @@
         
         if (!val) return;
 
-        const target = [65, 67, 69, 83, 83, 79, 95, 82, 69, 83, 84, 82, 73, 84, 79, 95, 83, 73, 83, 84, 69, 77, 65, 95, 79, 80, 69, 82, 65, 67, 73, 79, 78, 65, 76];
-   
-        const isMatch = val.length === target.length && 
+        const target = [69, 78, 67, 79, 68, 65, 77, 69, 78, 84, 79, 32, 66, 65, 83, 73, 67, 79];
+        
+     
+        const isMatch = (val.length === target.length) && 
                         val.split('').every((char, i) => char.charCodeAt(0) === target[i]);
 
         if (isMatch) {
@@ -54,7 +55,8 @@
             f.innerHTML = "❌ NEGADO! ERRO NA DECODIFICAÇÃO.";
             f.style.color = "#ff3131";
             term.className = "terminal error-border";
-            setTimeout(() => { term.className = "terminal"; }, 1000);
+            setTimeout(() => { term.className = "terminal"; }, 1500);
+            input.value = "";
         }
     }
 
