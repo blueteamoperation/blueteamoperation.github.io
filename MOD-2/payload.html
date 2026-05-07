@@ -38,16 +38,13 @@
         
         if (!val) return;
 
-        // Lógica de Validação Blindada (Sem a resposta no código)
-        // Resposta esperada: ACESSO_RESTRITO_SISTEMA_OPERACIONAL
-        // Checksum da soma ASCII: 2754
+       
         let checkSum = 0;
         for (let i = 0; i < val.length; i++) {
             checkSum += val.charCodeAt(i);
         }
 
-        // Validação adicional de segurança (XOR do primeiro e último char)
-        // 'A' ^ 'L' = 13
+    
         const securityGate = (val.charCodeAt(0) ^ val.charCodeAt(val.length - 1)) === 13;
 
         if (checkSum === 2754 && securityGate && val.length === 35) {
@@ -61,7 +58,7 @@
         }
     }
 
-    // Permitir Enter
+ 
     document.getElementById('flagInput').addEventListener('keypress', function (e) {
         if (e.key === 'Enter') verificar();
     });
