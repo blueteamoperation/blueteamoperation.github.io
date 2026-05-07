@@ -2,7 +2,7 @@
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <title>LINUX_AUTH_FORENSICS_V5_STABLE</title>
+    <title>LINUX_AUTH_FORENSICS_V5.3_FINAL</title>
     <style>
         :root { --neon-yellow: #f4d03f; --bg: #050505; --panel: #111; }
         body { background: var(--bg); color: var(--neon-yellow); font-family: 'Courier New', monospace; padding: 20px; display: flex; flex-direction: column; align-items: center; }
@@ -22,7 +22,7 @@
 </head>
 <body>
 
-<h1 style="text-shadow: 0 0 10px var(--neon-yellow);">[ SSH_AUTH_FORENSICS_V5_STABLE ]</h1>
+<h1 style="text-shadow: 0 0 10px var(--neon-yellow);">[ SSH_AUTH_FORENSICS_V5.3 ]</h1>
 
 <div class="container">
     <div class="terminal-section">
@@ -30,9 +30,9 @@
         <div class="log-view" id="logRaw"></div>
         <div class="input-line">
             <span class="prompt">root@soc-server:~#</span>
-            <input type="text" id="cmdInput" placeholder="grep 'Failed' | wc -l" autocomplete="off">
+            <input type="text" id="cmdInput" placeholder="grep -i 'Failed password' | wc -l" autocomplete="off">
         </div>
-        <div class="results-area" id="output">Terminal restaurado...</div>
+        <div class="results-area" id="output">Terminal estabilizado...</div>
     </div>
 
     <div class="missions-section" id="missionPanel">
@@ -47,7 +47,6 @@
 </div>
 
 <script>
-    // Gerando o log com precisão matemática (Total 92 falhas, 30 do usuário test)
     const finalLogs = [
         'Apr 26 14:00:01 srv sshd[100]: Failed password for root from 192.168.1.50 port 55432 ssh2',
         'Apr 26 14:00:03 srv sshd[100]: Failed password for root from 192.168.1.50 port 55432 ssh2',
@@ -55,17 +54,11 @@
         'Apr 26 14:02:10 srv sshd[105]: Failed password for admin from 10.0.0.15 port 42111 ssh2',
         'Apr 26 14:02:12 srv sshd[105]: Failed password for admin from 10.0.0.15 port 42111 ssh2',
         'Apr 26 14:05:01 srv sshd[110]: Failed password for invalid user guest from 172.16.5.5 port 33001 ssh2',
-        'Apr 26 14:05:03 srv sshd[110]: Failed password for invalid user guest from 172.16.5.5 port 33001 ssh2',
-        'Apr 26 14:05:05 srv sshd[110]: Failed password for invalid user guest from 172.16.5.5 port 33001 ssh2',
-        'Apr 26 14:05:07 srv sshd[110]: Failed password for invalid user guest from 172.16.5.5 port 33001 ssh2',
-        'Apr 26 14:10:15 srv sshd[120]: Accepted password for mrocha from 192.168.1.15 port 49200 ssh2',
-        'Apr 26 14:12:00 srv sshd[125]: Failed password for root from 192.168.1.50 port 55432 ssh2',
-        'Apr 26 14:12:02 srv sshd[125]: Failed password for root from 192.168.1.50 port 55432 ssh2',
-        'Apr 26 14:12:04 srv sshd[125]: Accepted password for root from 192.168.1.50 port 55432 ssh2',
         ...Array(40).fill('Apr 26 14:20:00 srv sshd[130]: Failed password for invalid user support from 45.12.33.1 port 51100 ssh2'),
         ...Array(5).fill('Apr 26 14:30:00 srv sshd[140]: Failed password for admin from 10.0.0.15 port 42111 ssh2'),
         ...Array(30).fill('Apr 26 14:50:00 srv sshd[160]: Failed password for invalid user test from 8.8.8.8 port 12345 ssh2'),
-        ...Array(8).fill('Apr 26 15:10:00 srv sshd[180]: Failed password for root from 192.168.1.50 port 55432 ssh2'),
+        ...Array(14).fill('Apr 26 15:10:00 srv sshd[180]: Failed password for root from 192.168.1.50 port 55432 ssh2'),
+        'Apr 26 14:10:15 srv sshd[120]: Accepted password for mrocha from 192.168.1.15 port 49200 ssh2',
         'Apr 26 15:00:01 srv sshd[170]: Accepted password for rbatista from 192.168.1.20 port 33441 ssh2',
         'Apr 26 15:05:00 srv sudo: rbatista : COMMAND=/usr/bin/vim index.php',
         'Apr 26 15:15:00 srv sshd[190]: Accepted password for root from 192.168.1.50 port 55432 ssh2'
@@ -74,54 +67,34 @@
     const missions = [
         { q: "1. Quantas falhas totais (Failed password) existem no log?", a: [57, 50] }, 
         { q: "2. Qual o IP que atacou massivamente o usuário 'support'?", a: [52, 53, 46, 49, 50, 46, 51, 51, 46, 49] },
-        { q: "3. Qual o usuário 'inválido' que aparece 30 vezes?", a: [116, 101, 115, 116] }, 
-        { q: "4. Qual IP realizou 7 tentativas falhas contra 'admin'?", a: [49, 48, 46, 48, 46, 48, 46, 49, 53] },
+        { q: "3. Qual o usuário 'inválido' que aparece 30 vezes?", a: [116, 101, 115, 116] },
+        { q: "4. Qual IP realizou 7 tentativas falhas no total contra 'admin'?", a: [49, 48, 46, 48, 46, 48, 46, 49, 53] },
         { q: "5. Qual usuário legítimo acessou às 14:10:15?", a: [109, 114, 111, 99, 104, 97] },
         { q: "6. Qual comando 'rbatista' executou usando sudo?", a: [47, 117, 115, 114, 47, 98, 105, 110, 47, 118, 105, 109, 32, 105, 110, 100, 101, 120, 46, 112, 104, 112] },
         { q: "7. Qual a porta utilizada pelo IP 192.168.1.20?", a: [51, 51, 52, 52, 49] },
-        { q: "8. Quantas falhas o IP 172.16.5.5 gerou?", a: [52] },
-        { q: "9. Quantos Accepted password existem no total?", a: [51] },
+        { q: "8. Quantas vezes o termo 'Accepted password' aparece?", a: [51] },
+        { q: "9. Quantas falhas o IP 172.16.5.5 gerou?", a: [49] }, 
         { q: "10. Qual IP conseguiu acesso root às 15:15:00?", a: [49, 57, 50, 46, 49, 54, 56, 46, 49, 46, 53, 48] }
     ];
 
     let currentMission = 0;
 
-    // MOTOR DE TERMINAL ORIGINAL RESTAURADO
     function executeCommand(input) {
         let lines = [...finalLogs];
         const pipes = input.split('|').map(p => p.trim());
         
         pipes.forEach(pipe => {
-            const parts = pipe.split(' ');
-            const cmd = parts[0];
-            const arg = parts.slice(1).join(' ').replace(/['"]/g, "");
-
-            if (cmd === 'grep') {
-                const isIgnore = pipe.includes('-i');
-                lines = lines.filter(l => isIgnore ? l.toLowerCase().includes(arg.toLowerCase()) : l.includes(arg));
+            if (pipe.startsWith('grep')) {
+                const isIgnore = pipe.includes(' -i');
+                // Extrai o padrão removendo 'grep', '-i' e aspas
+                let pattern = pipe.replace(/grep\s+(-i\s+)?/, '').replace(/['"]/g, '').trim();
+                lines = lines.filter(l => isIgnore ? l.toLowerCase().includes(pattern.toLowerCase()) : l.includes(pattern));
+            } 
+            else if (pipe.startsWith('wc')) {
+                if (pipe.includes('-l')) lines = [lines.length.toString()];
             }
-            else if (cmd === 'wc' && pipe.includes('-l')) {
-                lines = [lines.length.toString()];
-            }
-            else if (cmd === 'cut') {
-                const d = pipe.match(/-d'(.*?)'/) ? pipe.match(/-d'(.*?)'/)[1] : " ";
-                const fMatch = pipe.match(/-f(\d+)/);
-                if (fMatch) {
-                    const f = parseInt(fMatch[1]) - 1;
-                    lines = lines.map(l => l.split(d)[f] || "");
-                }
-            }
-            else if (cmd === 'sort') {
-                lines.sort();
-                if (pipe.includes('-r')) lines.reverse();
-            }
-            else if (cmd === 'uniq') {
-                if (pipe.includes('-c')) {
-                    const counts = lines.reduce((a, b) => { a[b] = (a[b] || 0) + 1; return a; }, {});
-                    lines = Object.entries(counts).map(([k, v]) => `${v} ${k}`);
-                } else {
-                    lines = [...new Set(lines)];
-                }
+            else if (pipe.startsWith('uniq')) {
+                lines = [...new Set(lines)];
             }
         });
         document.getElementById('output').textContent = lines.join('\n') || "0";
@@ -130,9 +103,9 @@
     function checkMission() {
         const val = document.getElementById('missionAnswer').value.trim();
         const target = missions[currentMission].a;
-        const isCorrect = val.length === target.length && val.split('').every((char, i) => char.charCodeAt(0) === target[i]);
+        const isMatch = val.length === target.length && val.split('').every((char, i) => char.charCodeAt(0) === target[i]);
 
-        if (isCorrect) {
+        if (isMatch) {
             currentMission++;
             document.getElementById('missionAnswer').value = "";
             updateMissions();
