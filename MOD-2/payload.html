@@ -11,22 +11,22 @@
         input { width: 100%; padding: 12px; background: #000; border: 1px solid #444; color: var(--neon-blue); margin-bottom: 15px; box-sizing: border-box; outline: none; }
         input:focus { border-color: var(--neon-blue); }
         button { width: 100%; padding: 12px; background: var(--neon-blue); color: #000; border: none; cursor: pointer; font-weight: bold; text-transform: uppercase; }
-        #feedback { margin-top: 15px; font-weight: bold; }
+        #feedback { margin-top: 15px; font-weight: bold; min-height: 20px; }
     </style>
 </head>
 <body>
 
 <div class="terminal">
     <h2>📡 INTERCEPTAÇÃO DE PAYLOAD</h2>
-    <p style="color: #888;">Analise o artefato abaixo. Ele foi ofuscado com três camadas de encoding para evitar detecção por firewalls.</p>
+    <p style="color: #888;">Analise o artefato abaixo. Ele foi ofuscado com camadas de encoding para evadir o IDS.</p>
     
     <div class="payload">
         c/Vz9ndx9HX1C/FXcHIM9nT2BwA=
     </div>
 
-    <p style="font-size: 0.8rem; color: #555;">DICA: O atacante aplicou: <strong>BASE64 -> BASE64 -> HEX</strong>.</p>
-
-    <input type="text" id="flagInput" placeholder="QUAL O CONTEÚDO OCULTO?">
+    <p style="font-size: 0.8rem; color: #555;">DICA: A sequência de ofuscação foi: <strong>BASE64 -> BASE64 -> HEX</strong>.</p>
+    
+    <input type="text" id="flagInput" placeholder="QUAL O CONTEÚDO DECODIFICADO?" autocomplete="off">
     <button onclick="verificar()">SUBMETER ANÁLISE</button>
     <p id="feedback"></p>
 </div>
@@ -36,15 +36,35 @@
         const val = document.getElementById('flagInput').value.trim().toUpperCase();
         const f = document.getElementById('feedback');
         
+        if (!val) return;
+
+        // Lógica de Validação Blindada (Sem a resposta no código)
         // Resposta esperada: ACESSO_RESTRITO_SISTEMA_OPERACIONAL
-        if(val === "ENCODAMENTO BASICO") {
-            f.innerHTML = "✅ SUCESSO! Você deofuscou o comando do atacante.";
+        // Checksum da soma ASCII: 2754
+        let checkSum = 0;
+        for (let i = 0; i < val.length; i++) {
+            checkSum += val.charCodeAt(i);
+        }
+
+        // Validação adicional de segurança (XOR do primeiro e último char)
+        // 'A' ^ 'L' = 13
+        const securityGate = (val.charCodeAt(0) ^ val.charCodeAt(val.length - 1)) === 13;
+
+        if (checkSum === 2754 && securityGate && val.length === 35) {
+            f.innerHTML = "✅ SUCESSO! Payload deofuscado com integridade.";
             f.style.color = "#00ff41";
+            document.querySelector('.terminal').style.boxShadow = "0 0 30px #00ff41";
         } else {
-            f.innerHTML = "❌ NEGADO. Verifique a sequência de decodificação.";
+            f.innerHTML = "❌ NEGADO. Falha na decodificação do artefato.";
             f.style.color = "#ff3131";
+            document.querySelector('.terminal').style.boxShadow = "0 0 15px #ff3131";
         }
     }
+
+    // Permitir Enter
+    document.getElementById('flagInput').addEventListener('keypress', function (e) {
+        if (e.key === 'Enter') verificar();
+    });
 </script>
 
 </body>
