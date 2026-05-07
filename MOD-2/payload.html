@@ -6,60 +6,59 @@
     <style>
         :root { --neon-blue: #00d4ff; --bg-dark: #0a0a0a; }
         body { background: var(--bg-dark); color: #fff; font-family: 'Courier New', monospace; padding: 40px; text-align: center; }
-        .terminal { border: 1px solid var(--neon-blue); padding: 30px; display: inline-block; background: #111; box-shadow: 0 0 15px var(--neon-blue); max-width: 800px; }
+        .terminal { border: 1px solid var(--neon-blue); padding: 30px; display: inline-block; background: #111; box-shadow: 0 0 15px var(--neon-blue); max-width: 800px; transition: 0.3s; }
         .payload { background: #000; padding: 20px; border: 1px dashed var(--neon-blue); word-break: break-all; margin: 20px 0; color: var(--neon-blue); font-size: 1rem; }
-        input { width: 100%; padding: 12px; background: #000; border: 1px solid #444; color: var(--neon-blue); margin-bottom: 15px; box-sizing: border-box; outline: none; }
-        input:focus { border-color: var(--neon-blue); }
+        input { width: 100%; padding: 12px; background: #000; border: 1px solid #444; color: var(--neon-blue); margin-bottom: 15px; box-sizing: border-box; outline: none; text-transform: uppercase; }
         button { width: 100%; padding: 12px; background: var(--neon-blue); color: #000; border: none; cursor: pointer; font-weight: bold; text-transform: uppercase; }
         #feedback { margin-top: 15px; font-weight: bold; min-height: 20px; }
+        .success-border { border-color: #00ff41 !important; box-shadow: 0 0 25px #00ff41 !important; }
+        .error-border { border-color: #ff3131 !important; box-shadow: 0 0 25px #ff3131 !important; }
     </style>
 </head>
 <body>
 
-<div class="terminal">
+<div class="terminal" id="term">
     <h2>📡 INTERCEPTAÇÃO DE PAYLOAD</h2>
-    <p style="color: #888;">Analise o artefato abaixo. Ele foi ofuscado com camadas de encoding para evadir o IDS.</p>
+    <p style="color: #888;">Analise o artefato e realize a deofuscação multinível.</p>
     
     <div class="payload">
         c/Vz9ndx9HX1C/FXcHIM9nT2BwA=
     </div>
 
-    <p style="font-size: 0.8rem; color: #555;">DICA: A sequência de ofuscação foi: <strong>BASE64 -> BASE64 -> HEX</strong>.</p>
+    <p style="font-size: 0.8rem; color: #555;">CAMADAS DETECTADAS: <strong>BASE64 -> BASE64 -> HEX</strong>.</p>
     
-    <input type="text" id="flagInput" placeholder="QUAL O CONTEÚDO DECODIFICADO?" autocomplete="off">
-    <button onclick="verificar()">SUBMETER ANÁLISE</button>
+    <input type="text" id="flagInput" placeholder="CONTEÚDO DECODIFICADO" autocomplete="off">
+    <button onclick="verificar()">INJETAR RESPOSTA</button>
     <p id="feedback"></p>
 </div>
 
 <script>
     function verificar() {
-        const val = document.getElementById('flagInput').value.trim().toUpperCase();
+        const input = document.getElementById('flagInput');
         const f = document.getElementById('feedback');
+        const term = document.getElementById('term');
+        const val = input.value.trim().toUpperCase();
         
         if (!val) return;
 
-       
-        let checkSum = 0;
-        for (let i = 0; i < val.length; i++) {
-            checkSum += val.charCodeAt(i);
-        }
+        const target = [65, 67, 69, 83, 83, 79, 95, 82, 69, 83, 84, 82, 73, 84, 79, 95, 83, 73, 83, 84, 69, 77, 65, 95, 79, 80, 69, 82, 65, 67, 73, 79, 78, 65, 76];
+   
+        const isMatch = val.length === target.length && 
+                        val.split('').every((char, i) => char.charCodeAt(0) === target[i]);
 
-    
-        const securityGate = (val.charCodeAt(0) ^ val.charCodeAt(val.length - 1)) === 13;
-
-        if (checkSum === 2754 && securityGate && val.length === 35) {
-            f.innerHTML = "✅ SUCESSO! Payload deofuscado com integridade.";
+        if (isMatch) {
+            f.innerHTML = "✅ SUCESSO! PAYLOAD RECONSTITUÍDO.";
             f.style.color = "#00ff41";
-            document.querySelector('.terminal').style.boxShadow = "0 0 30px #00ff41";
+            term.className = "terminal success-border";
         } else {
-            f.innerHTML = "❌ NEGADO. Falha na decodificação do artefato.";
+            f.innerHTML = "❌ NEGADO! ERRO NA DECODIFICAÇÃO.";
             f.style.color = "#ff3131";
-            document.querySelector('.terminal').style.boxShadow = "0 0 15px #ff3131";
+            term.className = "terminal error-border";
+            setTimeout(() => { term.className = "terminal"; }, 1000);
         }
     }
 
- 
-    document.getElementById('flagInput').addEventListener('keypress', function (e) {
+    document.getElementById('flagInput').addEventListener('keypress', (e) => {
         if (e.key === 'Enter') verificar();
     });
 </script>
