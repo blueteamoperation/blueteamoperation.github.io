@@ -82,16 +82,16 @@
 
   
     const missions = [
-        { q: "1. Quantas falhas totais (Failed password) existem no log?", a: [56, 53] }, // 85
-        { q: "2. Qual o IP que atacou massivamente o usuário 'support'?", a: [52, 53, 46, 49, 50, 46, 51, 51, 46, 49] }, // 45.12.33.1
-        { q: "3. Qual o usuário 'inválido' (invalid user) que aparece 30 vezes?", a: [116, 101, 115, 116] }, // test
-        { q: "4. Qual IP realizou tentativas falhas contra o usuário 'admin'?", a: [49, 48, 46, 48, 46, 48, 46, 49, 53] }, // 10.0.0.15
-        { q: "5. Qual usuário legítimo (Accepted) acessou o servidor às 14:10:15?", a: [109, 114, 111, 99, 104, 97] }, // mrocha
+        { q: "1. Quantas falhas totais (Failed password) existem no log?", a: [56, 53] }, 
+        { q: "2. Qual o IP que atacou massivamente o usuário 'support'?", a: [52, 53, 46, 49, 50, 46, 51, 51, 46, 49] }, 
+        { q: "3. Qual o usuário 'inválido' (invalid user) que aparece 30 vezes?", a: [116, 101, 115, 116] },
+        { q: "4. Qual IP realizou tentativas falhas contra o usuário 'admin'?", a: [49, 48, 46, 48, 46, 48, 46, 49, 53] }, 
+        { q: "5. Qual usuário legítimo (Accepted) acessou o servidor às 14:10:15?", a: [109, 114, 111, 99, 104, 97] }, 
         { q: "6. Qual comando o usuário 'rbatista' executou usando sudo?", a: [47, 117, 115, 114, 47, 98, 105, 110, 47, 118, 105, 109, 32, 105, 110, 100, 101, 120, 46, 112, 104, 112] }, // /usr/bin/vim index.php
-        { q: "7. Quantas vezes o termo 'session opened' aparece no log?", a: [51] }, // 3
-        { q: "8. Qual a porta de conexão utilizada pelo IP 192.168.1.20?", a: [51, 51, 52, 52, 49] }, // 33441
-        { q: "9. Quantas falhas o IP 172.16.5.5 gerou antes de desistir?", a: [52] }, // 4
-        { q: "10. Qual IP conseguiu acesso root às 15:15:00?", a: [49, 57, 50, 46, 49, 54, 56, 46, 49, 46, 53, 48] } // 192.168.1.50
+        { q: "7. Quantas vezes o termo 'session opened' aparece no log?", a: [51] }, 
+        { q: "8. Qual a porta de conexão utilizada pelo IP 192.168.1.20?", a: [51, 51, 52, 52, 49] }, 
+        { q: "9. Quantas falhas o IP 172.16.5.5 gerou antes de desistir?", a: [52] }, 
+        { q: "10. Qual IP conseguiu acesso root às 15:15:00?", a: [49, 57, 50, 46, 49, 54, 56, 46, 49, 46, 53, 48] } 
     ];
 
     let currentMission = 0;
