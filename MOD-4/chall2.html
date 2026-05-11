@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Cyber Defensor // Advanced Challenge</title>
+    <style>
+        :root { --bg: #05070a; --cyan: #00d4ff; --mag: #ff00ff; --text: #e6edf3; }
+        body { background: var(--bg); color: var(--text); font-family: 'Consolas', monospace; padding: 20px; }
+        .container { max-width: 1000px; margin: auto; }
+        .header { border-bottom: 2px solid var(--cyan); padding: 10px 0; margin-bottom: 30px; }
+        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+        .card { background: #0d1117; border: 1px solid #30363d; padding: 15px; border-radius: 4px; }
+        h1 { color: var(--cyan); letter-spacing: 2px; }
+        input { background: #000; border: 1px solid var(--cyan); color: #fff; padding: 8px; width: 100%; box-sizing: border-box; outline: none; margin-top: 10px; }
+        button { background: transparent; border: 1px solid var(--mag); color: var(--mag); padding: 8px 15px; cursor: pointer; margin-top: 10px; width: 100%; font-weight: bold; }
+        button:hover { background: var(--mag); color: #000; }
+        .status { font-size: 11px; margin-top: 10px; display: block; height: 15px; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="header">
+        <h1>SECURITY_OPS // LEVEL_02</h1>
+        <p style="color: var(--mag)">FONTE: apache_complex_500.json | INVESTIGAÇÃO DE 10 PONTOS</p>
+    </div>
+
+    <div class="grid" id="quizGrid"></div>
+</div>
+
+<script>
+    // Respostas ofuscadas (Base64)
+    const challenges = [
+        { q: "01. Qual o IP do atacante identificado no início dos logs?", a: "MTAuMC4wLjUw" },
+        { q: "02. Qual ferramenta de scan automatizado (User Agent) iniciou o recon?", a: "Tm1hcA==" },
+        { q: "03. Qual o código HTTP predominante durante a varredura de portas?", a: "NDA0" },
+        { q: "04. Qual utilizador foi alvo de 150 tentativas de Brute Force?", a: "c2lsdmlvLnBybw==" },
+        { q: "05. Qual ferramenta foi usada para explorar a falha de SQL Injection?", a: "U3FsbWFw" },
+        { q: "06. Qual o status code das tentativas falhadas de Brute Force?", a: "NDAx" },
+        { q: "07. Qual o arquivo de senhas do sistema que foi alvo de acesso?", a: "L2V0Yy9zaGFkb3c=" },
+        { q: "08. Qual arquivo continha as chaves de API da aplicação?", a: "Ly5lbnY=" },
+        { q: "09. Qual utilizador (User) está associado à leitura do /etc/shadow?", a: "cm9vdA==" },
+        { q: "10. Qual o nome do arquivo de backup detetado nos logs?", a: "L2JhY2t1cC5zcWw=" }
+    ];
+
+    const grid = document.getElementById('quizGrid');
+
+    challenges.forEach((item, i) => {
+        grid.innerHTML += `
+            <div class="card">
+                <h3>${item.q}</h3>
+                <input type="text" id="in-${i}" placeholder="DIGITE A RESPOSTA...">
+                <button onclick="verify(${i})">VALIDAR_SISTEMA</button>
+                <span id="st-${i}" class="status"></span>
+            </div>
+        `;
+    });
+
+    function verify(id) {
+        let userVal = document.getElementById(`in-${id}`).value.trim().toLowerCase();
+        let correctVal = atob(challenges[id].a).toLowerCase();
+        let st = document.getElementById(`st-${id}`);
+
+        // Lógica flexível para arquivos (com ou sem barra)
+        if (correctVal.startsWith('/') && userVal === correctVal.substring(1)) {
+            userVal = "/" + userVal;
+        }
+
+        // Validação Nikto/Nmap parcial
+        if (userVal.includes(correctVal) || correctVal.includes(userVal) && userVal.length > 3) {
+            st.innerText = "✓ ACESSO CONCEDIDO";
+            st.style.color = "#238636";
+        } else {
+            st.innerText = "X ACESSO NEGADO";
+            st.style.color = "#f85149";
+        }
+    }
+</script>
+</body>
+</html>
