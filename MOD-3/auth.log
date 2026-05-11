@@ -1,0 +1,98 @@
+May 11 06:00:01 server sshd[1234]: Server listening on 0.0.0.0 port 22.
+May 11 06:00:01 server sshd[1234]: Server listening on :: port 22.
+May 11 06:01:12 server sshd[1245]: Invalid user admin from 192.168.1.105 port 45231
+May 11 06:01:12 server sshd[1245]: Connection closed by authenticating user admin 192.168.1.105 port 45231 [preauth]
+May 11 06:01:15 server sshd[1247]: Invalid user guest from 192.168.1.105 port 45232
+May 11 06:01:15 server sshd[1247]: Connection closed by authenticating user guest 192.168.1.105 port 45232 [preauth]
+May 11 06:01:18 server sshd[1249]: Invalid user user from 192.168.1.105 port 45233
+May 11 06:01:18 server sshd[1249]: Connection closed by authenticating user user 192.168.1.105 port 45233 [preauth]
+May 11 06:02:10 server sshd[1251]: Accepted password for silvio from 10.0.0.15 port 51234 ssh2
+May 11 06:02:10 server sshd[1251]: pam_unix(sshd:session): session opened for user silvio by (uid=0)
+May 11 06:02:10 server systemd-logind[500]: New session 1 of user silvio.
+May 11 06:03:05 server sudo:   silvio : TTY=pts/0 ; PWD=/home/silvio ; USER=root ; COMMAND=/usr/bin/apt update
+May 11 06:03:05 server sudo: pam_unix(sudo:session): session opened for user root by silvio(uid=0)
+May 11 06:03:10 server sudo: pam_unix(sudo:session): session closed for user root
+May 11 06:05:22 server sshd[1260]: Received disconnect from 192.168.56.1 port 52311:11: Bye bye [preauth]
+May 11 06:05:22 server sshd[1260]: Disconnected from authenticating user root 192.168.56.1 port 52311 [preauth]
+May 11 06:10:01 server sshd[1300]: pam_unix(sshd:auth): authentication failure; logname= uid=0 euid=0 tty=ssh ruser= rhost=203.0.113.42  user=root
+May 11 06:10:03 server sshd[1300]: Failed password for root from 203.0.113.42 port 38210 ssh2
+May 11 06:10:05 server sshd[1302]: Failed password for root from 203.0.113.42 port 38212 ssh2
+May 11 06:10:07 server sshd[1304]: Failed password for root from 203.0.113.42 port 38214 ssh2
+May 11 06:10:09 server sshd[1306]: Failed password for root from 203.0.113.42 port 38216 ssh2
+May 11 06:10:11 server sshd[1308]: Failed password for root from 203.0.113.42 port 38218 ssh2
+May 11 06:10:13 server sshd[1310]: Failed password for root from 203.0.113.42 port 38220 ssh2
+May 11 06:10:14 server sshd[1310]: Disconnected from authenticating user root 203.0.113.42 port 38220 [preauth]
+May 11 06:10:14 server sshd[1310]: PAM 5 more authentication failures; logname= uid=0 euid=0 tty=ssh ruser= rhost=203.0.113.42  user=root
+May 11 06:15:45 server groupadd[1400]: group added to /etc/group: name=lab_users, GID=1001
+May 11 06:15:45 server groupadd[1400]: group added to /etc/gshadow: name=lab_users
+May 11 06:15:45 server groupadd[1400]: new group: name=lab_users, GID=1001
+May 11 06:16:10 server useradd[1405]: new user: name=aluno01, UID=1001, GID=1001, home=/home/aluno01, shell=/bin/bash
+May 11 06:16:15 server passwd[1408]: pam_unix(passwd:chauthtok): password changed for aluno01
+May 11 06:20:00 server CRON[1450]: pam_unix(cron:session): session opened for user root by (uid=0)
+May 11 06:20:01 server CRON[1450]: pam_unix(cron:session): session closed for user root
+May 11 06:22:30 server sudo:   silvio : TTY=pts/0 ; PWD=/home/silvio ; USER=root ; COMMAND=/usr/bin/tail -f /var/log/auth.log
+May 11 06:22:30 server sudo: pam_unix(sudo:session): session opened for user root by silvio(uid=0)
+May 11 06:25:12 server sshd[1500]: Accepted password for aluno01 from 10.0.0.20 port 49152 ssh2
+May 11 06:25:12 server sshd[1500]: pam_unix(sshd:session): session opened for user aluno01 by (uid=0)
+May 11 06:25:12 server systemd-logind[500]: New session 2 of user aluno01.
+May 11 06:26:45 server sudo:  aluno01 : TTY=pts/1 ; PWD=/home/aluno01 ; USER=root ; COMMAND=/usr/bin/cat /etc/shadow
+May 11 06:26:45 server sudo: pam_unix(sudo:auth): authentication failure; logname=aluno01 uid=1001 euid=0 tty=/dev/pts/1 ruser=aluno01 rhost=  user=aluno01
+May 11 06:26:48 server sudo:  aluno01 : 3 incorrect password attempts ; TTY=pts/1 ; PWD=/home/aluno01 ; USER=root ; COMMAND=/usr/bin/cat /etc/shadow
+May 11 06:30:10 server sshd[1500]: pam_unix(sshd:session): session closed for user aluno01
+May 11 06:30:10 server systemd-logind[500]: Session 2 logged out.
+May 11 06:40:01 server sshd[1600]: Invalid user support from 45.12.33.10 port 55432
+May 11 06:40:01 server sshd[1600]: Connection closed by authenticating user support 45.12.33.10 port 55432 [preauth]
+May 11 06:40:04 server sshd[1602]: Invalid user test from 45.12.33.10 port 55433
+May 11 06:40:04 server sshd[1602]: Connection closed by authenticating user test 45.12.33.10 port 55433 [preauth]
+May 11 06:40:07 server sshd[1604]: Invalid user nagios from 45.12.33.10 port 55434
+May 11 06:40:07 server sshd[1604]: Connection closed by authenticating user nagios 45.12.33.10 port 55434 [preauth]
+May 11 06:40:10 server sshd[1606]: Invalid user postgres from 45.12.33.10 port 55435
+May 11 06:40:10 server sshd[1606]: Connection closed by authenticating user postgres 45.12.33.10 port 55435 [preauth]
+May 11 06:40:13 server sshd[1608]: Invalid user oracle from 45.12.33.10 port 55436
+May 11 06:40:13 server sshd[1608]: Connection closed by authenticating user oracle 45.12.33.10 port 55436 [preauth]
+May 11 06:45:00 server sudo:   silvio : TTY=pts/0 ; PWD=/home/silvio ; USER=root ; COMMAND=/usr/sbin/tcpdump -i eth0
+May 11 06:50:22 server sshd[1251]: pam_unix(sshd:session): session closed for user silvio
+May 11 06:50:22 server systemd-logind[500]: Session 1 logged out.
+May 11 06:55:01 server sshd[1700]: pam_unix(sshd:auth): authentication failure; logname= uid=0 euid=0 tty=ssh ruser= rhost=185.220.101.5  user=root
+May 11 06:55:03 server sshd[1700]: Failed password for root from 185.220.101.5 port 44321 ssh2
+May 11 06:55:06 server sshd[1702]: Failed password for root from 185.220.101.5 port 44323 ssh2
+May 11 06:55:09 server sshd[1704]: Failed password for root from 185.220.101.5 port 44325 ssh2
+May 11 06:55:12 server sshd[1706]: Failed password for root from 185.220.101.5 port 44327 ssh2
+May 11 06:55:15 server sshd[1708]: Failed password for root from 185.220.101.5 port 44329 ssh2
+May 11 06:55:18 server sshd[1710]: Failed password for root from 185.220.101.5 port 44331 ssh2
+May 11 06:55:20 server sshd[1712]: Failed password for root from 185.220.101.5 port 44333 ssh2
+May 11 06:55:23 server sshd[1714]: Failed password for root from 185.220.101.5 port 44335 ssh2
+May 11 06:55:26 server sshd[1716]: Failed password for root from 185.220.101.5 port 44337 ssh2
+May 11 06:55:29 server sshd[1718]: Failed password for root from 185.220.101.5 port 44339 ssh2
+May 11 06:55:30 server sshd[1718]: Connection closed by authenticating user root 185.220.101.5 port 44339 [preauth]
+May 11 06:59:12 server polkitd[450]: Registered Authentication Agent for unix-process:1800:54321 (system bus name :1.20 [/usr/bin/pkttyagent], object path /org/freedesktop/PolicyKit1/AuthenticationAgent, locale en_US.UTF-8)
+May 11 07:00:01 server CRON[1810]: pam_unix(cron:session): session opened for user root by (uid=0)
+May 11 07:00:01 server CRON[1810]: pam_unix(cron:session): session closed for user root
+May 11 07:05:10 server sshd[1850]: Accepted publickey for silvio from 10.0.0.15 port 52100 ssh2: RSA SHA256:abcd1234...
+May 11 07:05:10 server sshd[1850]: pam_unix(sshd:session): session opened for user silvio by (uid=0)
+May 11 07:06:22 server sudo:   silvio : TTY=pts/0 ; PWD=/home/silvio ; USER=root ; COMMAND=/usr/bin/systemctl restart nginx
+May 11 07:10:45 server useradd[1900]: new user: name=temp_user, UID=1002, GID=1002, home=/home/temp_user, shell=/bin/sh
+May 11 07:12:01 server sshd[1910]: Invalid user webmaster from 104.24.11.50 port 33211
+May 11 07:12:01 server sshd[1910]: Connection closed by authenticating user webmaster 104.24.11.50 port 33211 [preauth]
+May 11 07:12:03 server sshd[1912]: Invalid user bot from 104.24.11.50 port 33212
+May 11 07:12:03 server sshd[1912]: Connection closed by authenticating user bot 104.24.11.50 port 33212 [preauth]
+May 11 07:15:30 server sudo:   silvio : TTY=pts/0 ; PWD=/home/silvio ; USER=root ; COMMAND=/usr/bin/userdel -r temp_user
+May 11 07:15:30 server userdel[1920]: delete user 'temp_user'
+May 11 07:15:30 server userdel[1920]: removed group 'temp_user' owned by 'temp_user'
+May 11 07:15:30 server userdel[1920]: removed shadow group 'temp_user' owned by 'temp_user'
+May 11 07:20:00 server sshd[1850]: pam_unix(sshd:session): session closed for user silvio
+May 11 07:25:01 server sshd[2000]: pam_unix(sshd:auth): authentication failure; logname= uid=0 euid=0 tty=ssh ruser= rhost=5.188.206.12  user=root
+May 11 07:25:03 server sshd[2000]: Failed password for root from 5.188.206.12 port 56789 ssh2
+May 11 07:25:05 server sshd[2002]: Failed password for root from 5.188.206.12 port 56790 ssh2
+May 11 07:25:07 server sshd[2004]: Failed password for root from 5.188.206.12 port 56791 ssh2
+May 11 07:25:09 server sshd[2006]: Failed password for root from 5.188.206.12 port 56792 ssh2
+May 11 07:25:11 server sshd[2008]: Failed password for root from 5.188.206.12 port 56793 ssh2
+May 11 07:25:13 server sshd[2010]: Failed password for root from 5.188.206.12 port 56794 ssh2
+May 11 07:25:15 server sshd[2012]: Failed password for root from 5.188.206.12 port 56795 ssh2
+May 11 07:25:17 server sshd[2014]: Failed password for root from 5.188.206.12 port 56796 ssh2
+May 11 07:25:19 server sshd[2016]: Failed password for root from 5.188.206.12 port 56797 ssh2
+May 11 07:25:21 server sshd[2018]: Failed password for root from 5.188.206.12 port 56798 ssh2
+May 11 07:25:22 server sshd[2018]: Connection closed by authenticating user root 5.188.206.12 port 56798 [preauth]
+May 11 07:30:01 server sshd[2100]: Accepted password for silvio from 10.0.0.15 port 53421 ssh2
+May 11 07:30:01 server sshd[2100]: pam_unix(sshd:session): session opened for user silvio by (uid=0)
+May 11 07:31:00 server sudo:   silvio : TTY=pts/0 ; PWD=/home/silvio ; USER=root ; COMMAND=/usr/bin/journalctl -xe
