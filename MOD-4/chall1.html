@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Cyber Defense Challenge // Apache Logs</title>
+    <style>
+        :root {
+            --bg: #05070a;
+            --card: #0d1117;
+            --cyan: #00d4ff;
+            --magenta: #ff00ff;
+            --text: #e6edf3;
+            --green: #238636;
+            --red: #f85149;
+        }
+
+        body {
+            background: var(--bg);
+            color: var(--text);
+            font-family: 'Consolas', 'Monaco', monospace;
+            padding: 40px;
+            margin: 0;
+        }
+
+        .container { max-width: 900px; margin: auto; }
+
+        .header {
+            border-bottom: 2px solid var(--cyan);
+            padding-bottom: 20px;
+            margin-bottom: 40px;
+        }
+
+        h1 { color: var(--cyan); text-transform: uppercase; letter-spacing: 4px; margin: 0; }
+        .meta { color: var(--magenta); font-size: 12px; margin-top: 5px; }
+
+        .quiz-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .card {
+            background: var(--card);
+            border: 1px solid #30363d;
+            padding: 20px;
+            border-radius: 4px;
+            transition: 0.3s;
+        }
+
+        .card:hover { border-color: var(--cyan); }
+
+        .card h3 { 
+            font-size: 14px; 
+            color: var(--cyan); 
+            margin-top: 0; 
+            min-height: 40px;
+        }
+
+        input {
+            width: 100%;
+            background: #000;
+            border: 1px solid #333;
+            color: var(--white);
+            padding: 10px;
+            box-sizing: border-box;
+            border-radius: 3px;
+            outline: none;
+            color: #fff;
+            font-family: inherit;
+        }
+
+        input:focus { border-color: var(--magenta); }
+
+        .actions { margin-top: 15px; display: flex; align-items: center; justify-content: space-between; }
+
+        button {
+            background: transparent;
+            border: 1px solid var(--cyan);
+            color: var(--cyan);
+            padding: 8px 15px;
+            cursor: pointer;
+            font-size: 12px;
+            text-transform: uppercase;
+        }
+
+        button:hover { background: var(--cyan); color: #000; }
+
+        .status { font-size: 11px; font-weight: bold; text-transform: uppercase; }
+        .correct { color: var(--green); }
+        .wrong { color: var(--red); }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="header">
+        <h1>INVESTIGATION_TERMINAL v1.0</h1>
+        <div class="meta">TARGET: apache_splunk_300.json // OBJECTIVE: FORENSIC ANALYSIS</div>
+    </div>
+
+    <div class="quiz-grid" id="quizGrid"></div>
+</div>
+
+<script>
+    // Respostas Ofuscadas (Base64)
+    // 1: 401 | 2: POST | 3: Nikto | 4: /.env | 5: JSON | 6: admin
+    const database = [
+        { q: "Qual o código HTTP que indica falha de autenticação?", a: "NDAx" },
+        { q: "Qual o método HTTP usado no ataque de Brute Force?", a: "UE9TVA==" },
+        { q: "Qual o User Agent da ferramenta de scanner detetada?", a: "TmlrdG8=" },
+        { q: "Qual o ficheiro sensível acedido com sucesso (200)?", a: "Ly5lbnY=" },
+        { q: "Qual o formato de estruturação dos logs gerados?", a: "SlNPTg==" },
+        { q: "Qual o utilizador alvo das tentativas de invasão?", a: "YWRtaW4=" }
+    ];
+
+    const grid = document.getElementById('quizGrid');
+
+    database.forEach((item, i) => {
+        const div = document.createElement('div');
+        div.className = 'card';
+        div.innerHTML = `
+            <h3>${item.q}</h3>
+            <input type="text" id="in-${i}" placeholder="RESPOSTA_">
+            <div class="actions">
+                <button onclick="validate(${i})">Verificar</button>
+                <span id="st-${i}" class="status"></span>
+            </div>
+        `;
+        grid.appendChild(div);
+    });
+
+    function validate(id) {
+        let userVal = document.getElementById(`in-${id}`).value.trim().toLowerCase();
+        let correctVal = atob(database[id].a).toLowerCase();
+        let status = document.getElementById(`st-${id}`);
+
+        // Lógica especial para aceitar .env ou /.env
+        if (correctVal === "/.env") {
+            if (userVal === "/.env" || userVal === ".env") {
+                success(status);
+                return;
+            }
+        }
+
+        if (userVal === correctVal) {
+            success(status);
+        } else {
+            status.innerText = "!! ERRO !!";
+            status.className = "status wrong";
+        }
+    }
+
+    function success(el) {
+        el.innerText = ">> OK";
+        el.className = "status correct";
+    }
+</script>
+
+</body>
+</html>
