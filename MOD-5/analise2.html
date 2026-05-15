@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>PHISHING_ADVANCED_FORENSICS</title>
+    <style>
+        :root { --neon: #0aff0a; --bg: #050505; --panel: #111; }
+        body { background: var(--bg); color: #fff; font-family: 'Courier New', monospace; padding: 20px; display: flex; flex-direction: column; align-items: center; }
+        .main-container { width: 98%; max-width: 1250px; display: grid; grid-template-columns: 1fr 420px; gap: 20px; }
+        .header-viewer { background: var(--panel); border: 1px solid #333; padding: 20px; border-radius: 4px; border-top: 3px solid var(--neon); }
+        .raw-source { background: #000; padding: 15px; border: 1px solid #222; font-size: 10px; line-height: 1.5; color: #777; overflow-x: auto; margin-bottom: 20px; }
+        .num-mark { display: inline-block; width: 16px; height: 16px; background: var(--neon); color: #000; border-radius: 50%; text-align: center; font-size: 10px; font-weight: bold; line-height: 16px; margin-right: 5px; }
+        .mission-panel { background: #0d0d0d; border: 1px solid var(--neon); padding: 20px; height: 90vh; overflow-y: auto; position: sticky; top: 10px; }
+        .mission-box { background: #1a1a1a; padding: 15px; border: 1px solid #444; margin-bottom: 15px; }
+        .mission-q { font-size: 12px; color: #ffcc00; margin-bottom: 10px; font-weight: bold; line-height: 1.4; }
+        input { width: 100%; padding: 10px; background: #000; border: 1px solid #444; color: #fff; margin-bottom: 8px; outline: none; box-sizing: border-box; }
+        button { width: 100%; padding: 12px; background: var(--neon); color: #000; border: none; font-weight: bold; cursor: pointer; text-transform: uppercase; }
+        .status-msg { font-size: 11px; margin-top: 5px; font-weight: bold; }
+        .field-label { color: var(--neon); }
+    </style>
+</head>
+<body>
+
+<h1 style="letter-spacing: 5px;">[ CYBER_FORENSICS_HEADER_CHALLENGE ]</h1>
+
+<div class="main-container">
+    <div class="header-viewer">
+        <div class="raw-source">
+            <span class="num-mark">1</span><span class="field-label">Delivered-To:</span> diretor.executivo@global-infra.net<br>
+            <span class="num-mark">2</span><span class="field-label">Received:</span> from mx.google.com (mx.google.com. [209.85.210.172]) by smtpd.global-infra.net with ESMTPS id x92si4342ot1.124; Fri, 26 Apr 2026 18:22:10 -0300<br>
+            <span class="num-mark">3</span><span class="field-label">Received:</span> from out.relay-service.com (out.relay-service.com. [195.133.44.12]) by mx.google.com with ESMTPS id l11-20020a0; Fri, 26 Apr 2026 18:20:55 -0300<br>
+            <span class="num-mark">4</span><span class="field-label">Received:</span> from srv-prod.cloud-node-dark.ru (srv-prod.cloud-node-dark.ru [91.210.107.55]) by out.relay-service.com; Fri, 26 Apr 2026 18:19:30 -0300<br>
+            <span class="num-mark">5</span><span class="field-label">X-Originating-IP:</span> [91.210.107.55]<br>
+            <span class="num-mark">6</span><span class="field-label">Return-Path:</span> &lt;bounce-alert@cloud-node-dark.ru&gt;<br>
+            <span class="num-mark">7</span><span class="field-label">Authentication-Results:</span> spf=<b style="color:#ff3131">fail</b> dkim=none dmarc=fail header.from=infra-alert.com<br>
+            <span class="num-mark">8</span><span class="field-label">From:</span> "Suporte Central de TI" &lt;security-noreply@infra-alert.com&gt;<br>
+            <span class="num-mark">9</span><span class="field-label">Reply-To:</span> helpdesk-emergency@protonmail.com<br>
+            <span class="num-mark">10</span><span class="field-label">Subject:</span> AVISO CRÍTICO: Tentativa de Acesso em sua Estação de Trabalho<br>
+            <span class="num-mark">11</span><span class="field-label">X-Mailer:</span> G-Lock Email Marketing Software v12.4.1<br>
+            <span class="num-mark">12</span><span class="field-label">Message-ID:</span> &lt;20260426181930.55.cloud-node-dark.ru@srv-prod&gt;
+        </div>
+        <div style="background: #111; padding: 25px; border: 1px solid #222; color: #999; font-size: 13px;">
+            <p>Prezado Diretor,</p>
+            <p>Uma atividade incomum foi detectada no seu logon remoto. Por questões de segurança, sua sessão será encerrada.</p>
+            <p>Para manter seu acesso ativo, verifique sua identidade no portal de auditoria:</p>
+            <p style="color: var(--neon); text-decoration: underline; cursor: pointer;">http://infra-alert.com-portal.net/auditoria/auth-verify</p>
+        </div>
+    </div>
+
+    <div class="mission-panel">
+        <h2 style="color: var(--neon); font-size: 0.9rem; border-bottom: 1px solid #333; padding-bottom: 10px;">ANÁLISE DE EVIDÊNCIAS</h2>
+        <div id="missions"></div>
+    </div>
+</div>
+
+<script>
+    const mData = [
+        { q: "1. Qual o endereço IP do servidor original que disparou o ataque (Hop mais antigo)?", a: "OTEuMjEwLjEwNy41NQ==" },
+        { q: "2. Qual o domínio real de origem identificado no caminho de retorno (Return-Path)?", a: "Y2xvdWQtbm9kZS1kYXJrLnJ1" },
+        { q: "3. Qual o resultado técnico da autenticação SPF nesta mensagem?", a: "ZmFpbA==" },
+        { q: "4. Qual software de automação foi usado para disparar o e-mail (X-Mailer)?", a: "Ry1Mb2NrIEVtYWlsIE1hcmtldGluZyBTb2Z0d2FyZQ==" },
+        { q: "5. Para qual domínio externo as respostas seriam enviadas no campo Reply-To?", a: "cHJvdG9ubWFpbC5jb20=" },
+        { q: "6. Qual o domínio falso (Typosquatting) utilizado no link do corpo do e-mail?", a: "aW5mcmEtYWxlcnQuY29tLXBvcnRhbC5uZXQ=" },
+        { q: "7. Qual o endereço de e-mail completo forjado no campo From?", a: "c2VjdXJpdHktbm9yZXBseUBpbmZyYS1hbGVydC5jb20=" }
+    ];
+
+    function render() {
+        const container = document.getElementById('missions');
+        mData.forEach((m, i) => {
+            const div = document.createElement('div');
+            div.className = 'mission-box';
+            div.innerHTML = `
+                <div class="mission-q">${m.q}</div>
+                <input type="text" id="ans${i}" autocomplete="off" placeholder="Evidência...">
+                <button onclick="check(${i})">Validar</button>
+                <div id="status${i}" class="status-msg"></div>
+            `;
+            container.appendChild(div);
+        });
+    }
+
+    function check(i) {
+        const userVal = document.getElementById(`ans${i}`).value.trim().toLowerCase();
+        const status = document.getElementById(`status${i}`);
+        const gabarito = window.atob(mData[i].a).toLowerCase();
+
+        if (userVal === gabarito || userVal.includes(gabarito)) {
+            status.innerText = "✓ EVIDÊNCIA CONFIRMADA";
+            status.style.color = "var(--neon)";
+        } else {
+            status.innerText = "✗ DADOS INVÁLIDOS";
+            status.style.color = "#ff3131";
+        }
+    }
+    render();
+</script>
+</body>
+</html>
