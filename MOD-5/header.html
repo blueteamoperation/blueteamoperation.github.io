@@ -43,10 +43,10 @@
         
         <div class="email-meta">
             <span class="forensic-mark" onclick="showInfo(1)">1</span><span class="field-label">Delivered-To:</span> <span class="field-value">vendedor.alvo@empresa.com.br</span><br>
-            <span class="forensic-mark" onclick="showInfo(2)">2</span><span class="field-label">Received:</span> <span class="field-value">from mail-ot1-x32c.server.com (mail-ot1-x32c.google.com. [192.168.210.172])</span><br>
+            <span class="forensic-mark" onclick="showInfo(2)">2</span><span class="field-label">Received:</span> <span class="field-value">from mail-ot1-x32c.server.com (mail-ot1-x32c.fakemail.com. [192.168.210.172])</span><br>
             <span class="forensic-mark" onclick="showInfo(3)">3</span><span class="field-label">X-Received:</span> <span class="field-value">by 2002:a05:6830:1a4b:b0:6ae:c88e:2881 with SMTP id m11-2002</span><br>
             <span class="forensic-mark" onclick="showInfo(4)">4</span><span class="field-label">Return-Path:</span> <span class="field-value">&lt;<span class="suspicious">bounce-mail-23@srv-evil.ru</span>&gt;</span><br>
-            <span class="forensic-mark" onclick="showInfo(5)">5</span><span class="field-label">Authentication-Results:</span> <span class="field-value">spf=<span class="suspicious">softfail</span> (google.com: domain of srv-evil.ru does not designate 209.85.210.172 as permitted sender)</span><br>
+            <span class="forensic-mark" onclick="showInfo(5)">5</span><span class="field-label">Authentication-Results:</span> <span class="field-value">spf=<span class="suspicious">softfail</span> (serverfake.com: domain of srv-evil.ru does not designate 209.85.210.172 as permitted sender)</span><br>
             <span class="forensic-mark" onclick="showInfo(6)">6</span><span class="field-label">From:</span> <span class="field-value">"Suporte Segurança Bradesco" &lt;<span class="suspicious">atendimento@bank-seguro.com</span>&gt;</span><br>
             <span class="forensic-mark" onclick="showInfo(7)">7</span><span class="field-label">Reply-To:</span> <span class="field-value">bank.suporte.urgente@fakemail.com</span><br>
             <span class="forensic-mark" onclick="showInfo(8)">8</span><span class="field-label">Subject:</span> <span class="field-value">🚨 ATENÇÃO: Dispositivo Desconhecido Detectado em sua Conta!</span><br>
@@ -80,7 +80,7 @@
         2: {
             title: "Received (Caminho do E-mail)",
             desc: "Este é o campo mais importante. Ele lista cada servidor (hop) pelo qual o e-mail passou, do remetente ao destinatário.",
-            imp: "Permite rastrear o endereço IP real do servidor de origem. No exemplo, o IP [209.85.210.172] deve ser investigado em bancos de dados de reputação."
+            imp: "Permite rastrear o endereço IP real do servidor de origem. No exemplo, o IP [192.168.210.172] deve ser investigado em bancos de dados de reputação."
         },
         3: {
             title: "X-Received",
@@ -100,12 +100,12 @@
         6: {
             title: "From (Remetente Exibido)",
             desc: "O nome e endereço que o usuário vê na caixa de entrada.",
-            imp: "Atacantes usam nomes amigáveis para enganar. Note que o domínio 'bradesco-seguro.com' não é o oficial (bradesco.com.br)."
+            imp: "Atacantes usam nomes amigáveis para enganar. Note que o domínio 'bank-seguro.com' não é o oficial (bank.com.br)."
         },
         7: {
             title: "Reply-To",
             desc: "Endereço que será usado se o usuário clicar em 'Responder'.",
-            imp: "Em golpes de engenharia social, o atacante usa um domínio oficial no 'From', mas um e-mail pessoal (gmail) no 'Reply-To' para receber os dados da vítima."
+            imp: "Em golpes de engenharia social, o atacante usa um domínio oficial no 'From', mas um e-mail pessoal (fakemail) no 'Reply-To' para receber os dados da vítima."
         },
         8: {
             title: "Subject (Assunto)",
