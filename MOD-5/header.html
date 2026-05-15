@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>E-MAIL_HEADER_FORENSICS</title>
+    <style>
+        :root { --neon: #00ff41; --bg: #050505; --panel: #111; --danger: #ff3131; }
+        body { background: var(--bg); color: #fff; font-family: 'Courier New', monospace; padding: 20px; display: flex; flex-direction: column; align-items: center; }
+        
+        .main-container { width: 95%; max-width: 1100px; display: grid; grid-template-columns: 1fr 350px; gap: 20px; }
+        
+        .header-viewer { background: var(--panel); border: 1px solid #333; padding: 25px; border-radius: 4px; box-shadow: 0 0 20px rgba(0,255,65,0.05); }
+        
+        .email-meta { background: #000; padding: 15px; border: 1px solid #222; font-size: 13px; line-height: 1.8; color: #888; margin-bottom: 20px; position: relative; }
+        
+        .forensic-mark {
+            display: inline-block; width: 18px; height: 18px; background: var(--neon); color: #000;
+            border-radius: 50%; text-align: center; font-size: 12px; font-weight: bold;
+            line-height: 18px; cursor: pointer; margin-right: 5px; box-shadow: 0 0 8px var(--neon);
+            transition: 0.3s;
+        }
+        .forensic-mark:hover { transform: scale(1.2); filter: brightness(1.2); }
+
+        .field-label { color: var(--neon); font-weight: bold; }
+        .field-value { color: #ccc; }
+        .suspicious { color: var(--danger); text-decoration: underline; }
+
+        .info-panel { background: #0d0d0d; border: 1px solid var(--neon); padding: 20px; height: fit-content; position: sticky; top: 20px; }
+        .info-title { color: var(--neon); font-size: 1.1rem; border-bottom: 1px solid #333; padding-bottom: 10px; margin-bottom: 15px; text-transform: uppercase; }
+        .info-content { font-size: 0.9rem; line-height: 1.5; color: #ddd; }
+        .importance { margin-top: 15px; color: #0ff; font-style: italic; border-top: 1px dashed #333; padding-top: 10px; }
+
+        h1 { text-transform: uppercase; letter-spacing: 4px; margin-bottom: 20px; border-bottom: 2px solid var(--neon); }
+    </style>
+</head>
+<body>
+
+<h1>[ HEADER_ANALYSIS_TOOL_V1.0 ]</h1>
+
+<div class="main-container">
+    <div class="header-viewer">
+        <h2 style="color: var(--neon); font-size: 1rem; margin-top: 0;">&gt; RAW_HEADER_SOURCE:</h2>
+        
+        <div class="email-meta">
+            <span class="forensic-mark" onclick="showInfo(1)">1</span><span class="field-label">Delivered-To:</span> <span class="field-value">vendedor.alvo@empresa.com.br</span><br>
+            <span class="forensic-mark" onclick="showInfo(2)">2</span><span class="field-label">Received:</span> <span class="field-value">from mail-ot1-x32c.google.com (mail-ot1-x32c.google.com. [209.85.210.172])</span><br>
+            <span class="forensic-mark" onclick="showInfo(3)">3</span><span class="field-label">X-Received:</span> <span class="field-value">by 2002:a05:6830:1a4b:b0:6ae:c88e:2881 with SMTP id m11-2002</span><br>
+            <span class="forensic-mark" onclick="showInfo(4)">4</span><span class="field-label">Return-Path:</span> <span class="field-value">&lt;<span class="suspicious">bounce-mail-23@srv-evil.ru</span>&gt;</span><br>
+            <span class="forensic-mark" onclick="showInfo(5)">5</span><span class="field-label">Authentication-Results:</span> <span class="field-value">spf=<span class="suspicious">softfail</span> (google.com: domain of srv-evil.ru does not designate 209.85.210.172 as permitted sender)</span><br>
+            <span class="forensic-mark" onclick="showInfo(6)">6</span><span class="field-label">From:</span> <span class="field-value">"Suporte Segurança Bradesco" &lt;<span class="suspicious">atendimento@bradesco-seguro.com</span>&gt;</span><br>
+            <span class="forensic-mark" onclick="showInfo(7)">7</span><span class="field-label">Reply-To:</span> <span class="field-value">bank.suporte.urgente@gmail.com</span><br>
+            <span class="forensic-mark" onclick="showInfo(8)">8</span><span class="field-label">Subject:</span> <span class="field-value">🚨 ATENÇÃO: Dispositivo Desconhecido Detectado em sua Conta!</span><br>
+            <span class="forensic-mark" onclick="showInfo(9)">9</span><span class="field-label">Date:</span> <span class="field-value">Fri, 26 Apr 2026 13:01:05 -0300</span><br>
+            <span class="forensic-mark" onclick="showInfo(10)">10</span><span class="field-label">Message-ID:</span> <span class="field-value">&lt;CAG-23-abc-123@mail.gmail.com&gt;</span>
+        </div>
+
+        <div style="background: #111; padding: 20px; border: 1px solid #222; color: #888; font-size: 14px;">
+            <p>Prezado Cliente,</p>
+            <p>Detectamos um acesso suspeito à sua conta vindo de um dispositivo em Moscou, RU.</p>
+            <p>Se não foi você, clique no link abaixo para bloquear sua conta imediatamente:</p>
+            <p style="color: #00d4ff; text-decoration: underline;">https://bank-seguranca-portal.net/login/auth-secure</p>
+        </div>
+    </div>
+
+    <div class="info-panel" id="forensicPanel">
+        <div class="info-title">Detalhamento Forense</div>
+        <div id="infoBody" class="info-content">
+            Selecione um marcador numerado para analisar a importância forense do campo.
+        </div>
+    </div>
+</div>
+
+<script>
+    const forensicData = {
+        1: {
+            title: "Delivered-To",
+            desc: "Indica o endereço de e-mail do destinatário final que recebeu a mensagem.",
+            imp: "Ajuda a confirmar se o e-mail foi direcionado a um alvo específico ou se faz parte de um disparo em massa (spam list)."
+        },
+        2: {
+            title: "Received (Caminho do E-mail)",
+            desc: "Este é o campo mais importante. Ele lista cada servidor (hop) pelo qual o e-mail passou, do remetente ao destinatário.",
+            imp: "Permite rastrear o endereço IP real do servidor de origem. No exemplo, o IP [209.85.210.172] deve ser investigado em bancos de dados de reputação."
+        },
+        3: {
+            title: "X-Received",
+            desc: "Um cabeçalho não padrão adicionado pelos servidores (geralmente Google) para rastreamento interno.",
+            imp: "Útil para correlacionar logs internos de provedores durante uma investigação judicial."
+        },
+        4: {
+            title: "Return-Path",
+            desc: "Endereço para onde notificações de erro (bounce) são enviadas.",
+            imp: "Muitas vezes, atacantes esquecem de forjar este campo. Aqui vemos um domínio russo (.ru), o que é altamente suspeito para um banco brasileiro."
+        },
+        5: {
+            title: "Authentication-Results (SPF)",
+            desc: "Informa se o e-mail passou nos testes de SPF (Sender Policy Framework).",
+            imp: "O 'softfail' indica que o servidor que enviou o e-mail não tem autorização oficial do domínio. É um forte indício de Spoofing (falsificação)."
+        },
+        6: {
+            title: "From (Remetente Exibido)",
+            desc: "O nome e endereço que o usuário vê na caixa de entrada.",
+            imp: "Atacantes usam nomes amigáveis para enganar. Note que o domínio 'bradesco-seguro.com' não é o oficial (bradesco.com.br)."
+        },
+        7: {
+            title: "Reply-To",
+            desc: "Endereço que será usado se o usuário clicar em 'Responder'.",
+            imp: "Em golpes de engenharia social, o atacante usa um domínio oficial no 'From', mas um e-mail pessoal (gmail) no 'Reply-To' para receber os dados da vítima."
+        },
+        8: {
+            title: "Subject (Assunto)",
+            desc: "O título da mensagem.",
+            imp: "Analistas buscam por gatilhos emocionais (senso de urgência, ameaça, prêmio) que são típicos de ataques de Phishing."
+        },
+        9: {
+            title: "Date (Data e Fuso Horário)",
+            desc: "Data e hora do envio da mensagem.",
+            imp: "O fuso horário (-0300) pode indicar a localização geográfica do atacante ou se ele configurou o sistema para simular o horário local do alvo."
+        },
+        10: {
+            title: "Message-ID",
+            desc: "Um identificador único gerado pelo servidor de e-mail.",
+            imp: "Fundamental para o 'Threat Hunting'. Você pode buscar por este ID nos logs do servidor de e-mail corporativo para ver quem mais recebeu a mensagem."
+        }
+    };
+
+    function showInfo(id) {
+        const data = forensicData[id];
+        const body = document.getElementById('infoBody');
+        
+        body.innerHTML = `
+            <strong>Campo:</strong> ${data.title}<br><br>
+            ${data.desc}
+            <div class="importance">
+                <strong>Importância Forense:</strong><br>
+                ${data.imp}
+            </div>
+        `;
+
+        // Efeito visual de foco
+        document.getElementById('forensicPanel').style.boxShadow = "0 0 15px var(--neon)";
+        setTimeout(() => {
+            document.getElementById('forensicPanel').style.boxShadow = "none";
+        }, 500);
+    }
+</script>
+
+</body>
+</html>
