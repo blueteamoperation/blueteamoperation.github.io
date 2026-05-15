@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>INVESTIGACAO_FORENSE_EMAIL_FINAL</title>
+    <style>
+        :root { --neon: #0aff0a; --bg: #050505; --panel: #111; }
+        body { background: var(--bg); color: #fff; font-family: 'Courier New', monospace; padding: 20px; display: flex; flex-direction: column; align-items: center; }
+        .main-container { width: 98%; max-width: 1200px; display: grid; grid-template-columns: 1fr 400px; gap: 20px; }
+        .header-viewer { background: var(--panel); border: 1px solid #333; padding: 20px; border-radius: 4px; }
+        .raw-source { background: #000; padding: 15px; border: 1px solid #222; font-size: 11px; line-height: 1.6; color: #888; overflow-x: auto; margin-bottom: 20px; }
+        .num-mark { display: inline-block; width: 18px; height: 18px; background: var(--neon); color: #000; border-radius: 50%; text-align: center; font-size: 11px; font-weight: bold; line-height: 18px; margin-right: 5px; }
+        .mission-panel { background: #0d0d0d; border: 1px solid var(--neon); padding: 20px; height: 90vh; overflow-y: auto; position: sticky; top: 10px; }
+        .mission-box { background: #1a1a1a; padding: 15px; border: 1px solid #444; margin-bottom: 15px; }
+        .mission-q { font-size: 12px; color: #ffcc00; margin-bottom: 10px; font-weight: bold; line-height: 1.4; }
+        input { width: 100%; padding: 8px; background: #000; border: 1px solid #444; color: #fff; margin-bottom: 8px; outline: none; box-sizing: border-box; }
+        button { width: 100%; padding: 10px; background: var(--neon); color: #000; border: none; font-weight: bold; cursor: pointer; width: 100%; }
+        .status-msg { font-size: 11px; margin-top: 5px; font-weight: bold; }
+        .field-label { color: var(--neon); }
+    </style>
+</head>
+<body>
+
+<h1 style="letter-spacing: 5px; text-shadow: 0 0 10px var(--neon);">[ ANALISADOR_DE_CABECALHOS_V8 ]</h1>
+
+<div class="main-container">
+    <div class="header-viewer">
+        <div class="raw-source">
+            <span class="num-mark">1</span><span class="field-label">Delivered-To:</span> gestor@servicos-tech.local<br>
+            <span class="num-mark">2</span><span class="field-label">Received:</span> from relay.mkt-sender.net (relay.mkt-sender.net. [185.156.11.88]) by mx.google.com with ESMTPS id q1-20020a056830114b00b006ae; Fri, 26 Apr 2026 13:00:01 -0700<br>
+            <span class="num-mark">3</span><span class="field-label">Received:</span> from srv-out.shadow-node.io (srv-out.shadow-node.io [103.245.13.92]) by relay.mkt-sender.net; Fri, 26 Apr 2026 12:58:45 -0700<br>
+            <span class="num-mark">4</span><span class="field-label">Return-Path:</span> &lt;bounce@shadow-node.io&gt;<br>
+            <span class="num-mark">5</span><span class="field-label">Authentication-Results:</span> mx.google.com; <b style="color:#ff3131">spf=fail</b> (google.com: domain of shadow-node.io does not designate 185.156.11.88 as permitted sender)<br>
+            <span class="num-mark">6</span><span class="field-label">From:</span> "Suporte Corporativo" &lt;ajuda@intranet-portal.com&gt;<br>
+            <span class="num-mark">7</span><span class="field-label">Reply-To:</span> admin-security@fastmail.temp<br>
+            <span class="num-mark">8</span><span class="field-label">Subject:</span> URGENTE: Atualização Crítica de Segurança Requerida<br>
+            <span class="num-mark">9</span><span class="field-label">X-Mailer:</span> PHPMailer 6.5.0 (https://github.com/PHPMailer/PHPMailer)<br>
+            <span class="num-mark">10</span><span class="field-label">Content-Type:</span> text/html; charset=UTF-8
+        </div>
+        <div style="background: #111; padding: 20px; border: 1px solid #222; color: #888;">
+            <p>Atenção: Seu acesso será bloqueado por falta de sincronização MFA.</p>
+            <p>Valide sua conta no link abaixo:</p>
+            <p style="color: var(--neon); text-decoration: underline;">http://intranet-portal.com/auth/verify-token-update</p>
+        </div>
+    </div>
+
+    <div class="mission-panel">
+        <h2 style="color: var(--neon); font-size: 1rem; border-bottom: 1px solid #333; padding-bottom: 10px;">RELATÓRIO FORENSE</h2>
+        <div id="missionsContainer"></div>
+    </div>
+</div>
+
+<script>
+    const mData = [
+        { q: "1. Qual o IP real de origem do atacante? (Observe o salto mais antigo).", a: "MTAzLjI0NS4xMy45Mg==" },
+        { q: "2. Qual o domínio original que disparou o e-mail (campo Return-Path)?", a: "c2hhZG93LW5vZGUuaW8=" },
+        { q: "3. Qual utilitário foi usado para gerar e enviar este e-mail (campo X-Mailer)?", a: "UEhQTWFpbGVy" },
+        { q: "4. Qual o resultado da autenticação SPF? (Responda 'fail' ou 'pass').", a: "ZmFpbA==" },
+        { q: "5. Para qual domínio o e-mail de resposta (Reply-To) será enviado?", a: "ZmFzdG1haWwudGVtcA==" },
+        { q: "6. Qual o domínio do link de phishing contido no corpo do e-mail?", a: "aW50cmFuZXQtcG9ydGFsLmNvbQ==" }
+    ];
+
+    function renderMissions() {
+        const container = document.getElementById('missionsContainer');
+        container.innerHTML = ""; 
+        mData.forEach((m, i) => {
+            const div = document.createElement('div');
+            div.className = 'mission-box';
+            div.innerHTML = `
+                <div class="mission-q">${m.q}</div>
+                <input type="text" id="ans${i}" autocomplete="off" placeholder="Insira a evidência...">
+                <button onclick="check(${i})">VALIDAR SISTEMA</button>
+                <div id="status${i}" class="status-msg"></div>
+            `;
+            container.appendChild(div);
+        });
+    }
+
+    function check(i) {
+        const userVal = document.getElementById(`ans${i}`).value.trim().toLowerCase();
+        const status = document.getElementById(`status${i}`);
+        const gabarito = window.atob(mData[i].a).toLowerCase();
+
+        if (userVal === gabarito) {
+            status.innerText = "✓ SUCESSO: EVIDÊNCIA VALIDADA.";
+            status.style.color = "var(--neon)";
+        } else {
+            status.innerText = "✗ ERRO: DADOS INCORRETOS.";
+            status.style.color = "#ff3131";
+        }
+    }
+
+    renderMissions();
+</script>
+
+</body>
+</html>
