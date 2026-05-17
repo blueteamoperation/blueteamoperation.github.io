@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simulador Interativo: Transporte UDP</title>
+    <style>
+        :root {
+            --bg-color: #0f172a;
+            --card-bg: #1e293b;
+            --text-color: #f8fafc;
+            --accent-orange: #f97316;
+            --accent-blue: #3b82f6;
+            --accent-green: #10b981;
+            --accent-red: #ef4444;
+            --border-color: #334155;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            border-bottom: 2px solid var(--border-color);
+            padding-bottom: 15px;
+            margin-bottom: 25px;
+        }
+
+        h1 {
+            color: var(--accent-orange);
+            margin: 0 0 10px 0;
+            font-size: 1.8rem;
+            text-transform: uppercase;
+        }
+
+        .dashboard {
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            gap: 20px;
+            margin-bottom: 25px;
+        }
+
+        .panel {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 20px;
+        }
+
+        h2 {
+            font-size: 1.2rem;
+            margin-top: 0;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 8px;
+            color: #cbd5e1;
+        }
+
+        .btn-control {
+            width: 100%;
+            padding: 12px;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            margin-bottom: 12px;
+            transition: background 0.2s;
+        }
+
+        #btn-stream { background-color: var(--accent-orange); }
+        #btn-stream:hover { background-color: #ea580c; }
+
+        #btn-drop { background-color: #475569; }
+        #btn-drop:hover { background-color: #334155; }
+
+        .network-topology {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: relative;
+            padding: 40px 60px;
+            background-color: #0b0f19;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            margin-bottom: 25px;
+            min-height: 150px;
+        }
+
+        .host {
+            background-color: var(--card-bg);
+            border: 2px solid var(--border-color);
+            border-radius: 6px;
+            padding: 15px;
+            text-align: center;
+            width: 220px;
+            z-index: 2;
+        }
+
+        .host.active { border-color: var(--accent-orange); box-shadow: 0 0 15px rgba(249, 115, 22, 0.4); }
+
+        .host-name { font-weight: bold; color: #fff; margin-bottom: 5px; }
+        .host-meta { font-family: monospace; font-size: 0.8rem; color: #94a3b8; }
+
+        .network-line {
+            position: absolute;
+            top: 50%;
+            left: 20%;
+            right: 20%;
+            height: 4px;
+            background-color: var(--border-color);
+            z-index: 1;
+        }
+
+        .packet {
+            position: absolute;
+            width: 95px;
+            height: 26px;
+            background-color: var(--accent-orange);
+            border-radius: 4px;
+            top: calc(50% - 13px);
+            display: none;
+            z-index: 3;
+            box-shadow: 0 0 10px rgba(249, 115, 22, 0.5);
+            text-align: center;
+            font-size: 0.7rem;
+            font-weight: bold;
+            color: #fff;
+            line-height: 26px;
+            font-family: monospace;
+        }
+
+        .log-console {
+            background-color: #020617;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            padding: 12px;
+            font-family: monospace;
+            height: 220px;
+            overflow-y: auto;
+            font-size: 0.85rem;
+            color: #ffedd5;
+            line-height: 1.5;
+        }
+
+        .header-box {
+            background: #2a3447;
+            padding: 4px 8px;
+            border-radius: 3px;
+            font-size: 0.8rem;
+            color: #fdba74;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <h1>Simulador Didático: Protocolo de Transporte UDP</h1>
+        <p>Veja a transmissão contínua de datagramas sem estabelecimento de sessão ou confirmação de recebimento (No Handshake / No ACKs).</p>
+    </header>
+
+    <div class="dashboard">
+        <!-- Ações do Aluno -->
+        <div class="panel">
+            <h2>1. Controlar Fluxo de Transmissão</h2>
+            <button id="btn-stream" class="btn-control" onclick="transmitirStreaming(false)">Transmitir Vídeo (Fluxo Normal)</button>
+            <button id="btn-drop" class="btn-control" onclick="transmitirStreaming(true)">Simular Perda de Pacote (Instabilidade)</button>
+        </div>
+
+        <!-- Analisador de Cabeçalhos -->
+        <div class="panel">
+            <h2>2. Monitor de Datagramas UDP</h2>
+            <div id="log-box" class="log-console">
+                [SISTEMA] Aguardando envio de dados. Escolha uma das opções acima para iniciar a transmissão VoIP/Streaming.
+            </div>
+        </div>
+    </div>
+
+    <!-- Topologia Visual -->
+    <div class="network-topology">
+        <div class="network-line"></div>
+        <div id="packet-anim" class="packet">UDP Length: 8</div>
+
+        <div id="node-src" class="host">
+            <div class="host-name">🎥 Servidor de Streaming</div>
+            <div class="host-meta">IP: 10.0.0.10</div>
+            <div class="host-meta">Porta de Origem: 5004 (RTP)</div>
+        </div>
+
+        <div id="node-dst" class="host">
+            <div class="host-name">💻 Dispositivo do Usuário</div>
+            <div class="host-meta">IP: 192.168.1.50</div>
+            <div class="host-meta">Porta de Destino: 34562</div>
+        </div>
+    </div>
+</div>
+
+<script>
+    let seqFake = 1;
+
+    function log(msg, cor) {
+        const box = document.getElementById("log-box");
+        const styleCor = cor ? ` style="color: ${cor}"` : '';
+        box.innerHTML += `<br><span${styleCor}>${msg}</span>`;
+        box.scrollTop = box.scrollHeight;
+    }
+
+    function desativarBotoes(estado) {
+        document.getElementById("btn-stream").disabled = estado;
+        document.getElementById("btn-drop").disabled = estado;
+    }
+
+    function transmitirStreaming(simularPerda) {
+        desativarBotoes(true);
+        document.getElementById("log-box").innerHTML = `<b>[TRANSMISSÃO] Iniciando envio de frames multimídia sobre UDP...</b>`;
+        document.getElementById("node-src").classList.add("active");
+
+        // Envia Datagrama 1
+        setTimeout(() => {
+            enviarDatagrama(1, "var(--accent-orange)", () => {
+                log(`[CLIENTE] Frame de vídeo #1 renderizado imediatamente. Sem envio de confirmação (ACK).`, "var(--accent-green)");
+                
+                // Envia Datagrama 2 (Onde pode ocorrer a perda)
+                setTimeout(() => {
+                    if (simularPerda) {
+                        log(`<br>[UDP] Enviando Datagrama #2 (Áudio/Vídeo)...`, "#cbd5e1");
+                        log(`⚡ <span class="header-box">HEADER UDP:</span> Src Port: 5004 | Dst Port: 34562 | Length: 1400 | Checksum`, "var(--accent-orange)");
+                        
+                        // O pacote vai até o meio do caminho (50%) e sofre o drop
+                        animarPacote(25, 50, "DATAGRAM #2", "var(--accent-orange)", () => {
+                            log(`❌ [REDE] Ruído na rede ou buffer cheio! Datagrama #2 foi **REJEITADO/PERDIDO** no meio físico.`, "var(--accent-red)");
+                            log(`⚠️ [UDP CONTROLE] O protocolo ignora a perda. Sem buffers de retransmissão. O fluxo continua!`, "var(--accent-orange)");
+                            
+                            // Envia Datagrama 3 mesmo após a perda do 2
+                            prosseguirParaDatagrama3();
+                        });
+                    } else {
+                        enviarDatagrama(2, "var(--accent-orange)", () => {
+                            log(`[CLIENTE] Frame de vídeo #2 renderizado com sucesso.`, "var(--accent-green)");
+                            prosseguirParaDatagrama3();
+                        });
+                    }
+                }, 1200);
+            });
+        }, 500);
+    }
+
+    function enviarDatagrama(num, cor, callback) {
+        log(`<br>[UDP] Enviando Datagrama #${num} (Áudio/Vídeo)...`, "#cbd5e1");
+        log(`⚡ <span class="header-box">HEADER UDP:</span> Src Port: 5004 | Dst Port: 34562 | Length: 1400 | Checksum`, "var(--accent-orange)");
+        
+        animarPacote(25, 75, `DATAGRAM #${num}`, cor, () => {
+            log(`[SERVER] Datagrama #${num} entregue na porta 34562 do destino.`, "var(--accent-orange)");
+            callback();
+        });
+    }
+
+    function prosseguirParaDatagrama3() {
+        setTimeout(() => {
+            enviarDatagrama(3, "var(--accent-orange)", () => {
+                log(`[CLIENTE] Frame de vídeo #3 renderizado.`, "var(--accent-green)");
+                log(`<br>✅ <b>[FIM DO FLUXO]</b> Transmissão concluída. Note que não houve Handshake no início, nem conexões residuais no fim.`, "var(--accent-cyan)");
+                document.getElementById("node-src").className = "host";
+                desativarBotoes(false);
+            });
+        }, 1200);
+    }
+
+    function animarPacote(dePos, paraPos, texto, cor, callback) {
+        const p = document.getElementById("packet-anim");
+        p.style.display = "block";
+        p.innerText = texto;
+        p.style.backgroundColor = cor;
+        p.style.boxShadow = `0 0 10px ${cor}`;
+        p.style.left = dePos + "%";
+
+        let atual = dePos;
+        const direcao = paraPos > dePos ? 1 : -1;
+
+        const intervalo = setInterval(() => {
+            if ((direcao === 1 && atual >= paraPos) || (direcao === -1 && atual <= paraPos)) {
+                clearInterval(intervalo);
+                p.style.display = "none";
+                callback();
+            } else {
+                atual += direcao * 2;
+                p.style.left = atual + "%";
+            }
+        }, 20);
+    }
+</script>
+
+</body>
+</html>

@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Desafio Prático: Interação de Linha de Comando POP3</title>
+    <style>
+        :root {
+            --bg-color: #090d16;
+            --card-bg: #111827;
+            --text-color: #e2e8f0;
+            --accent-green: #10b981;
+            --accent-blue: #3b82f6;
+            --accent-orange: #f97316;
+            --border-color: #1f2937;
+            --terminal-bg: #030712;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            border-bottom: 2px solid var(--border-color);
+            padding-bottom: 15px;
+            margin-bottom: 25px;
+        }
+
+        h1 {
+            color: var(--accent-orange);
+            margin: 0 0 10px 0;
+            font-size: 1.6rem;
+            text-transform: uppercase;
+        }
+
+        .instructions {
+            background-color: var(--card-bg);
+            border-left: 4px solid var(--accent-blue);
+            padding: 15px;
+            border-radius: 4px;
+            margin-bottom: 25px;
+            font-size: 0.95rem;
+            line-height: 1.5;
+        }
+
+        .instructions ul {
+            margin: 5px 0 0 0;
+            padding-left: 20px;
+        }
+
+        code {
+            background-color: #1e293b;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: monospace;
+            color: #f1f5f9;
+        }
+
+        /* Área do Terminal */
+        .terminal-container {
+            background-color: var(--terminal-bg);
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+            overflow: hidden;
+            margin-bottom: 20px;
+        }
+
+        .terminal-header {
+            background-color: #1f2937;
+            padding: 10px;
+            font-family: monospace;
+            font-size: 0.8rem;
+            color: #9ca3af;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .terminal-screen {
+            padding: 15px;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 0.95rem;
+            height: 350px;
+            overflow-y: auto;
+            line-height: 1.6;
+        }
+
+        .server-response { color: var(--accent-green); }
+        .client-command { color: var(--accent-blue); font-weight: bold; }
+        .system-alert { color: var(--accent-orange); font-style: italic; }
+
+        .input-line {
+            display: flex;
+            align-items: center;
+            margin-top: 10px;
+            border-top: 1px solid #1f2937;
+            padding-top: 10px;
+        }
+
+        .prompt {
+            color: var(--accent-blue);
+            font-weight: bold;
+            margin-right: 10px;
+            white-space: nowrap;
+        }
+
+        input[type="text"] {
+            background-color: transparent;
+            border: none;
+            color: #fff;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 0.95rem;
+            width: 100%;
+            outline: none;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <h1>Interação de Linha de Comando POP3</h1>
+        <p>Interaja diretamente com a porta 110 da caixa postal de um servidor comprometido para recuperar dados sensíveis.</p>
+    </header>
+
+    <div class="instructions">
+        <strong>🎯 Objetivo do Aluno:</strong> Você estabeleceu uma conexão via netcat com o servidor de e-mail de <code>hack.ru</code>. Use os comandos sequenciais do padrão POP3 para ler a mensagem pendente.
+        <ul>
+            <li><b>Passo 1:</b> Envie o usuário usando: <code>USER analista</code></li>
+            <li><b>Passo 2:</b> Insira a senha da credencial vazada: <code>PASS cyber2026</code></li>
+            <li><b>Passo 3:</b> Verifique o número de mensagens armazenadas na caixa com: <code>STAT</code></li>
+            <li><b>Passo 4:</b> Solicite a leitura e captura da mensagem de índice 1 com: <code>RETR 1</code></li>
+            <li><b>Passo 5:</b> Feche a sessão de auditoria com: <code>QUIT</code></li>
+        </ul>
+    </div>
+
+    <!-- Interface do Prompt Interativo -->
+    <div class="terminal-container">
+        <div class="terminal-header">
+            <span>Terminal: nc mail.hack.ru 110</span>
+            <span style="color: #6b7280;">PORTA TCP 110</span>
+        </div>
+        
+        <div id="terminal-screen" class="terminal-screen">
+            <span class="system-alert">[SISTEMA] Conectando a mail.hack.ru...</span><br>
+            <span class="server-response">+OK POP3 Server ready &lt;session_id_9921@hack.ru&gt;</span>
+        </div>
+
+        <div class="input-line">
+            <span class="prompt">POP3-CLI></span>
+            <input type="text" id="user-input" autofocus autocomplete="off" placeholder="Digite o comando POP3 aqui e aperte Enter..." onkeydown="processarTeclado(event)">
+        </div>
+    </div>
+</div>
+
+<script>
+    // Estado interno da máquina de estados do protocolo POP3
+    let estadoAtual = "AUTENTICACAO_USER"; 
+
+    const logs = document.getElementById("terminal-screen");
+    const campoInput = document.getElementById("user-input");
+
+    function print(text, classe) {
+        logs.innerHTML += `<br><span class="${classe}">${text}</span>`;
+        logs.scrollTop = logs.scrollHeight;
+    }
+
+    function processarTeclado(event) {
+        if (event.key === "Enter") {
+            const comandoBruto = campoInput.value;
+            const comandoLimpo = comandoBruto.trim();
+            campoInput.value = "";
+
+            if (comandoLimpo === "") return;
+
+            // Ecoa o comando digitado pelo aluno no console do laboratório
+            print(`> ${comandoBruto}`, "client-command");
+
+            // Divide o comando e argumentos de forma simples
+            const partes = comandoLimpo.split(" ");
+            const cmdPrincipal = partes[0].toUpperCase();
+
+            // Lógica global de interceptação do QUIT em qualquer estado
+            if (cmdPrincipal === "QUIT") {
+                print("+OK POP3 server signing off (Recursos desalocados).", "server-response");
+                print("[SISTEMA] Conexão TCP finalizada de forma limpa.", "system-alert");
+                campoInput.disabled = true;
+                return;
+            }
+
+            // Máquina de Estados Finita do Protocolo POP3
+            switch(estadoAtual) {
+                
+                case "AUTENTICACAO_USER":
+                    if (cmdPrincipal === "USER" && partes[1] === "analista") {
+                        setTimeout(() => {
+                            print("+OK name is a valid mailbox. Send password.", "server-response");
+                            estadoAtual = "AUTENTICACAO_PASS";
+                        }, 400);
+                    } else {
+                        setTimeout(() => {
+                            print("-ERR invalid user or command missing. Try: USER analista", "system-alert");
+                        }, 400);
+                    }
+                    break;
+
+                case "AUTENTICACAO_PASS":
+                    if (cmdPrincipal === "PASS" && partes[1] === "cyber2026") {
+                        setTimeout(() => {
+                            print("+OK mailbox locked and ready (1 message, 420 octets).", "server-response");
+                            estadoAtual = "SESSÃO_TRANSAÇÃO";
+                        }, 400);
+                    } else {
+                        setTimeout(() => {
+                            print("-ERR invalid password. Check your instructions ledger.", "system-alert");
+                        }, 400);
+                    }
+                    break;
+
+                case "SESSÃO_TRANSAÇÃO":
+                    if (cmdPrincipal === "STAT") {
+                        setTimeout(() => {
+                            print("+OK 1 420", "server-response");
+                            print("[SISTEMA INSTRUÇÃO] Caixa contém 1 mensagem. Use RETR 1 para ler as strings do payload.", "system-alert");
+                        }, 400);
+                    } 
+                    else if (cmdPrincipal === "RETR" && partes[1] === "1") {
+                        setTimeout(() => {
+                            print("+OK 420 octets follow...", "server-response");
+                            // Impressão da mensagem estruturada com o payload da análise estática
+                            logs.innerHTML += `<br><div style="background: #111827; border: 1px dashed #4b5563; padding: 10px; margin: 8px 0; color: #cbd5e1; font-size: 0.9rem;">
+                                Received: from mail.hack.ru (185.220.101.5)<br>
+                                From: c2-master@hack.ru<br>
+                                To: target-node@agent.ru<br>
+                                Subject: CONFIDENCIAL: Chave de Extração C2<br>
+                                <br>
+                                ATENÇÃO AGENTE: A flag de validação do laboratório está descrita abaixo:<br>
+                                FLAG_MBOX{p0p3_cl34rt3xt_p4ssw0rd_v4lu3}<br>
+                                <br>
+                                Apague esta mensagem imediatamente após a leitura (Comando DELE 1).
+                            </div>`;
+                            logs.scrollTop = logs.scrollHeight;
+                        }, 600);
+                    }
+                    else if (cmdPrincipal === "DELE" && partes[1] === "1") {
+                        setTimeout(() => {
+                            print("+OK message 1 marked for deletion. (Will be removed after QUIT).", "server-response");
+                        }, 400);
+                    }
+                    else {
+                        setTimeout(() => {
+                            print("-ERR command unrecognized or out of order in TRANSACTION state. Use STAT or RETR 1.", "system-alert");
+                        }, 400);
+                    }
+                    break;
+
+                default:
+                    print("-ERR State Machine Failure.", "system-alert");
+            }
+        }
+    }
+</script>
+
+</body>
+</html>

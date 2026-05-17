@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Desafio Prático: Interação de Linha de Comando Telnet</title>
+    <style>
+        :root {
+            --bg-color: #090d16;
+            --card-bg: #111827;
+            --text-color: #e2e8f0;
+            --accent-green: #10b981;
+            --accent-blue: #3b82f6;
+            --accent-red: #ef4444;
+            --accent-cyan: #06b6d4;
+            --border-color: #1f2937;
+            --terminal-bg: #020617;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            border-bottom: 2px solid var(--border-color);
+            padding-bottom: 15px;
+            margin-bottom: 25px;
+        }
+
+        h1 {
+            color: var(--accent-red);
+            margin: 0 0 10px 0;
+            font-size: 1.6rem;
+            text-transform: uppercase;
+        }
+
+        .instructions {
+            background-color: var(--card-bg);
+            border-left: 4px solid var(--accent-red);
+            padding: 15px;
+            border-radius: 4px;
+            margin-bottom: 25px;
+            font-size: 0.95rem;
+            line-height: 1.5;
+        }
+
+        .instructions ul {
+            margin: 5px 0 0 0;
+            padding-left: 20px;
+        }
+
+        code {
+            background-color: #1e293b;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: monospace;
+            color: #f1f5f9;
+        }
+
+        .terminal-container {
+            background-color: var(--terminal-bg);
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+            overflow: hidden;
+            margin-bottom: 20px;
+        }
+
+        .terminal-header {
+            background-color: #1f2937;
+            padding: 10px;
+            font-family: monospace;
+            font-size: 0.8rem;
+            color: #9ca3af;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .terminal-screen {
+            padding: 15px;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 0.95rem;
+            height: 380px;
+            overflow-y: auto;
+            line-height: 1.6;
+        }
+
+        .server-response { color: #ffffff; }
+        .client-command { color: var(--accent-cyan); font-weight: bold; }
+        .system-alert { color: #ae7fff; font-style: italic; }
+        .flag-success { color: var(--accent-green); font-weight: bold; }
+
+        .input-line {
+            display: flex;
+            align-items: center;
+            margin-top: 10px;
+            border-top: 1px solid #1f2937;
+            padding-top: 10px;
+        }
+
+        .prompt {
+            color: var(--accent-red);
+            font-weight: bold;
+            margin-right: 10px;
+            white-space: nowrap;
+        }
+
+        input[type="text"] {
+            background-color: transparent;
+            border: none;
+            color: #fff;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 0.95rem;
+            width: 100%;
+            outline: none;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <h1>Inspeção de Sessão Insegura (Telnet)</h1>
+        <p>Explore as vulnerabilidades de protocolos legados sem criptografia para auditar um servidor Linux remoto.</p>
+    </header>
+
+    <div class="instructions">
+        <strong>🎯 Cenário para o Aluno:</strong> Você capturou strings de texto em um tráfego de rede e conseguiu acesso ao prompt do Telnet de <code>core-srv.hack.ru</code>. Execute os comandos padrão de shell para coletar informações.
+        <ul>
+            <li><b>Passo 1:</b> Autentique com o usuário capturado: <code>root</code></li>
+            <li><b>Passo 2:</b> Digite a senha administrativa vazada: <code>telnet_is_dead_2026</code></li>
+            <li><b>Passo 3:</b> Descubra em qual diretório você está usando o comando: <code>pwd</code></li>
+            <li><b>Passo 4:</b> Liste os arquivos ocultos do servidor com: <code>ls -la</code></li>
+            <li><b>Passo 5:</b> Leia o arquivo secreto para expor a flag: <code>cat flag.txt</code></li>
+            <li><b>Passo 6:</b> Finalize a sessão remota digitando: <code>exit</code></li>
+        </ul>
+    </div>
+
+    <!-- Interface CLI -->
+    <div class="terminal-container">
+        <div class="terminal-header">
+            <span>Terminal: telnet core-srv.hack.ru 23</span>
+            <span style="color: #6b7280;">PORTA TCP 23 (TEXTO CLARO)</span>
+        </div>
+        
+        <div id="terminal-screen" class="terminal-screen">
+            <span class="system-alert">[SISTEMA] Conectando via TCP à porta 23 de core-srv.hack.ru...</span><br>
+            <span class="server-response">Welcome to Ubuntu 24.04 LTS (GNU/Linux core 6.8.0-generic)</span><br>
+            <span class="server-response">core-srv login:</span>
+        </div>
+
+        <div class="input-line">
+            <span id="cli-prompt" class="prompt">login:</span>
+            <input type="text" id="user-input" autofocus autocomplete="off" placeholder="Digite o comando e pressione Enter..." onkeydown="processarComando(event)">
+        </div>
+    </div>
+</div>
+
+<script>
+    // Gerenciador de estados da CLI simulada
+    let estadoTerminal = "LOGIN_USER"; 
+
+    const tela = document.getElementById("terminal-screen");
+    const campoInput = document.getElementById("user-input");
+    const labelPrompt = document.getElementById("cli-prompt");
+
+    function printLine(text, classe) {
+        tela.innerHTML += `<br><span class="${classe}">${text}</span>`;
+        tela.scrollTop = tela.scrollHeight;
+    }
+
+    function processarComando(event) {
+        if (event.key === "Enter") {
+            const comandoBruto = campoInput.value;
+            const comandoLimpo = comandoBruto.trim();
+            campoInput.value = "";
+
+            if (comandoLimpo === "") return;
+
+            // Tratamento visual para não exibir a senha digitada (comportamento padrão do Telnet/Linux)
+            if (estadoTerminal === "LOGIN_PASS") {
+                printLine("> ********", "client-command");
+            } else {
+                printLine(`> ${comandoBruto}`, "client-command");
+            }
+
+            const partes = comandoLimpo.split(" ");
+            const cmdBase = partes[0].toLowerCase();
+
+            // Interceptação global do comando de saída
+            if (cmdBase === "exit" || cmdBase === "logout") {
+                printLine("Connection closed by foreign host.", "server-response");
+                printLine("[SISTEMA] Conexão Telnet encerrada.", "system-alert");
+                campoInput.disabled = true;
+                labelPrompt.innerText = "closed:";
+                return;
+            }
+
+            // Máquina de estados do terminal Linux remoto
+            switch(estadoTerminal) {
+                
+                case "LOGIN_USER":
+                    if (comandoLimpo === "root") {
+                        setTimeout(() => {
+                            printLine("Password: ", "server-response");
+                            labelPrompt.innerText = "Password:";
+                            estadoTerminal = "LOGIN_PASS";
+                        }, 300);
+                    } else {
+                        setTimeout(() => {
+                            printLine("Login incorrect", "server-response");
+                            printLine("core-srv login: ", "server-response");
+                            labelPrompt.innerText = "login:";
+                        }, 300);
+                    }
+                    break;
+
+                case "LOGIN_PASS":
+                    if (comandoLimpo === "telnet_is_dead_2026") {
+                        setTimeout(() => {
+                            printLine("Last login: Sun May 17 10:14:22 on pts/0", "server-response");
+                            printLine("root@core-srv:~# ", "server-response");
+                            labelPrompt.innerText = "root@core-srv:~#";
+                            labelPrompt.style.color = "var(--accent-green)";
+                            estadoTerminal = "SHELL_PROMPT";
+                        }, 400);
+                    } else {
+                        setTimeout(() => {
+                            printLine("Login incorrect", "server-response");
+                            printLine("core-srv login: ", "server-response");
+                            labelPrompt.innerText = "login:";
+                            estadoTerminal = "LOGIN_USER";
+                        }, 400);
+                    }
+                    break;
+
+                case "SHELL_PROMPT":
+                    setTimeout(() => {
+                        if (cmdBase === "pwd") {
+                            printLine("/root", "server-response");
+                        } 
+                        else if (cmdBase === "ls") {
+                            if (partes[1] === "-la" || partes[1] === "-a" || partes[1] === "-l") {
+                                printLine("drwx------  2 root root 4096 May 17 11:00 .", "server-response");
+                                printLine("drwxr-xr-x 22 root root 4096 May 17 09:15 ..", "server-response");
+                                printLine("-rw-r--r--  1 root root  124 May 17 11:02 .bashrc", "server-response");
+                                printLine("-rw-r--r--  1 root root   41 May 17 11:05 flag.txt", "server-response");
+                            } else {
+                                printLine("flag.txt", "server-response");
+                            }
+                        } 
+                        else if (cmdBase === "cat") {
+                            if (partes[1] === "flag.txt") {
+                                printLine("🏁 <span class='flag-success'>FLAG_TELNET{c1e4rt3xt_vun1n_p0rt_23}</span>", "server-response");
+                            } else if (!partes[1]) {
+                                printLine("cat: missing operand", "server-response");
+                            } else {
+                                printLine(`cat: ${partes[1]}: No such file or directory`, "server-response");
+                            }
+                        } 
+                        else if (cmdBase === "clear") {
+                            tela.innerHTML = '<span class="system-alert">[SISTEMA] Tela limpa pelo comando do shell.</span>';
+                        }
+                        else if (cmdBase === "whoami") {
+                            printLine("root", "server-response");
+                        }
+                        else {
+                            printLine(`-bash: ${cmdBase}: command not found`, "server-response");
+                        }
+                        
+                        // Garante que o prompt do terminal continue aparecendo após a execução
+                        tela.innerHTML += `<br><span class="server-response">root@core-srv:~# </span>`;
+                        tela.scrollTop = tela.scrollHeight;
+                    }, 300);
+                    break;
+
+                default:
+                    printLine("[ERRO] Falha crítica na máquina de estados da CLI.", "var(--accent-red)");
+            }
+        }
+    }
+</script>
+
+</body>
+</html>

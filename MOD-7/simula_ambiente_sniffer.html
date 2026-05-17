@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Laboratório Sandbox: Engenharia de Redes</title>
+    <style>
+        :root {
+            --bg-color: #0f172a;
+            --card-bg: #1e293b;
+            --text-color: #f8fafc;
+            --accent-blue: #3b82f6;
+            --accent-green: #10b981;
+            --accent-red: #ef4444;
+            --accent-purple: #a855f7;
+            --accent-cyan: #22d3ee;
+            --border-color: #334155;
+            --hub-gold: #f59e0b;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1150px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            border-bottom: 2px solid var(--border-color);
+            padding-bottom: 15px;
+            margin-bottom: 25px;
+        }
+
+        h1 {
+            color: var(--hub-gold);
+            margin: 0 0 10px 0;
+            font-size: 1.6rem;
+            text-transform: uppercase;
+        }
+
+        .instructions {
+            background-color: var(--card-bg);
+            border-left: 4px solid var(--accent-purple);
+            padding: 15px;
+            border-radius: 4px;
+            margin-bottom: 25px;
+            font-size: 0.95rem;
+            line-height: 1.5;
+        }
+
+        .workspace {
+            display: grid;
+            grid-template-columns: 240px 1fr;
+            gap: 20px;
+            margin-bottom: 25px;
+        }
+
+        .inventory {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 15px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            min-height: 420px;
+        }
+
+        .draggable-item {
+            border-radius: 6px;
+            padding: 12px;
+            text-align: center;
+            cursor: grab;
+            font-weight: bold;
+            font-size: 0.85rem;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+        }
+        
+        #item-client { background-color: #1e3a8a; border: 2px solid var(--accent-blue); }
+        #item-hub { background-color: #7c2d12; border: 2px solid var(--hub-gold); }
+        #item-server { background-color: #064e3b; border: 2px solid var(--accent-green); }
+        #item-sniffer { background-color: #581c87; border: 2px solid var(--accent-purple); }
+
+        .panel-topology {
+            background-color: #0b0f19;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            position: relative;
+            height: 420px;
+            overflow: hidden;
+        }
+
+        .drop-zone {
+            position: absolute;
+            border: 2px dashed #475569;
+            background-color: rgba(30, 41, 59, 0.2);
+            border-radius: 6px;
+            width: 170px;
+            height: 85px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 0.75rem;
+            color: #64748b;
+            text-align: center;
+            padding: 5px;
+            box-sizing: border-box;
+            z-index: 2;
+        }
+        .drop-zone.hovered { border-color: var(--accent-cyan); background-color: rgba(34, 211, 238, 0.1); }
+        .drop-zone.occupied { border-color: #fff; border-style: solid; color: #fff; background-color: var(--card-bg); }
+
+        #slot-1 { top: 150px; left: 40px; }
+        #slot-2 { top: 150px; left: 340px; }
+        #slot-3 { top: 40px; right: 40px; }
+        #slot-4 { bottom: 40px; right: 40px; }
+
+        svg.network-links {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+            pointer-events: none;
+        }
+        .net-line { stroke: #1e293b; stroke-width: 4; transition: stroke 0.4s; }
+
+        .packet {
+            position: absolute;
+            width: 85px;
+            height: 22px;
+            border-radius: 4px;
+            display: none;
+            z-index: 3;
+            text-align: center;
+            font-size: 0.65rem;
+            font-weight: bold;
+            color: #fff;
+            line-height: 22px;
+            font-family: monospace;
+        }
+
+        .console-panel {
+            background-color: #020617;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 15px;
+            font-family: monospace;
+            height: 180px;
+            overflow-y: auto;
+            font-size: 0.85rem;
+            line-height: 1.5;
+        }
+        .txt-ok { color: var(--accent-green); }
+        .txt-warn { color: var(--hub-gold); }
+        .txt-err { color: var(--accent-red); }
+        .txt-data { color: #f43f5e; font-weight: bold; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <h1>Laboratório Sandbox: Engenharia de Redes e Captura Global</h1>
+        <p>Monte toda a topologia arrastando os ativos para os slots corretos na malha física em Y e inicie o ciclo In/Out.</p>
+    </header>
+
+    <div class="instructions">
+        <strong>🛠️ Missão do Aluno:</strong> Arraste cada equipamento do rack para o seu respectivo slot de destino. Quando todos os equipamentos estiverem devidamente posicionados na malha em Y, clique no botão para testar a transmissão do meio físico.
+    </div>
+
+    <div class="workspace">
+        <div id="rack" class="inventory">
+            <h2 style="font-size: 0.9rem; margin: 0; border-bottom: 1px solid var(--border-color); padding-bottom: 5px;">Rack de Ativos</h2>
+            
+            <div id="item-client" class="draggable-item" draggable="true" ondragstart="drag(event)">💻 Host Local</div>
+            <div id="item-hub" class="draggable-item" draggable="true" ondragstart="drag(event)">🔌 HUB Passivo</div>
+            <div id="item-server" class="draggable-item" draggable="true" ondragstart="drag(event)">🖥️ Web Server</div>
+            <div id="item-sniffer" class="draggable-item" draggable="true" ondragstart="drag(event)">💀 Sniffer Node</div>
+
+            <button id="btn-capture" class="btn-control" style="background-color: var(--accent-green); margin-top: auto;" onclick="iniciarCaptura()" disabled>Iniciar Captura</button>
+            <button onclick="reiniciarSandbox()" style="padding: 10px; background: #334155; border: none; color: #fff; border-radius: 4px; cursor: pointer; font-weight: bold;">Limpar Malha</button>
+        </div>
+
+        <div class="panel-topology">
+            <svg class="network-links">
+                <line id="line-1-2" class="net-line" x1="210" y1="192" x2="340" y2="192" />
+                <line id="line-2-3" class="net-line" x1="510" y1="170" x2="720" y2="105" />
+                <line id="line-2-4" class="net-line" x1="510" y1="215" x2="720" y2="280" />
+            </svg>
+
+            <div id="pkt-a" class="packet" style="background-color: var(--accent-blue);">HTTP DATA</div>
+            <div id="pkt-b" class="packet" style="background-color: var(--accent-blue);">HTTP DUP</div>
+
+            <div id="slot-1" class="drop-zone" ondragover="allowDrop(event)" ondragleave="leaveDrop(event)" ondrop="drop(event)">📦 Slot de Origem 1</div>
+            <div id="slot-2" class="drop-zone" ondragover="allowDrop(event)" ondragleave="leaveDrop(event)" ondrop="drop(event)">📦 Slot Concentrador 2</div>
+            <div id="slot-3" class="drop-zone" ondragover="allowDrop(event)" ondragleave="leaveDrop(event)" ondrop="drop(event)">📦 Slot de Destino 3</div>
+            <div id="slot-4" class="drop-zone" ondragover="allowDrop(event)" ondragleave="leaveDrop(event)" ondrop="drop(event)">📦 Slot de Monitoramento 4</div>
+        </div>
+    </div>
+
+    <div class="panel">
+        <h2>Painel Tshark / Captura Global de Tráfego</h2>
+        <div id="console-box" class="console-panel">
+            [SISTEMA] Barramento físico desconectado. Reposicione os ativos do rack nos slots vazios da topologia em Y...
+        </div>
+    </div>
+</div>
+
+<script>
+    let slotsOcupados = { "slot-1": null, "slot-2": null, "slot-3": null, "slot-4": null };
+    let totalAlocados = 0;
+    let travado = false;
+
+    function log(msg, classe) {
+        const box = document.getElementById("console-box");
+        const style = classe ? ` class="${classe}"` : '';
+        box.innerHTML += `<br><span${style}>${msg}</span>`;
+        box.scrollTop = box.scrollHeight;
+    }
+
+    function allowDrop(ev) {
+        if (travado) return;
+        ev.preventDefault(); 
+        ev.currentTarget.classList.add("hovered");
+    }
+
+    function leaveDrop(ev) {
+        ev.currentTarget.classList.remove("hovered");
+    }
+
+    function drag(ev) {
+        if (travado) return;
+        ev.dataTransfer.setData("text_id", ev.target.id);
+    }
+
+    function drop(ev) {
+        ev.preventDefault();
+        if (travado) return;
+
+        const slot = ev.currentTarget;
+        slot.classList.remove("hovered");
+
+        if (slotsOcupados[slot.id]) return;
+
+        const idElemento = ev.dataTransfer.getData("text_id");
+        const elementoArrastado = document.getElementById(idElemento);
+        if (!elementoArrastado) return;
+
+        slotsOcupados[slot.id] = idElemento;
+        totalAlocados++;
+
+        slot.innerHTML = `<b>${elementoArrastado.innerText}</b><br><small style="color:var(--accent-cyan)">Conectado</small>`;
+        slot.classList.add("occupied");
+        elementoArrastado.style.display = "none";
+
+        if (totalAlocados === 4) {
+            document.getElementById("btn-capture").disabled = false;
+            document.getElementById("console-box").innerHTML = "<b>[SISTEMA] Infraestrutura cabeada. Pronto para iniciar a transmissão.</b>";
+        }
+    }
+
+    function reiniciarSandbox() {
+        document.getElementById("console-box").innerHTML = "[SISTEMA] Barramento físico limpo. Reposicione os ativos.";
+        document.getElementById("btn-capture").disabled = true;
+        
+        const slotsConf = [
+            { id: "slot-1", txt: "📦 Slot de Origem 1" },
+            { id: "slot-2", txt: "📦 Slot Concentrador 2" },
+            { id: "slot-3", txt: "📦 Slot de Destino 3" },
+            { id: "slot-4", txt: "📦 Slot de Monitoramento 4" }
+        ];
+
+        slotsConf.forEach(s => {
+            const el = document.getElementById(s.id);
+            el.className = "drop-zone";
+            el.innerHTML = s.txt;
+        });
+
+        const itens = ["item-client", "item-hub", "item-server", "item-sniffer"];
+        itens.forEach(i => {
+            const el = document.getElementById(i);
+            if(el) el.style.display = "block";
+        });
+
+        document.querySelectorAll(".net-line").forEach(l => l.style.stroke = "#1e293b");
+        slotsOcupados = { "slot-1": null, "slot-2": null, "slot-3": null, "slot-4": null };
+        totalAlocados = 0;
+        travado = false;
+    }
+
+    function iniciarCaptura() {
+        if (totalAlocados < 4 || travado) return;
+        travado = true;
+        document.getElementById("btn-capture").disabled = true;
+
+        const estaCorreto = (
+            slotsOcupados["slot-1"] === "item-client" &&
+            slotsOcupados["slot-2"] === "item-hub" &&
+            slotsOcupados["slot-3"] === "item-server" &&
+            slotsOcupados["slot-4"] === "item-sniffer"
+        );
+
+        if (estaCorreto) {
+            log("⚡ [SINAL] Link UP! Topologia em Y validada com sucesso.", "txt-ok");
+            executarFluxoFisico(); // CORRIGIDO: Chamar o nome exato da função declarada abaixo
+        } else {
+            log("❌ [ERRO DE ARQUITETURA] Falha de sincronismo elétrico no meio. Link Down.", "txt-err");
+            
+            if (slotsOcupados["slot-2"] !== "item-hub") {
+                log("💡 Análise de Falha: O concentrador elétrico de broadcast (HUB) não foi posicionado no ponto central de comutação (Slot 2).", "txt-warn");
+            } else {
+                log("💡 Análise de Falha: O HUB está no centro, mas as pontas de origem, destino ou o nó de escuta estão trocados.", "txt-warn");
+            }
+            travado = false;
+            document.getElementById("btn-capture").disabled = false;
+        }
+    }
+
+    function rodarX(id, deX, paraX, fixY, cor, callback) {
+        const p = document.getElementById(id);
+        p.style.display = "block";
+        p.style.backgroundColor = cor;
+        p.style.boxShadow = `0 0 8px ${cor}`;
+        p.style.top = fixY + "px";
+        p.style.left = deX + "px";
+
+        let x = deX;
+        const s = setInterval(() => {
+            if (x >= paraX) { clearInterval(s); p.style.display = "none"; callback(); }
+            else { x += 6; p.style.left = x + "px"; }
+        }, 15);
+    }
+
+    function rodarDiagonal(id, deX, paraX, deY, paraY, cor, callback) {
+        const p = document.getElementById(id);
+        p.style.display = "block";
+        p.style.backgroundColor = cor;
+        p.style.boxShadow = `0 0 8px ${cor}`;
+        p.style.left = deX + "px";
+        p.style.top = deY + "px";
+
+        let x = deX; let y = deY;
+        const passos = (paraX - deX) / 6;
+        const incY = (paraY - deY) / passos;
+
+        const s = setInterval(() => {
+            if (x >= paraX) { clearInterval(s); p.style.display = "none"; callback(); }
+            else { x += 6; y += incY; p.style.left = x + "px"; y += incY; p.style.top = y + "px"; }
+        }, 15);
+    }
+
+    function executarFluxoFisico() {
+        log("<br>🚀 <b>[TRAFFIC] Transmitindo datagrama HTTP da estação de origem...</b>");
+        document.getElementById("line-1-2").style.stroke = "var(--accent-blue)";
+        
+        rodarX("pkt-a", 210, 340, 165, "var(--accent-blue)", () => {
+            log("<br>🔌 <span class='txt-warn'>[HUB CENTRAL]</span> Frame recebido na porta 1. Replicando sinais elétricos cegamente para todas as interfaces!", "txt-warn");
+            
+            document.getElementById("line-2-3").style.stroke = "var(--accent-blue)";
+            document.getElementById("line-2-4").style.stroke = "var(--accent-red)";
+
+            let concluidos = 0;
+
+            rodarDiagonal("pkt-a", 510, 720, 165, 75, "var(--accent-blue)", () => {
+                log("[SERVER] Conexão processada. Resposta enviada.");
+                verificarFinalizacao(++concluidos);
+            });
+
+            rodarDiagonal("pkt-b", 510, 720, 165, 270, "var(--accent-red)", () => {
+                log("<br>💀 <span class='txt-data'>[EVIDÊNCIA COLETADA]:</span> O nó interceptador capturou o payload em texto claro!", "txt-data");
+                log("<span style='color:#38bdf8'>[ASCII DUMP]: POST /auth.php HTTP/1.1 \\r\\n user=silvio&pass=hub_sniff_ok_2026</span>", "txt-data");
+                verificarFinalizacao(++concluidos);
+            });
+        });
+    }
+
+    function verificarFinalizacao(qtd) {
+        if(qtd === 2) {
+            log("<br>✅ <b>[CONCLUÍDO]</b> Desafio finalizado. Você provou a fragilidade estrutural da Camada 1.", "txt-ok");
+        }
+    }
+</script>
+
+</body>
+</html>

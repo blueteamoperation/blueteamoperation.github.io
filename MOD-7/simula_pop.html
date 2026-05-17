@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simulador Interativo: Fluxo POP3</title>
+    <style>
+        :root {
+            --bg-color: #0f172a;
+            --card-bg: #1e293b;
+            --text-color: #f8fafc;
+            --accent-orange: #f97316;
+            --accent-blue: #3b82f6;
+            --accent-green: #10b981;
+            --border-color: #334155;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            border-bottom: 2px solid var(--border-color);
+            padding-bottom: 15px;
+            margin-bottom: 25px;
+        }
+
+        h1 {
+            color: var(--accent-orange);
+            margin: 0 0 10px 0;
+            font-size: 1.8rem;
+            text-transform: uppercase;
+        }
+
+        .dashboard {
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            gap: 20px;
+            margin-bottom: 25px;
+        }
+
+        .panel {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 20px;
+        }
+
+        h2 {
+            font-size: 1.2rem;
+            margin-top: 0;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 8px;
+            color: #cbd5e1;
+        }
+
+        .btn-control {
+            width: 100%;
+            padding: 12px;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            margin-bottom: 12px;
+            transition: background 0.2s;
+        }
+
+        #btn-auth { background-color: var(--accent-blue); }
+        #btn-auth:hover { background-color: #2563eb; }
+
+        #btn-retr { background-color: var(--accent-orange); }
+        #btn-retr:hover { background-color: #ea580c; }
+
+        button:disabled {
+            background-color: #334155 !important;
+            color: #64748b;
+            cursor: not-allowed;
+        }
+
+        .network-topology {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: relative;
+            padding: 40px 60px;
+            background-color: #0b0f19;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            margin-bottom: 25px;
+            min-height: 150px;
+        }
+
+        .host {
+            background-color: var(--card-bg);
+            border: 2px solid var(--border-color);
+            border-radius: 6px;
+            padding: 15px;
+            text-align: center;
+            width: 220px;
+            z-index: 2;
+            transition: all 0.3s ease;
+        }
+
+        .host.active { border-color: var(--accent-blue); box-shadow: 0 0 15px rgba(59, 130, 246, 0.4); }
+        .host.success { border-color: var(--accent-green); box-shadow: 0 0 15px rgba(16, 185, 129, 0.4); }
+
+        .host-name { font-weight: bold; color: #fff; margin-bottom: 5px; }
+        .host-meta { font-family: monospace; font-size: 0.8rem; color: #94a3b8; }
+
+        .network-line {
+            position: absolute;
+            top: 50%;
+            left: 20%;
+            right: 20%;
+            height: 4px;
+            background-color: var(--border-color);
+            z-index: 1;
+        }
+
+        .packet {
+            position: absolute;
+            width: 110px;
+            height: 26px;
+            background-color: var(--accent-blue);
+            border-radius: 4px;
+            top: calc(50% - 13px);
+            display: none;
+            z-index: 3;
+            box-shadow: 0 0 10px rgba(59, 130, 246, 0.5);
+            text-align: center;
+            font-size: 0.7rem;
+            font-weight: bold;
+            color: #fff;
+            line-height: 26px;
+            font-family: monospace;
+        }
+
+        .log-console {
+            background-color: #020617;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            padding: 12px;
+            font-family: monospace;
+            height: 240px;
+            overflow-y: auto;
+            font-size: 0.85rem;
+            color: #ffedd5;
+            line-height: 1.5;
+        }
+
+        .pop-cmd { color: #38bdf8; font-weight: bold; }
+        .pop-rsp { color: #4ade80; }
+        .pop-mail { color: #fca5a5; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <h1>Simulador Didático: Funcionamento do POP3</h1>
+        <p>Monitore o fluxo de transações de correio eletrônico na Camada de Aplicação sobre TCP (Porta 110).</p>
+    </header>
+
+    <div class="dashboard">
+        <div class="panel">
+            <h2>1. Controle de Fluxo</h2>
+            <button id="btn-auth" class="btn-control" onclick="executarAutenticacao()">1. Autenticar no Servidor</button>
+            <button id="btn-retr" class="btn-control" onclick="executarRetr()" disabled>2. Baixar E-mail (RETR 1)</button>
+            <button class="btn-control" onclick="resetSimulador()" style="background-color: #475569; margin-top: 15px;">Reiniciar Lab</button>
+        </div>
+
+        <div class="panel">
+            <h2>2. Inspeção de Comandos (Texto Claro)</h2>
+            <div id="log-box" class="log-console">
+                [SISTEMA] Sockets abertos na porta 110. Servidor aguardando comandos do cliente...
+            </div>
+        </div>
+    </div>
+
+    <div class="network-topology">
+        <div class="network-line"></div>
+        <div id="packet-anim" class="packet">USER</div>
+
+        <div id="node-client" class="host">
+            <div class="host-name">💻 Cliente de E-mail</div>
+            <div class="host-meta">IP: 192.168.1.30</div>
+            <div class="host-meta">Estado: AUTHORIZATION</div>
+        </div>
+
+        <div id="node-server" class="host">
+            <div class="host-name">🖥️ Servidor de Correio</div>
+            <div class="host-meta">IP: 185.220.101.5</div>
+            <div class="host-meta">MBOX: mail.hack.ru</div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function log(msg, cor) {
+        const box = document.getElementById("log-box");
+        const styleCor = cor ? ` style="color: ${cor}"` : '';
+        box.innerHTML += `<br><span${styleCor}>${msg}</span>`;
+        box.scrollTop = box.scrollHeight;
+    }
+
+    function resetSimulador() {
+        document.getElementById("log-box").innerHTML = "[SISTEMA] Estado resetado. Aguardando comandos.";
+        document.getElementById("node-client").className = "host";
+        document.getElementById("node-server").className = "host";
+        document.getElementById("btn-auth").disabled = false;
+        document.getElementById("btn-retr").disabled = true;
+    }
+
+    function animarPacote(dePos, paraPos, texto, color, callback) {
+        const p = document.getElementById("packet-anim");
+        p.style.display = "block";
+        p.innerText = texto;
+        p.style.backgroundColor = color;
+        p.style.boxShadow = `0 0 10px ${color}`;
+        p.style.left = dePos + "%";
+
+        let atual = dePos;
+        const direcao = paraPos > dePos ? 1 : -1;
+
+        const intervalo = setInterval(() => {
+            if ((direcao === 1 && atual >= paraPos) || (direcao === -1 && atual <= paraPos)) {
+                clearInterval(intervalo);
+                p.style.display = "none";
+                callback();
+            } else {
+                atual += direcao * 2;
+                p.style.left = atual + "%";
+            }
+        }, 20);
+    }
+
+    function executarAutenticacao() {
+        document.getElementById("btn-auth").disabled = true;
+        document.getElementById("node-client").classList.add("active");
+        document.getElementById("log-box").innerHTML = "<b>[POP3 INÍCIO] Recebendo banner e enviando comandos de validação...</b>";
+
+        setTimeout(() => {
+            log("<span class='pop-rsp'>+OK POP3 Server ready &lt;9921@hack.ru&gt;</span>");
+
+            setTimeout(() => {
+                log("<br>💬 <b>ENVIO DE COMANDOS (Cliente -> Servidor):</b>", "#fff");
+                log("<span class='pop-cmd'>USER analista</span>");
+                
+                animarPacote(25, 75, "USER", "var(--accent-blue)", () => {
+                    log("<span class='pop-rsp'>+OK name is a valid mailbox. Send password.</span>");
+
+                    setTimeout(() => {
+                        log("<span class='pop-cmd'>PASS cyber2026</span>", "var(--accent-red)");
+                        
+                        animarPacote(25, 75, "PASS", "var(--accent-red)", () => {
+                            document.getElementById("node-server").classList.add("active");
+                            log("<span class='pop-rsp'>+OK mailbox locked and ready (1 message, 420 octets).</span>");
+                            log("<br>💬 <b>CONSULTANDO STATUS DA CAIXA:</b>", "#fff");
+                            log("<span class='pop-cmd'>STAT</span>");
+
+                            animarPacote(25, 75, "STAT", "var(--accent-blue)", () => {
+                                log("<span class='pop-rsp'>+OK 1 420</span> <i>(Fase de TRANSACTION iniciada)</i>");
+                                document.getElementById("btn-retr").disabled = false;
+                            });
+                        });
+                    }, 1200);
+                });
+            }, 1200);
+        }, 800);
+    }
+
+    function executarRetr() {
+        document.getElementById("btn-retr").disabled = true;
+        log("<br>💬 <b>SOLICITANDO CAPTURA DO E-MAIL:</b>", "#fff");
+        log("<span class='pop-cmd'>RETR 1</span>");
+
+        animarPacote(25, 75, "RETR 1", "var(--accent-blue)", () => {
+            log("<span class='pop-rsp'>+OK 420 octets follow...</span>");
+
+            setTimeout(() => {
+                log("<br>⏪ <b>RETORNO DO CONTEÚDO DO E-MAIL (Servidor -> Cliente):</b>", "#fff");
+                log("<span class='pop-mail'>From: c2-master@hack.ru</span>");
+                log("<span class='pop-mail'>Subject: Chave C2</span>");
+                log("<span class='pop-mail'>FLAG_MBOX{p0p3_cl34rt3xt_p4ssw0rd_v4lu3}</span>");
+                log("<span class='pop-mail'>.</span> <i>(Ponto finalizando a transmissão)</i>", "#94a3b8");
+
+                animarPacote(75, 25, "EMAIL DATA", "var(--accent-green)", () => {
+                    document.getElementById("node-client").className = "host success";
+                    document.getElementById("node-server").className = "host success";
+                    log("<br>✅ <b>[CONCLUÍDO]</b> Mensagem baixada e armazenada localmente no cliente.", "var(--accent-green)");
+                });
+            }, 1200);
+        });
+    }
+</script>
+
+</body>
+</html>
