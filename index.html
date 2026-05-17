@@ -83,33 +83,71 @@
             justify-content: space-between;
         }
 
-        /* SEÇÕES */
+        /* SEÇÕES (ACCORDION) */
         .section {
-            margin-bottom: 40px;
+            margin-bottom: 15px; /* Reduzido para alinhar melhor os blocos fechados */
+            border: 1px solid transparent;
+            transition: border 0.3s ease;
+        }
+
+        /* Quando a seção estiver ativa, ganha uma borda sutil */
+        .section.active {
+            border: 1px solid rgba(0, 255, 255, 0.2);
+            background: rgba(0, 255, 255, 0.01);
         }
 
         .section h2 {
             font-size: 14px;
             color: var(--accent-color);
             background: rgba(0, 255, 255, 0.05);
-            padding: 8px 15px;
+            padding: 12px 15px;
             border-left: 4px solid var(--accent-color);
             text-transform: uppercase;
             display: flex;
             justify-content: space-between;
+            align-items: center;
+            margin: 0;
+            cursor: pointer; /* Transforma em botão clicável */
+            user-select: none;
+            transition: background 0.3s;
         }
 
+        .section h2:hover {
+            background: rgba(0, 255, 255, 0.15);
+        }
+
+        /* Indicador dinâmico de abrir/fechar */
         .section h2::after {
-            content: "[OFFICIAL_RECORD]";
-            font-size: 10px;
-            opacity: 0.5;
+            content: "[ + ]";
+            font-size: 12px;
+            opacity: 0.7;
+            font-family: monospace;
+        }
+
+        .section.active h2::after {
+            content: "[ - ]";
+            color: var(--terminal-green);
+        }
+
+        /* CONTEÚDO OCULTO POR PADRÃO */
+        .section-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease-out, padding 0.3s ease;
+            padding: 0 15px;
+        }
+
+        /* Classe ativa para exibir o conteúdo via JS */
+        .section.active .section-content {
+            max-height: 1000px; /* Valor alto o suficiente para comportar os links */
+            padding: 15px 15px;
         }
 
         /* LINKS / LISTA */
         ul {
             list-style: none;
             padding: 0;
-            margin-left: 10px;
+            margin: 0;
         }
 
         li {
@@ -173,100 +211,132 @@
     </div>
 
     <p style="font-size: 13px; color: #555; margin-bottom: 30px;">
-        // Repositório de artefatos, labs e análise forense.
+        // Repositório de artefatos, labs e análise forense. Clique nos módulos para expandir.
     </p>
 
     <!-- Módulo 1 -->
     <div class="section">
         <h2>📂 Módulo - 1</h2>
-        <ul>
-            <li><a href="https://blueteamoperation.github.io/MOD-1/ri.html" target="_blank">Atividade 1 - Ciclo de Resposta a Incidentes.</a></li>
-            <li><a href="https://blueteamoperation.github.io/MOD-1/matriz.html" target="_blank">Atividade 2 - Matriz de Risco.</a></li>
-            <li><a href="https://blueteamoperation.github.io/MOD-1/kill.html" target="_blank">Atividade 3 - Kill Chain.</a></li>
-            <li><a href="https://blueteamoperation.github.io/MOD-1/ceh.html" target="_blank">Atividade 4 - Fases de um Ataque Metodologia C|EH.</a></li>
-            <li><a href="https://blueteamoperation.github.io/MOD-1/dfir.html" target="_blank">Atividade 5 - DFIR em Ação.</a></li>
-            <li><a href="https://blueteamoperation.github.io/MOD-1/vetores.html" target="_blank">Atividade 6 - Vetores de Ataques.</a></li>
-            <li><a href="https://blueteamoperation.github.io/MOD-1/vuln.html" target="_blank">Atividade 7 - Analisando Vulnerablidades.</a></li>
-            <li><a href="https://blueteamoperation.github.io/MOD-1/ataques.html" target="_blank">Atividade 8 - Analisando Ataques.</a></li>
-        </ul>
+        <div class="section-content">
+            <ul>
+                <li><a href="https://blueteamoperation.github.io/MOD-1/ri.html" target="_blank">Atividade 1 - Ciclo de Resposta a Incidentes.</a></li>
+                <li><a href="https://blueteamoperation.github.io/MOD-1/matriz.html" target="_blank">Atividade 2 - Matriz de Risco.</a></li>
+                <li><a href="https://blueteamoperation.github.io/MOD-1/kill.html" target="_blank">Atividade 3 - Kill Chain.</a></li>
+                <li><a href="https://blueteamoperation.github.io/MOD-1/ceh.html" target="_blank">Atividade 4 - Fases de um Ataque Metodologia C|EH.</a></li>
+                <li><a href="https://blueteamoperation.github.io/MOD-1/dfir.html" target="_blank">Atividade 5 - DFIR em Ação.</a></li>
+                <li><a href="https://blueteamoperation.github.io/MOD-1/vetores.html" target="_blank">Atividade 6 - Vetores de Ataques.</a></li>
+                <li><a href="https://blueteamoperation.github.io/MOD-1/vuln.html" target="_blank">Atividade 7 - Analisando Vulnerablidades.</a></li>
+                <li><a href="https://blueteamoperation.github.io/MOD-1/ataques.html" target="_blank">Atividade 8 - Analisando Ataques.</a></li>
+            </ul>
+        </div>
     </div>
 
     <!-- Módulo 2 -->
     <div class="section">
         <h2>📂 Módulo - 2</h2>
-        <ul>
-            <li><a href="https://blueteamoperation.github.io/MOD-2/conv.html" target="_blank">Atividade 1 - Convertendo Dados.</a></li>
-            <li><a href="https://blueteamoperation.github.io/MOD-2/endian.html" target="_blank">Atividade 2 - Ordem dos Endianess.</a></li>
-            <li><a href="https://blueteamoperation.github.io/MOD-2/ascii.html" target="_blank">Atividade 3 - ASCII.</a></li>
-            <li><a href="https://blueteamoperation.github.io/MOD-2/mustang.html" target="_blank">Atividade 4 - Mustang Vermelho.</a></li>
-            <li><a href="https://blueteamoperation.github.io/MOD-2/cadeia.html" target="_blank">Atividade 5 - Cadeia de Custódia.</a></li>
-             <li><a href="https://blueteamoperation.github.io/MOD-2/magic.zip" target="_blank">Atividade 6 - Magic Numbers Files.</a></li>
-            <li><a href="https://blueteamoperation.github.io/MOD-2/magic.html" target="_blank">Atividade 7 - Magic Numbers.</a></li>
-            <li><a href="https://blueteamoperation.github.io/MOD-2/steg.html" target="_blank">Atividade 8 - Hidden.</a></li>
-            <li><a href="https://blueteamoperation.github.io/MOD-2/payload.html" target="_blank">Atividade 9 - Master Payload.</a></li>
-        </ul>
+        <div class="section-content">
+            <ul>
+                <li><a href="https://blueteamoperation.github.io/MOD-2/conv.html" target="_blank">Atividade 1 - Convertendo Dados.</a></li>
+                <li><a href="https://blueteamoperation.github.io/MOD-2/endian.html" target="_blank">Atividade 2 - Ordem dos Endianess.</a></li>
+                <li><a href="https://blueteamoperation.github.io/MOD-2/ascii.html" target="_blank">Atividade 3 - ASCII.</a></li>
+                <li><a href="https://blueteamoperation.github.io/MOD-2/mustang.html" target="_blank">Atividade 4 - Mustang Vermelho.</a></li>
+                <li><a href="https://blueteamoperation.github.io/MOD-2/cadeia.html" target="_blank">Atividade 5 - Cadeia de Custódia.</a></li>
+                <li><a href="https://blueteamoperation.github.io/MOD-2/magic.zip" target="_blank">Atividade 6 - Magic Numbers Files.</a></li>
+                <li><a href="https://blueteamoperation.github.io/MOD-2/magic.html" target="_blank">Atividade 7 - Magic Numbers.</a></li>
+                <li><a href="https://blueteamoperation.github.io/MOD-2/steg.html" target="_blank">Atividade 8 - Hidden.</a></li>
+                <li><a href="https://blueteamoperation.github.io/MOD-2/payload.html" target="_blank">Atividade 9 - Master Payload.</a></li>
+            </ul>
+        </div>
     </div>
 
     <!-- Módulo 3 -->
     <div class="section">
         <h2>📂 Módulo - 3</h2>
-        <ul>
-             <li><a href="https://blueteamoperation.github.io/MOD-3/logs_windows.evtx" target="_blank">Logs Windows</a></li>
-                   <li><a href="https://blueteamoperation.github.io/MOD-3/sysmon.evtx" target="_blank">Logs Sysmon</a></li>
-              <li><a href="https://blueteamoperation.github.io/MOD-3/auth.log" target="_blank">Logs Linux</a></li>
-             <li><a href="https://blueteamoperation.github.io/MOD-3/access.log" target="_blank">Logs Apache Server</a></li>
-             <li><a href="https://blueteamoperation.github.io/MOD-3/snort.log.zip" target="_blank">Logs Snort</a></li>
-            <li><a href="https://blueteamoperation.github.io/MOD-3/apache.html" target="_blank">Atividade 1 - Apache Master.</a></li>
-              <li><a href="https://blueteamoperation.github.io/MOD-3/linux.html" target="_blank">Atividade 2 - LOG Linux.</a></li>
-           
+        <div class="section-content">
+            <ul>
+                <li><a href="https://blueteamoperation.github.io/MOD-3/logs_windows.evtx" target="_blank">Logs Windows</a></li>
+                <li><a href="https://blueteamoperation.github.io/MOD-3/sysmon.evtx" target="_blank">Logs Sysmon</a></li>
+                <li><a href="https://blueteamoperation.github.io/MOD-3/auth.log" target="_blank">Logs Linux</a></li>
+                <li><a href="https://blueteamoperation.github.io/MOD-3/access.log" target="_blank">Logs Apache Server</a></li>
+                <li><a href="https://blueteamoperation.github.io/MOD-3/snort.log.zip" target="_blank">Logs Snort</a></li>
+                <li><a href="https://blueteamoperation.github.io/MOD-3/apache.html" target="_blank">Atividade 1 - Apache Master.</a></li>
+                <li><a href="https://blueteamoperation.github.io/MOD-3/linux.html" target="_blank">Atividade 2 - LOG Linux.</a></li>
+            </ul>
+        </div>
     </div>
 
-      <div class="section">
+    <!-- Módulo 4 -->
+    <div class="section">
         <h2>📂 Módulo - 4</h2>
-        <ul>
-             <li><a href="https://blueteamoperation.github.io/MOD-4/splunk_vpn.json.zip" target="_blank">VPN Splunk Log (Utilizado no Exercício de Filtros Básicos)</a></li>
-               <li><a href="https://blueteamoperation.github.io/MOD-4/splunk.html" target="_blank">Filtros Básicos SPL Splunk</a></li>
-    <li><a href="https://blueteamoperation.github.io/MOD-4/apache_splunk_300.json.zip" target="_blank">Log CTF-I Splunk (Utilizado no CTF-I Splunk)</a></li>
-              <li><a href="https://blueteamoperation.github.io/MOD-4/chall1.html" target="_blank">CTF I - Splunk </a></li>
-              <li><a href="https://blueteamoperation.github.io/MOD-4/apache_complex_500.json.zip" target="_blank">Log CTF-II Splunk (Utilizado no CTF-II Splunk)</a></li>
-        <li><a href="https://blueteamoperation.github.io/MOD-4/chall2.html" target="_blank">CTF II - Splunk </a></li>
-        
-             
-           
+        <div class="section-content">
+            <ul>
+                <li><a href="https://blueteamoperation.github.io/MOD-4/splunk_vpn.json.zip" target="_blank">VPN Splunk Log (Utilizado no Exercício de Filtros Básicos)</a></li>
+                <li><a href="https://blueteamoperation.github.io/MOD-4/splunk.html" target="_blank">Filtros Básicos SPL Splunk</a></li>
+                <li><a href="https://blueteamoperation.github.io/MOD-4/apache_splunk_300.json.zip" target="_blank">Log CTF-I Splunk (Utilizado no CTF-I Splunk)</a></li>
+                <li><a href="https://blueteamoperation.github.io/MOD-4/chall1.html" target="_blank">CTF I - Splunk </a></li>
+                <li><a href="https://blueteamoperation.github.io/MOD-4/apache_complex_500.json.zip" target="_blank">Log CTF-II Splunk (Utilizado no CTF-II Splunk)</a></li>
+                <li><a href="https://blueteamoperation.github.io/MOD-4/chall2.html" target="_blank">CTF II - Splunk </a></li>
+            </ul>
+        </div>
     </div>
 
-
- <div class="section">
+    <!-- Módulo 5 -->
+    <div class="section">
         <h2>📂 Módulo - 5</h2>
-        <ul>
-             <li><a href="https://blueteamoperation.github.io/MOD-5/header.html" target="_blank">Conhecendo Campos do Cabeçalho de um -email.</a></li>
+        <div class="section-content">
+            <ul>
+                <li><a href="https://blueteamoperation.github.io/MOD-5/header.html" target="_blank">Conhecendo Campos do Cabeçalho de um -email.</a></li>
                 <li><a href="https://blueteamoperation.github.io/MOD-5/analise1.html" target="_blank">Análise Básica de Cabeçalho de e-mail - I.</a></li>
-    <li><a href="https://blueteamoperation.github.io/MOD-5/analise2.html" target="_blank">Análise Básica de Cabeçalho de e-mail - II.</a></li>
-        
-    
+                <li><a href="https://blueteamoperation.github.io/MOD-5/analise2.html" target="_blank">Análise Básica de Cabeçalho de e-mail - II.</a></li>
+            </ul>
+        </div>
     </div>
 
-     <div class="section">
+    <!-- Módulo 6 -->
+    <div class="section">
         <h2>📂 Módulo - 6</h2>
-        <ul>
-             <li><a href="https://blueteamoperation.github.io/MOD-6/eicar.exe.7z" target="_blank">Artefato EICAR (Analisando HASH VírusTotal).</a></li>
-             <li><a href="https://blueteamoperation.github.io/MOD-6/artefato.exe.7z" target="_blank">Artefato (Utilizado na análise de Assinatura e Strings).</a></li>
-              <li><a href="https://blueteamoperation.github.io/MOD-6/hack.exe.7z" target="_blank">Artefato (Utilizado na análise de Packers).</a></li>
-               <li><a href="https://blueteamoperation.github.io/MOD-6/encode.html" target="_blank">Analisando Ofuscações.</a></li>
-              <li><a href="https://blueteamoperation.github.io/MOD-6/backdoor.exe.7z" target="_blank">Analisando Artefato de forma Dinâmica.</a></li>
-             <li><a href="https://blueteamoperation.github.io/MOD-6/analise.doc.7z" target="_blank">Artefato Análise de Macros com OLEVBA.</a></li>
-            <li><a href="https://blueteamoperation.github.io/MOD-6/files_pdf.7z" target="_blank">Artefatos PDF para análise PDFID, PDF-PARSER.</a></li>
-     
-        
-    
+        <div class="section-content">
+            <ul>
+                <li><a href="https://blueteamoperation.github.io/MOD-6/eicar.exe.7z" target="_blank">Artefato EICAR (Analisando HASH VírusTotal).</a></li>
+                <li><a href="https://blueteamoperation.github.io/MOD-6/artefato.exe.7z" target="_blank">Artefato (Utilizado na análise de Assinatura e Strings).</a></li>
+                <li><a href="https://blueteamoperation.github.io/MOD-6/hack.exe.7z" target="_blank">Artefato (Utilizado na análise de Packers).</a></li>
+                <li><a href="https://blueteamoperation.github.io/MOD-6/encode.html" target="_blank">Analisando Ofuscações.</a></li>
+                <li><a href="https://blueteamoperation.github.io/MOD-6/backdoor.exe.7z" target="_blank">Analisando Artefato de forma Dinâmica.</a></li>
+                <li><a href="https://blueteamoperation.github.io/MOD-6/analise.doc.7z" target="_blank">Artefato Análise de Macros com OLEVBA.</a></li>
+                <li><a href="https://blueteamoperation.github.io/MOD-6/files_pdf.7z" target="_blank">Artefatos PDF para análise PDFID, PDF-PARSER.</a></li>
+            </ul>
+        </div>
     </div>
 
-    
     <div class="footer">
         --- END OF SESSION --- <br>
         BlueTeamOps • DFIR • Cyber Defense
     </div>
 </div>
+
+<script>
+    // Seleciona todos os cabeçalhos de módulo
+    const sections = document.querySelectorAll('.section h2');
+
+    sections.forEach(header => {
+        header.addEventListener('click', () => {
+            const currentSection = header.parentElement;
+            
+            // Alterna a classe 'active' na seção clicada
+            currentSection.classList.toggle('active');
+
+            // OPCIONAL: Se quiser que apenas UM módulo fique aberto por vez (estilo sanfona), 
+            // desinale as linhas abaixo:
+            /*
+            document.querySelectorAll('.section').forEach(sec => {
+                if (sec !== currentSection) {
+                    sec.classList.remove('active');
+                }
+            });
+            */
+        });
+    });
+</script>
 
 </body>
 </html>
