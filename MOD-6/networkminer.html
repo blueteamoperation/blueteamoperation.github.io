@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PASSIVE NETWORK FORENSICS // NETWORKMINER LAB</title>
+    <style>
+        :root {
+            --neon-cyan: #00f0ff;
+            --neon-magenta: #ff007f;
+            --dark-bg: #09090e;
+            --card-bg: #111122;
+            --terminal-green: #39ff14;
+            --warning-amber: #ffb700;
+        }
+
+        body {
+            background-color: var(--dark-bg);
+            color: #ffffff;
+            font-family: 'Courier New', Courier, monospace;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            border-bottom: 2px dashed var(--neon-cyan);
+            padding-bottom: 20px;
+            width: 100%;
+            max-width: 950px;
+        }
+
+        h1 {
+            color: var(--neon-cyan);
+            text-shadow: 0 0 10px var(--neon-cyan);
+            font-size: 2.3rem;
+            margin: 0;
+        }
+
+        .subtitle {
+            color: var(--neon-magenta);
+            font-weight: bold;
+            letter-spacing: 2px;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 950px;
+        }
+
+        .challenge-card {
+            background-color: var(--card-bg);
+            border: 1px solid #1f1f3a;
+            border-left: 5px solid var(--neon-magenta);
+            border-radius: 4px;
+            padding: 20px;
+            margin-bottom: 25px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.6);
+        }
+
+        .challenge-card h3 {
+            color: var(--neon-cyan);
+            margin-top: 0;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .badge {
+            font-size: 0.8rem;
+            background: #1a1a3a;
+            padding: 4px 8px;
+            border-radius: 3px;
+            color: var(--warning-amber);
+            border: 1px solid var(--warning-amber);
+        }
+
+        .instruction-box {
+            background-color: #05050a;
+            border: 1px solid #1a1a32;
+            padding: 12px;
+            border-radius: 4px;
+            color: #ffffff;
+            font-size: 0.95rem;
+            margin: 15px 0;
+            line-height: 1.4;
+        }
+
+        .instruction-box strong {
+            color: var(--warning-amber);
+        }
+
+        .input-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        input[type="text"] {
+            background-color: #000;
+            border: 1px solid var(--neon-cyan);
+            color: #fff;
+            padding: 10px;
+            font-family: inherit;
+            flex-grow: 1;
+            border-radius: 4px;
+        }
+
+        button {
+            background-color: transparent;
+            border: 1px solid var(--neon-magenta);
+            color: var(--neon-magenta);
+            padding: 10px 20px;
+            cursor: pointer;
+            font-family: inherit;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            border-radius: 4px;
+        }
+
+        button:hover {
+            background-color: var(--neon-magenta);
+            color: #000;
+            box-shadow: 0 0 15px var(--neon-magenta);
+        }
+
+        .status {
+            margin-top: 10px;
+            font-weight: bold;
+            font-size: 0.95rem;
+        }
+
+        .success { color: var(--terminal-green); }
+        .error { color: #ff3333; }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <h1>[ FORENSICS ANALYSIS // NETWORKMINER ]</h1>
+        <div class="subtitle">LAB: ARTEFATOS E IDENTIFICAÇÃO DE HOSTS (HTTP.CAP)</div>
+        <div class="instruction-box" style="text-align: left; border-color: var(--neon-cyan);">
+            <strong>Procedimento Inicial:</strong> No terminal do Kali Purple, digite <code>networkminer</code>. Com a ferramenta aberta, carregue o arquivo <code>http.cap</code> para processar as evidências de rede de forma passiva: Artefato analisado: <a href="https://blueteamoperation.github.io/MOD-6/http.cap" target="_blank"> http.cap</a>
+        </div>
+    </div>
+
+    <div class="container">
+
+        <div class="challenge-card">
+            <h3>#01 - Identificação do OS do Servidor <span class="badge">Aba: Hosts</span></h3>
+            <p>Qual o sistema operacional relativo ao IP <strong>10.1.1.1</strong>?</p>
+            <div class="instruction-box">
+                <strong>Dica:</strong> Navegue até a aba <strong>hosts</strong>, expanda o IP e vá em <strong>host details</strong>.
+            </div>
+            <div class="input-group">
+                <input type="text" id="ans1" placeholder="Flag: Nome do OS">
+                <button onclick="checkAnswer(1, 'Linux')">SUBMIT</button>
+            </div>
+            <div class="status" id="status1"></div>
+        </div>
+
+        <div class="challenge-card">
+            <h3>#02 - Identificação do OS do Cliente <span class="badge">Aba: Hosts</span></h3>
+            <p>Qual é o sistema operacional relativo ao IP <strong>10.1.1.101</strong>?</p>
+            <div class="instruction-box">
+                <strong>Dica:</strong> Navegue até a aba <strong>hosts</strong>, expanda o IP e vá em <strong>host details</strong>.
+            </div>
+            <div class="input-group">
+                <input type="text" id="ans2" placeholder="Flag: Nome do OS">
+                <button onclick="checkAnswer(2, 'Windows')">SUBMIT</button>
+            </div>
+            <div class="status" id="status2"></div>
+        </div>
+
+        <div class="challenge-card">
+            <h3>#03 - Versão da Aplicação Web <span class="badge">Aba: Hosts</span></h3>
+            <p>Qual a versão do servidor Apache utilizado pelo Servidor?</p>
+            <div class="instruction-box">
+                <strong>Dica:</strong> Navegue até a aba <strong>hosts</strong>, expanda o IP e vá em <strong>host details</strong>.
+            </div>
+            <div class="input-group">
+                <input type="text" id="ans3" placeholder="Flag: Versão do Apache">
+                <button onclick="checkAnswer(3, '2.0.40')">SUBMIT</button>
+            </div>
+            <div class="status" id="status3"></div>
+        </div>
+
+        <div class="challenge-card">
+            <h3>#04 - Integridade de Arquivos Reconstruídos <span class="badge">Aba: Files</span></h3>
+            <p>Qual o hash Md5 relativo ao arquivo <strong>DSC07858[1].JPG</strong>?</p>
+            <div class="instruction-box">
+                <strong>Dica:</strong> Navegue até a aba <strong>files</strong>, clique sobre o arquivo e obtenha o hash.
+            </div>
+            <div class="input-group">
+                <input type="text" id="ans4" placeholder="Flag: hash md5">
+                <button onclick="checkAnswer(4, '835d8e7a12d31c4bbe4eeff7b4b5ab3b')">SUBMIT</button>
+            </div>
+            <div class="status" id="status4"></div>
+        </div>
+
+        <div class="challenge-card">
+            <h3>#05 - Volumetria de Imagens Extraídas <span class="badge">Aba: Images</span></h3>
+            <p>Quantas imagens são visíveis?</p>
+            <div class="instruction-box">
+                <strong>Dica:</strong> Navegue até a aba <strong>images</strong>.
+            </div>
+            <div class="input-group">
+                <input type="text" id="ans5" placeholder="Flag: Apenas o número">
+                <button onclick="checkAnswer(5, '5')">SUBMIT</button>
+            </div>
+            <div class="status" id="status5"></div>
+        </div>
+
+    </div>
+
+    <script>
+        function checkAnswer(qNum, correctAnswer) {
+            const userInput = document.getElementById('ans' + qNum).value.trim();
+            const statusDiv = document.getElementById('status' + qNum);
+            
+            if (userInput.toLowerCase() === correctAnswer.toLowerCase()) {
+                statusDiv.className = "status success";
+                statusDiv.innerHTML = "[+] ACCESS GRANTED: Resposta correta!";
+            } else {
+                statusDiv.className = "status error";
+                statusDiv.innerHTML = "[-] ACCESS DENIED: Tente novamente.";
+            }
+        }
+    </script>
+</body>
+</html>
