@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ICMP TUNNELING DETECTION // CTF LAB</title>
+    <style>
+        :root {
+            --neon-cyan: #00f0ff;
+            --neon-magenta: #ff007f;
+            --dark-bg: #09090e;
+            --card-bg: #111122;
+            --terminal-green: #39ff14;
+            --warning-amber: #ffb700;
+        }
+
+        body {
+            background-color: var(--dark-bg);
+            color: #ffffff;
+            font-family: 'Courier New', Courier, monospace;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            border-bottom: 2px dashed var(--neon-cyan);
+            padding-bottom: 20px;
+            width: 100%;
+            max-width: 950px;
+        }
+
+        h1 {
+            color: var(--neon-cyan);
+            text-shadow: 0 0 10px var(--neon-cyan);
+            font-size: 2.3rem;
+            margin: 0;
+        }
+
+        .subtitle {
+            color: var(--neon-magenta);
+            font-weight: bold;
+            letter-spacing: 2px;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 950px;
+        }
+
+        .challenge-card {
+            background-color: var(--card-bg);
+            border: 1px solid #1f1f3a;
+            border-left: 5px solid var(--neon-magenta);
+            border-radius: 4px;
+            padding: 20px;
+            margin-bottom: 25px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.6);
+        }
+
+        .challenge-card h3 {
+            color: var(--neon-cyan);
+            margin-top: 0;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .input-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        input[type="text"] {
+            background-color: #000;
+            border: 1px solid var(--neon-cyan);
+            color: #fff;
+            padding: 10px;
+            font-family: inherit;
+            flex-grow: 1;
+            border-radius: 4px;
+        }
+
+        button {
+            background-color: transparent;
+            border: 1px solid var(--neon-magenta);
+            color: var(--neon-magenta);
+            padding: 10px 20px;
+            cursor: pointer;
+            font-family: inherit;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            border-radius: 4px;
+        }
+
+        button:hover {
+            background-color: var(--neon-magenta);
+            color: #000;
+            box-shadow: 0 0 15px var(--neon-magenta);
+        }
+
+        .status {
+            margin-top: 10px;
+            font-weight: bold;
+            font-size: 0.95rem;
+        }
+
+        .success { color: var(--terminal-green); }
+        .error { color: #ff3333; }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <h1>[ ADVANCED THREAT HUNTING // COVERT CHANNELS ]</h1>
+        <div class="subtitle">LAB CTF: EXFILTRAÇÃO E TÚNEL ICMP</div>
+    </div>
+
+    <div class="container">
+
+        <!-- QUESTÃO ÚNICA -->
+        <div class="challenge-card">
+            <h3>#01 - Data Leakage via ICMP Request/Reply</h3>
+            <p>Inspecionando os campos de carga útil (Data/Payload) dos pacotes de eco do protocolo ICMP nesta captura, um atacante estabeleceu um canal oculto para executar comandos remotamente de forma camuflada. Quais foram os comandos passados através do túnel ICMP? <br> <li>Artefato: <a href="https://blueteamoperation.github.io/MOD-6/icmp_c2.pcap" target="_blank"><font color="white">icmp_c2.pcap</font></a></li></p>
+            <p style="font-size: 0.85rem; color: #aaa;"><em>Nota: Insira as respostas exatamente na ordem em que foram executadas, separadas por vírgulas e sem espaços adicionais após a vírgula.</em></p>
+            <div class="input-group">
+                <input type="text" id="ans1" placeholder="Exemplo: comando1,comando2,comando3">
+                <button onclick="checkAnswer(1, 'whoami,hostname,ifconfig /all,net user,dir C:\\Users')">SUBMIT</button>
+            </div>
+            <div class="status" id="status1"></div>
+        </div>
+
+    </div>
+
+    <script>
+        function checkAnswer(qNum, correctAnswer) {
+            const userInput = document.getElementById('ans' + qNum).value.trim();
+            const statusDiv = document.getElementById('status' + qNum);
+            
+            // Normalize spaces around commas for user convenience if needed, 
+            // but keep the internal script comparison direct.
+            if (userInput === "whoami,hostname,ifconfig /all,net user,dir C:\Users" || 
+                userInput === "whoami,hostname,ifconfig /all,net user,dir C:\\Users") {
+                statusDiv.className = "status success";
+                statusDiv.innerHTML = "[+] ACCESS GRANTED: Protocolo violado e comandos identificados com sucesso!";
+            } else {
+                statusDiv.className = "status error";
+                statusDiv.innerHTML = "[-] ACCESS DENIED: Sequência de comandos incorreta ou formato inválido.";
+            }
+        }
+    </script>
+</body>
+</html>
