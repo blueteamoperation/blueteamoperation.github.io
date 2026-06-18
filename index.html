@@ -453,22 +453,33 @@
 </div>
 
 <script>
-    // Gerenciador dos Módulos Principais
+    // Gerenciador dos Módulos Principais (Accordion)
     const mainSections = document.querySelectorAll('.section h2');
     mainSections.forEach(header => {
         header.addEventListener('click', () => {
             const currentSection = header.parentElement;
+            
+            // Fecha as outras seções se quiser um efeito sanfona limpo (opcional)
+            // Se preferir deixar várias abertas, mantenha apenas o toggle.
             currentSection.classList.toggle('active');
         });
     });
 
-    // Gerenciador das Novas Subseções do Módulo 7
+    // Gerenciador das Subseções Internas do Módulo 6 (Sub-Accordion)
     const subSections = document.querySelectorAll('.sub-section h3');
     subSections.forEach(subHeader => {
         subHeader.addEventListener('click', (e) => {
-            e.stopPropagation(); // Evita bugs de clique duplo fechando o módulo pai
+            e.stopPropagation(); // Previne o bubbling para o h2 pai
+            
             const currentSub = subHeader.parentElement;
             currentSub.classList.toggle('active');
+            
+            // AJUSTE CRÍTICO: Força o container pai (Módulo 6) a recalcular a altura
+            const parentContent = currentSub.closest('.section-content');
+            if (parentContent) {
+                // Como usamos max-content no CSS, reajustamos para renderizar o overflow
+                parentContent.style.maxHeight = 'max-content';
+            }
         });
     });
 </script>
