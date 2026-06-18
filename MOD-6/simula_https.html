@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simulador Interativo: Protocolo HTTPS (TLS 1.3)</title>
+    <style>
+        :root {
+            --bg-color: #0f172a;
+            --card-bg: #1e293b;
+            --text-color: #f8fafc;
+            --accent-blue: #3b82f6;
+            --accent-purple: #a855f7;
+            --accent-green: #10b981;
+            --accent-yellow: #eab308;
+            --border-color: #334155;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            border-bottom: 2px solid var(--border-color);
+            padding-bottom: 15px;
+            margin-bottom: 25px;
+        }
+
+        h1 {
+            color: var(--accent-purple);
+            margin: 0 0 10px 0;
+            font-size: 1.8rem;
+            text-transform: uppercase;
+        }
+
+        .dashboard {
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            gap: 20px;
+            margin-bottom: 25px;
+        }
+
+        .panel {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 20px;
+        }
+
+        h2 {
+            font-size: 1.2rem;
+            margin-top: 0;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 8px;
+            color: #cbd5e1;
+        }
+
+        .btn-control {
+            width: 100%;
+            padding: 12px;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            margin-bottom: 12px;
+            transition: background 0.2s;
+        }
+
+        #btn-tls { background-color: var(--accent-blue); }
+        #btn-tls:hover { background-color: #2563eb; }
+
+        #btn-crypto-get { background-color: var(--accent-purple); }
+        #btn-crypto-get:hover { background-color: #9333ea; }
+
+        button:disabled {
+            background-color: #334155 !important;
+            color: #64748b;
+            cursor: not-allowed;
+        }
+
+        .network-topology {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: relative;
+            padding: 40px 60px;
+            background-color: #0b0f19;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            margin-bottom: 25px;
+            min-height: 150px;
+        }
+
+        .host {
+            background-color: var(--card-bg);
+            border: 2px solid var(--border-color);
+            border-radius: 6px;
+            padding: 15px;
+            text-align: center;
+            width: 220px;
+            z-index: 2;
+            transition: all 0.3s ease;
+        }
+
+        .host.handshake { border-color: var(--accent-blue); box-shadow: 0 0 15px rgba(59, 130, 246, 0.4); }
+        .host.secure { border-color: var(--accent-green); box-shadow: 0 0 15px rgba(16, 185, 129, 0.4); }
+
+        .host-name { font-weight: bold; color: #fff; margin-bottom: 5px; }
+        .host-meta { font-family: monospace; font-size: 0.8rem; color: #94a3b8; }
+
+        .network-line {
+            position: absolute;
+            top: 50%;
+            left: 20%;
+            right: 20%;
+            height: 4px;
+            background-color: var(--border-color);
+            z-index: 1;
+            transition: background-color 0.5s;
+        }
+
+        .packet {
+            position: absolute;
+            width: 120px;
+            height: 26px;
+            border-radius: 4px;
+            top: calc(50% - 13px);
+            display: none;
+            z-index: 3;
+            text-align: center;
+            font-size: 0.65rem;
+            font-weight: bold;
+            color: #fff;
+            line-height: 26px;
+            font-family: monospace;
+        }
+
+        .log-console {
+            background-color: #020617;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            padding: 12px;
+            font-family: monospace;
+            height: 260px;
+            overflow-y: auto;
+            font-size: 0.85rem;
+            color: #e2e8f0;
+            line-height: 1.5;
+        }
+
+        .tls-meta { color: #38bdf8; }
+        .tls-server { color: #eab308; }
+        .crypto-data { color: #a855f7; font-style: italic; }
+        .plain-data { color: #4ade80; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <h1>Simulador Didático: Criptografia e Fluxo HTTPS</h1>
+        <p>Acompanhe o estabelecimento do túnel criptografado TLS 1.3 antes do tráfego das requisições HTTP locais na porta 443.</p>
+    </header>
+
+    <div class="dashboard">
+        <!-- Controles -->
+        <div class="panel">
+            <h2>1. Orquestração do Protocolo</h2>
+            <button id="btn-tls" class="btn-control" onclick="executarTLSHandshake()">1. Iniciar TLS 1.3 Handshake</button>
+            <button id="btn-crypto-get" class="btn-control" onclick="executarEncryptedGet()" disabled>2. Enviar HTTP GET Criptografado</button>
+            <button class="btn-control" onclick="resetSimulador()" style="background-color: #475569; margin-top: 15px;">Reiniciar Lab</button>
+        </div>
+
+        <!-- Saída Sniffer -->
+        <div class="panel">
+            <h2>2. Inspeção L7 / Wireshark View</h2>
+            <div id="log-box" class="log-console">
+                [SISTEMA] Conexão TCP aberta na porta 443. O meio físico está aguardando a negociação dos parâmetros criptográficos do TLS...
+            </div>
+        </div>
+    </div>
+
+    <!-- Topologia -->
+    <div class="network-topology">
+        <div id="net-line" class="network-line"></div>
+        <div id="packet-anim" class="packet">Client Hello</div>
+
+        <div id="node-client" class="host">
+            <div class="host-name">🔒 Navegador Segurado</div>
+            <div class="host-meta">IP: 192.168.1.45</div>
+            <div id="lbl-tunnel-client" class="host-meta" style="color: var(--accent-red); font-weight: bold;">TÚNEL: INATIVO</div>
+        </div>
+
+        <div id="node-server" class="host">
+            <div class="host-name">🖥️ Web Server (SSL)</div>
+            <div class="host-meta">IP: 185.220.101.5</div>
+            <div class="host-meta">Host: hack.ru (Porta 443)</div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function log(msg, cor) {
+        const box = document.getElementById("log-box");
+        const styleCor = cor ? ` style="color: ${cor}"` : '';
+        box.innerHTML += `<br><span${styleCor}>${msg}</span>`;
+        box.scrollTop = box.scrollHeight;
+    }
+
+    function resetSimulador() {
+        document.getElementById("log-box").innerHTML = "[SISTEMA] Sessão finalizada. Parâmetros de chaves descartados da memória.";
+        document.getElementById("node-client").className = "host";
+        document.getElementById("node-server").className = "host";
+        document.getElementById("net-line").style.backgroundColor = "var(--border-color)";
+        document.getElementById("lbl-tunnel-client").innerText = "TÚNEL: INATIVO";
+        document.getElementById("lbl-tunnel-client").style.color = "var(--accent-red)";
+        document.getElementById("btn-tls").disabled = false;
+        document.getElementById("btn-crypto-get").disabled = true;
+    }
+
+    function animarPacote(dePos, paraPos, texto, color, callback) {
+        const p = document.getElementById("packet-anim");
+        p.style.display = "block";
+        p.innerText = texto;
+        p.style.backgroundColor = color;
+        p.style.boxShadow = `0 0 10px ${color}`;
+        p.style.left = dePos + "%";
+
+        let atual = dePos;
+        const direcao = paraPos > dePos ? 1 : -1;
+
+        const intervalo = setInterval(() => {
+            if ((direcao === 1 && atual >= paraPos) || (direcao === -1 && atual <= paraPos)) {
+                clearInterval(intervalo);
+                p.style.display = "none";
+                callback();
+            } else {
+                atual += direcao * 2;
+                p.style.left = atual + "%";
+            }
+        }, 20);
+    }
+
+    // PASSO 1: TLS HANDSHAKE (NEGOCIAÇÃO)
+    function executarTLSHandshake() {
+        document.getElementById("btn-tls").disabled = true;
+        document.getElementById("node-client").classList.add("handshake");
+        document.getElementById("log-box").innerHTML = "<b>[TLS HANDSHAKE] Iniciando negociação de chaves assimétricas...</b>";
+
+        // 1. Client Hello
+        setTimeout(() => {
+            log("<br>👉 <b>[CLIENT HELLO]</b> Cliente propõe algoritmos de criptografia (Cipher Suites) e envia um valor aleatório (Key Share).", "#fff");
+            log("<span class='tls-meta'>TLSv1.3 Record Layer: Handshake Protocol: Client Hello</span>");
+
+            animarPacote(25, 75, "CLIENT HELLO", "var(--accent-blue)", () => {
+                document.getElementById("node-server").classList.add("handshake");
+                
+                // 2. Server Hello + Certificate
+                setTimeout(() => {
+                    log("<br>👈 <b>[SERVER HELLO & CERTIFICATE]</b> Servidor escolhe a Cipher Suite, envia seu Key Share assimétrico e apresenta o Certificado X.509 de validação.", "#fff");
+                    log("<span class='tls-server'>TLSv1.3 Record Layer: Handshake Protocol: Server Hello, Certificate</span>");
+
+                    animarPacote(75, 25, "SERVER HELLO", "var(--accent-yellow)", () => {
+                        log("<br><b>[CLIENT] Validando cadeia do certificado contra as ACs confiáveis do S.O...</b>", "var(--accent-green)");
+                        log("<b>[MECANISMO] Ambos calculam a Chave Secreta Simétrica via algoritmo Diffie-Hellman!</b>", "var(--accent-purple)");
+
+                        // 3. Finished (Túnel Fechado)
+                        setTimeout(() => {
+                            document.getElementById("net-line").style.backgroundColor = "var(--accent-green)";
+                            document.getElementById("node-client").className = "host secure";
+                            document.getElementById("node-server").className = "host secure";
+                            document.getElementById("lbl-tunnel-client").innerText = "TÚNEL: TLS 1.3 ATIVO";
+                            document.getElementById("lbl-tunnel-client").style.color = "var(--accent-green)";
+
+                            log("<br>✅ <b>[TÚNEL CRIPTOGRAFADO ESTABELECIDO]</b> Handshake concluído. A partir de agora, todo dado de aplicação será cifrado por criptografia simétrica AES-GCM.", "var(--accent-green)");
+                            document.getElementById("btn-crypto-get").disabled = false;
+                        }, 1200);
+                    });
+                }, 1500);
+            });
+        }, 800);
+    }
+
+    // PASSO 2: ENVIO DA REQUISIÇÃO PROTEGIDA
+    function executarEncryptedGet() {
+        document.getElementById("btn-crypto-get").disabled = true;
+        log("<br><b>[HTTP APPLICATION LAYER] Navegador injeta a requisição na pilha TLS cifrada...</b>", "#fff");
+
+        // O que o sniffer intercepta na rede
+        log("<br>🚀 <b>INTERCEPTAÇÃO DO SNIFFER NA REDE (Cliente -> Servidor):</b>", "var(--accent-red)");
+        log("<span class='crypto-data'>Application Data: 41f3d8a2b9e0c5d7f3e21a8c9b0e7f... (Dados ilegíveis!)</span>");
+
+        animarPacote(25, 75, "ENC DATA (AES)", "var(--accent-purple)", () => {
+            log("<br><b>[SERVER] Pacote recebido. Descriptografando com a chave simétrica de sessão...</b>", "#cbd5e1");
+            log("<span class='plain-data'>[Decrypted]: GET /index.html HTTP/1.1</span>");
+            log("<span class='plain-data'>[Decrypted]: Host: hack.ru</span>");
+
+            // Servidor responde protegido
+            setTimeout(() => {
+                log("<br>⏪ <b>INTERCEPTAÇÃO DO SNIFFER NA VOLTA (Servidor -> Cliente):</b>", "var(--accent-red)");
+                log("<span class='crypto-data'>Application Data: 9f8e7d6c5b4a3f2e1d0c9b8a7f6e5d... (HTML Criptografado!)</span>");
+
+                animarPacote(75, 25, "ENC REPLY (AES)", "var(--accent-purple)", () => {
+                    log("<br><b>[CLIENT] Decodificando carga útil de dados no navegador...</b>", "#cbd5e1");
+                    log("<span class='plain-data'>[Decrypted]: HTTP/1.1 200 OK</span>");
+                    log("<span class='plain-data'>[Decrypted Body]: &lt;html&gt;&lt;body&gt;FLAG_HTTPS{715_1_3_p3rf3c7_f0rw4rd_53cr3cy}&lt;/body&gt;&lt;/html&gt;</span>");
+
+                    log("<br>✅ <b>[SUCESSO]</b> Processo concluído com sigilo absoluto contra ataques de Man-in-the-Middle (MitM).", "var(--accent-green)");
+                    document.getElementById("btn-crypto-get").disabled = false;
+                });
+            }, 1500);
+        });
+    }
+</script>
+
+</body>
+</html>
