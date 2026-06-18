@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SSL/TLS DECRYPTION // PRE-MASTER SECRET LAB</title>
+    <style>
+        :root {
+            --neon-cyan: #00f0ff;
+            --neon-magenta: #ff007f;
+            --dark-bg: #09090e;
+            --card-bg: #111122;
+            --terminal-green: #39ff14;
+            --warning-amber: #ffb700;
+        }
+
+        body {
+            background-color: var(--dark-bg);
+            color: #ffffff;
+            font-family: 'Courier New', Courier, monospace;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            border-bottom: 2px dashed var(--neon-cyan);
+            padding-bottom: 20px;
+            width: 100%;
+            max-width: 950px;
+        }
+
+        h1 {
+            color: var(--neon-cyan);
+            text-shadow: 0 0 10px var(--neon-cyan);
+            font-size: 2.3rem;
+            margin: 0;
+        }
+
+        .subtitle {
+            color: var(--neon-magenta);
+            font-weight: bold;
+            letter-spacing: 2px;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 950px;
+        }
+
+        .challenge-card {
+            background-color: var(--card-bg);
+            border: 1px solid #1f1f3a;
+            border-left: 5px solid var(--neon-magenta);
+            border-radius: 4px;
+            padding: 20px;
+            margin-bottom: 25px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.6);
+        }
+
+        .challenge-card h3 {
+            color: var(--neon-cyan);
+            margin-top: 0;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .badge {
+            font-size: 0.8rem;
+            background: #1a1a3a;
+            padding: 4px 8px;
+            border-radius: 3px;
+            color: var(--warning-amber);
+            border: 1px solid var(--warning-amber);
+        }
+
+        .instruction-box {
+            background-color: #05050a;
+            border: 1px solid #1a1a32;
+            padding: 12px;
+            border-radius: 4px;
+            color: #ffffff;
+            font-size: 0.95rem;
+            margin: 15px 0;
+            line-height: 1.4;
+        }
+
+        .instruction-box ol {
+            margin: 5px 0 0 20px;
+            padding: 0;
+        }
+
+        .filter-box {
+            color: var(--terminal-green);
+            font-family: 'Consolas', monospace;
+            background: #000;
+            padding: 2px 6px;
+            border-radius: 3px;
+            border: 1px solid #222;
+        }
+
+        .input-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        input[type="text"] {
+            background-color: #000;
+            border: 1px solid var(--neon-cyan);
+            color: #fff;
+            padding: 10px;
+            font-family: inherit;
+            flex-grow: 1;
+            border-radius: 4px;
+        }
+
+        button {
+            background-color: transparent;
+            border: 1px solid var(--neon-magenta);
+            color: var(--neon-magenta);
+            padding: 10px 20px;
+            cursor: pointer;
+            font-family: inherit;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            border-radius: 4px;
+        }
+
+        button:hover {
+            background-color: var(--neon-magenta);
+            color: #000;
+            box-shadow: 0 0 15px var(--neon-magenta);
+        }
+
+        .status {
+            margin-top: 10px;
+            font-weight: bold;
+            font-size: 0.95rem;
+        }
+
+        .success { color: var(--terminal-green); }
+        .error { color: #ff3333; }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <h1>[ TLS DECRYPTION // PRE-MASTER SECRET LOG ]</h1>
+        <div class="subtitle">LAB: AUDITORIA DE SESSÃO SSL KEYLOGFILE</div>
+        <div class="instruction-box" style="text-align: left; border-color: var(--neon-cyan);">
+            <strong>Cenário do Laboratório:</strong> Você coletou um arquivo de log contendo os segredos de sessão TLS (Pre-Master Secret / SSLKEYLOGFILE) e precisa carregá-lo no Wireshark para descriptografar os pacotes de uma navegação protegida por HTTPS e inspecionar a volumetria das requisições web. Artefato : <a href="https://blueteamoperation.github.io/MOD-6/ssl.zip" target="_blank">ssl.zip</a>
+        </div>
+    </div>
+
+    <div class="container">
+
+        <!-- PROCEDIMENTO DE CONFIGURAÇÃO -->
+        <div class="challenge-card" style="border-left-color: var(--warning-amber);">
+            <h3 style="color: var(--warning-amber);">[ PROCEDIMENTO DE DESCRIPTOGRAFIA NO WIRESHARK ]</h3>
+            <div class="instruction-box" style="background-color: #0c0c16;">
+                <ol>
+                    <li>Abra o arquivo de captura de pacotes no Wireshark.</li>
+                    <li>Vá no menu superior em: <strong>Edit</strong> -> <strong>Preferences</strong> (ou Settings).</li>
+                    <li>No menu lateral esquerdo, expanda a árvore de <strong>Protocols</strong> e localize o protocolo <strong>TLS</strong>.</li>
+                    <li>Encontre o campo de configuração rotulado como <strong>(Pre)-Master-Secret log filename</strong>.</li>
+                    <li>Clique em <strong>Browse...</strong> e selecione o seu arquivo de log de chaves (SSLKEYLOGFILE).</li>
+                    <li>Clique em OK / Aplicar para que os pacotes sejam atualizados e o tráfego HTTP oculto seja revelado.</li>
+                </ol>
+            </div>
+        </div>
+
+        <!-- QUESTÃO 1 -->
+        <div class="challenge-card">
+            <h3>#01 - Volumetria de Sucesso da Aplicação <span class="badge">Filtro: http.response.code == 200</span></h3>
+            <p>Após carregar com sucesso o arquivo de chaves TLS e aplicar o filtro pelas respostas bem-sucedidas do servidor, quantos pacotes com o código de status HTTP <strong>200 OK</strong> foram identificados?</p>
+            <div class="input-group">
+                <input type="text" id="ans1" placeholder="Flag: Apenas o número">
+                <button onclick="checkAnswer(1, '73')">SUBMIT</button>
+            </div>
+            <div class="status" id="status1"></div>
+        </div>
+
+        <!-- QUESTÃO 2 -->
+        <div class="challenge-card">
+            <h3>#02 - Auditoria de Envio de Dados <span class="badge">Filtro: http.request.method == POST</span></h3>
+            <p>Inspecionando os métodos de requisição disparados pelo cliente, quantas ocorrências do método <strong>POST</strong> existem mapeadas na captura?</p>
+            <div class="input-group">
+                <input type="text" id="ans2" placeholder="Flag: Apenas o número">
+                <button onclick="checkAnswer(2, '0')">SUBMIT</button>
+            </div>
+            <div class="status" id="status2"></div>
+        </div>
+
+        <!-- QUESTÃO 3 -->
+        <div class="challenge-card">
+            <h3>#03 - Mapeamento de Requisições de Leitura <span class="badge">Filtro: http.request.method == GET</span></h3>
+            <p>Por fim, ao filtrar apenas pelas requisições de download e leitura de recursos estruturais da página, qual é o total de requisições utilizando o método <strong>GET</strong>?</p>
+            <div class="input-group">
+                <input type="text" id="ans3" placeholder="Flag: Apenas o número">
+                <button onclick="checkAnswer(3, '73')">SUBMIT</button>
+            </div>
+            <div class="status" id="status3"></div>
+        </div>
+
+    </div>
+
+    <script>
+        function checkAnswer(qNum, correctAnswer) {
+            const userInput = document.getElementById('ans' + qNum).value.trim();
+            const statusDiv = document.getElementById('status' + qNum);
+            
+            if (userInput.toLowerCase() === correctAnswer.toLowerCase()) {
+                statusDiv.className = "status success";
+                statusDiv.innerHTML = "[+] ACCESS GRANTED: Métrica descriptografada com sucesso!";
+            } else {
+                statusDiv.className = "status error";
+                statusDiv.innerHTML = "[-] ACCESS DENIED: Contagem incorreta.";
+            }
+        }
+    </script>
+</body>
+</html>
