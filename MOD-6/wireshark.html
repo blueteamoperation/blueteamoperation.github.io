@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DEEP PACKET INSPECTION // WIRESHARK LAB</title>
+    <style>
+        :root {
+            --neon-cyan: #00f0ff;
+            --neon-magenta: #ff007f;
+            --dark-bg: #09090e;
+            --card-bg: #111122;
+            --terminal-green: #39ff14;
+            --warning-amber: #ffb700;
+        }
+
+        body {
+            background-color: var(--dark-bg);
+            color: #ffffff;
+            font-family: 'Courier New', Courier, monospace;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            border-bottom: 2px dashed var(--neon-magenta);
+            padding-bottom: 20px;
+            width: 100%;
+            max-width: 950px;
+        }
+
+        h1 {
+            color: var(--neon-magenta);
+            text-shadow: 0 0 10px var(--neon-magenta);
+            font-size: 2.3rem;
+            margin: 0;
+        }
+
+        .subtitle {
+            color: var(--neon-cyan);
+            font-weight: bold;
+            letter-spacing: 2px;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 950px;
+        }
+
+        .challenge-card {
+            background-color: var(--card-bg);
+            border: 1px solid #1f1f3a;
+            border-left: 5px solid var(--neon-cyan);
+            border-radius: 4px;
+            padding: 20px;
+            margin-bottom: 25px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.6);
+        }
+
+        .challenge-card h3 {
+            color: var(--neon-cyan);
+            margin-top: 0;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .badge {
+            font-size: 0.8rem;
+            background: #1a1a3a;
+            padding: 4px 8px;
+            border-radius: 3px;
+            color: var(--warning-amber);
+            border: 1px solid var(--warning-amber);
+        }
+
+        .gui-instruction {
+            background-color: #05050a;
+            border: 1px solid #1a1a32;
+            padding: 12px;
+            border-radius: 4px;
+            color: #ffffff;
+            font-size: 0.95rem;
+            margin: 15px 0;
+            line-height: 1.4;
+        }
+
+        .gui-instruction strong {
+            color: var(--warning-amber);
+        }
+
+        .filter-box {
+            color: var(--terminal-green);
+            font-family: 'Consolas', monospace;
+            background: #000;
+            padding: 4px 8px;
+            border-radius: 3px;
+            border: 1px solid #222;
+        }
+
+        .input-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        input[type="text"] {
+            background-color: #000;
+            border: 1px solid var(--neon-magenta);
+            color: #fff;
+            padding: 10px;
+            font-family: inherit;
+            flex-grow: 1;
+            border-radius: 4px;
+        }
+
+        button {
+            background-color: transparent;
+            border: 1px solid var(--neon-cyan);
+            color: var(--neon-cyan);
+            padding: 10px 20px;
+            cursor: pointer;
+            font-family: inherit;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            border-radius: 4px;
+        }
+
+        button:hover {
+            background-color: var(--neon-cyan);
+            color: #000;
+            box-shadow: 0 0 15px var(--neon-cyan);
+        }
+
+        .status {
+            margin-top: 10px;
+            font-weight: bold;
+            font-size: 0.95rem;
+        }
+
+        .success { color: var(--terminal-green); }
+        .error { color: #ff3333; }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <h1>[ GUI NETWORK FORENSICS // WIRESHARK ]</h1>
+        <div class="subtitle">LAB PROTOCOLO HTTP & METRICAS DE TRÁFEGO</div>
+        <p>Abra o arquivo <code>http.cap</code> diretamente na interface gráfica do Wireshark e siga os menus indicados.</p>
+    </div>
+
+    <div class="container">
+
+        <div class="challenge-card">
+            <h3>#01 - Mapeamento de Nós Ativos <span class="badge">Menu: Endpoints</span></h3>
+            <p>Acessando a lista global de Endpoints do Wireshark, quantos endereços IPv4 únicos geraram ou receberam tráfego nesta captura?</p>
+            <div class="gui-instruction">
+                <strong>Caminho no Wireshark:</strong><br>
+                Vá no menu superior: <code>Statistics</code> -> <code>Endpoints</code>.<br>
+                Selecione a aba <strong>IPv4</strong> na janela e veja a quantidade de IPs exibidas na tabela.
+            </div>
+            <div class="input-group">
+                <input type="text" id="ans1" placeholder="Flag: Apenas o número">
+                <button onclick="checkAnswer(1, '4')">SUBMIT</button>
+            </div>
+            <div class="status" id="status1"></div>
+        </div>
+
+        <div class="challenge-card">
+            <h3>#02 - Volumetria de Conversas TCP <span class="badge">Menu: Conversations</span></h3>
+            <p>Analisando as conexões de transporte no menu Conversations, qual foi a porta TCP de origem (porta alta do cliente) utilizada que gerou o maior números de bytes?</p>
+            <div class="gui-instruction">
+                <strong>Caminho no Wireshark:</strong><br>
+                Acesse: <code>Statistics</code> -> <code>Conversations</code>.<br>
+                Clique na aba <strong>TCP</strong>. Ordene os bytes do maior para o menor e observe a porta utilizada pelo cliente.
+            </div>
+            <div class="input-group">
+                <input type="text" id="ans2" placeholder="Flag formato: número da porta (ex: 4444)">
+                <button onclick="checkAnswer(2, '3200')">SUBMIT</button>
+            </div>
+            <div class="status" id="status2"></div>
+        </div>
+
+        <div class="challenge-card">
+            <h3>#03 - Título da Página Principal <span class="badge">Filtro de Exibição</span></h3>
+            <p>Ao analisar a primeira resposta HTTP bem-sucedida da raiz do servidor principal (10.1.1.1), qual é a string exata contida dentro da tag de título (&lt;title&gt;) do código HTML retornado?</p>
+            <div class="gui-instruction">
+                <strong>Filtro sugerido:</strong> Insira na barra de filtros: <span class="filter-box">http.response.code == 200</span><br>
+                Selecione o primeiro pacote de resposta do IP 10.1.1.1. No painel inferior de inspeção de dados textuais/HTML (ou dando um <i>Follow HTTP Stream</i>), localize o texto que está entre <code>&lt;title&gt;</code> e <code>&lt;/title&gt;</code>.
+            </div>
+            <div class="input-group">
+                <input type="text" id="ans3" placeholder="Flag: Texto do título exatamente como escrito">
+                <button onclick="checkAnswer(3, 'Ronnie sahlbergs Websida')">SUBMIT</button>
+            </div>
+            <div class="status" id="status3"></div>
+        </div>
+
+        <div class="challenge-card">
+            <h3>#04 - Rastreamento de Referência de Tráfego <span class="badge">Filtro Avançado</span></h3>
+            <p>Quando o navegador do usuário realizou o download da imagem de fundo <code>bg2.jpg</code>, qual foi a URL completa que constava no campo <strong>Referer</strong> do cabeçalho da requisição?</p>
+            <div class="gui-instruction">
+                <strong>Filtro sugerido:</strong> Filtre por <span class="filter-box">http.request.uri contains "bg2.jpg"</span><br>
+                Expanda os detalhes do pacote no painel central (<i>Hypertext Transfer Protocol</i>) e localize a linha que descreve o campo de metadado <code>Referer:</code>.
+            </div>
+            <div class="input-group">
+                <input type="text" id="ans4" placeholder="Flag: http://.../caminho">
+                <button onclick="checkAnswer(4, 'http://10.1.1.1/Websidan/index.html')">SUBMIT</button>
+            </div>
+            <div class="status" id="status4"></div>
+        </div>
+
+    </div>
+
+    <script>
+        function checkAnswer(qNum, correctAnswer) {
+            const userInput = document.getElementById('ans' + qNum).value.trim();
+            const statusDiv = document.getElementById('status' + qNum);
+            
+            if (userInput.toLowerCase() === correctAnswer.toLowerCase()) {
+                statusDiv.className = "status success";
+                statusDiv.innerHTML = "[+] ACCESS GRANTED: Flag validada com sucesso!";
+            } else {
+                statusDiv.className = "status error";
+                statusDiv.innerHTML = "[-] ACCESS DENIED: Resposta incorreta para os dados reais do pcap.";
+            }
+        }
+    </script>
+</body>
+</html>
