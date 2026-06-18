@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HACK THE PACKET // CTF LAB</title>
+    <style>
+        :root {
+            --neon-cyan: #00f0ff;
+            --neon-magenta: #ff007f;
+            --dark-bg: #0a0a12;
+            --card-bg: #121225;
+            --terminal-green: #39ff14;
+        }
+
+        body {
+            background-color: var(--dark-bg);
+            color: #ffffff;
+            font-family: 'Courier New', Courier, monospace;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            border-bottom: 2px dashed var(--neon-cyan);
+            padding-bottom: 20px;
+            width: 100%;
+            max-width: 900px;
+        }
+
+        h1 {
+            color: var(--neon-cyan);
+            text-shadow: 0 0 10px var(--neon-cyan);
+            font-size: 2.5rem;
+            margin: 0;
+        }
+
+        .subtitle {
+            color: var(--neon-magenta);
+            font-weight: bold;
+            letter-spacing: 2px;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 900px;
+        }
+
+        .challenge-card {
+            background-color: var(--card-bg);
+            border: 1px solid #232342;
+            border-left: 5px solid var(--neon-magenta);
+            border-radius: 4px;
+            padding: 20px;
+            margin-bottom: 25px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+        }
+
+        .challenge-card h3 {
+            color: var(--neon-cyan);
+            margin-top: 0;
+        }
+
+        .tshark-hint {
+            background-color: #05050a;
+            border: 1px solid #1a1a3a;
+            padding: 10px;
+            border-radius: 4px;
+            color: var(--terminal-green);
+            font-size: 0.9rem;
+            overflow-x: auto;
+            margin: 15px 0;
+        }
+
+        .input-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        input[type="text"] {
+            background-color: #000;
+            border: 1px solid var(--neon-cyan);
+            color: #fff;
+            padding: 10px;
+            font-family: inherit;
+            flex-grow: 1;
+            border-radius: 4px;
+        }
+
+        button {
+            background-color: transparent;
+            border: 1px solid var(--neon-magenta);
+            color: var(--neon-magenta);
+            padding: 10px 20px;
+            cursor: pointer;
+            font-family: inherit;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            border-radius: 4px;
+        }
+
+        button:hover {
+            background-color: var(--neon-magenta);
+            color: #000;
+            box-shadow: 0 0 15px var(--neon-magenta);
+        }
+
+        .status {
+            margin-top: 10px;
+            font-weight: bold;
+            font-size: 0.95rem;
+        }
+
+        .success { color: var(--terminal-green); }
+        .error { color: #ff3333; }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <h1>[ TSHARK -TRAFFIC ANALYSIS ]</h1>
+        <div class="subtitle">DESAFIO CTF: PCAP FORENSICS</div>
+        <p>Analise o arquivo <a href="teste"><code>http.cap</code></a> utilizando o <strong>TShark</strong> para responder às perguntas.</p>
+    </div>
+
+    <div class="container">
+
+        <div class="challenge-card" id="q1">
+            <h3>#01 - Identificação do Servidor</h3>
+            <p>Qual é o endereço IP de destino do servidor para o qual o navegador web realiza a primeira requisição GET HTTP?</p>
+            <div class="tshark-hint">
+                <strong>Use TShark:</strong><br>
+                tshark -r http_with_jpegs.cap -Y "http.request.method == GET" -T fields -e ip.dst | head -n 1
+            </div>
+            <div class="input-group">
+                <input type="text" id="ans1" placeholder="Flag: X.X.X.X">
+                <button onclick="checkAnswer(1, '10.1.1.1')">SUBMIT</button>
+            </div>
+            <div class="status" id="status1"></div>
+        </div>
+
+        <div class="challenge-card" id="q2">
+            <h3>#02 - Impressão Digital do Client</h3>
+            <p>O atacante/usuário utilizou um navegador alternativo (Opera). Qual versão do produto Opera está explicitamente declarada no cabeçalho do User-Agent na primeira requisição?</p>
+            <div class="tshark-hint">
+                <strong>Use TShark:</strong><br>
+                tshark -r http_with_jpegs.cap -Y "http.user_agent contains Opera" -T fields -e http.user_agent | head -n 1
+            </div>
+            <div class="input-group">
+                <input type="text" id="ans2" placeholder="Flag: X.XX">
+                <button onclick="checkAnswer(2, '7.11')">SUBMIT</button>
+            </div>
+            <div class="status" id="status2"></div>
+        </div>
+
+        <div class="challenge-card" id="q3">
+            <h3>#03 - Reconhecimento de Aplicação (Banner Grabbing)</h3>
+            <p>Qual a string exata do banner de Server HTTP (Nome e Versão do Servidor + OS) retornada pelo servidor Apache na primeira resposta válida (HTTP 200 OK)?</p>
+            <div class="tshark-hint">
+                <strong>Use TShark:</strong><br>
+                tshark -r http_with_jpegs.cap -Y "http.response.code == 200" -T fields -e http.server | head -n 1
+            </div>
+            <div class="input-group">
+                <input type="text" id="ans3" placeholder="Flag: Servidor/Versao (OS)">
+                <button onclick="checkAnswer(3, 'Apache/2.0.40 (Red Hat Linux)')">SUBMIT</button>
+            </div>
+            <div class="status" id="status3"></div>
+        </div>
+
+        <div class="challenge-card" id="q4">
+            <h3>#04 - Descoberta de Endpoint / Exfiltração</h3>
+            <p>Qual o URI do script ASP acessado via método POST em direção ao host 'ins1.opera.com'?</p>
+            <div class="tshark-hint">
+                <strong>Use TShark:</strong><br>
+                tshark -r http_with_jpegs.cap -Y "http.request.method == POST" -T fields -e http.request.uri
+            </div>
+            <div class="input-group">
+                <input type="text" id="ans4" placeholder="Flag: /caminho/do/script.asp">
+                <button onclick="checkAnswer(4, '/scripts/cms/xcms.asp')">SUBMIT</button>
+            </div>
+            <div class="status" id="status4"></div>
+        </div>
+
+        <div class="challenge-card" id="q5">
+            <h3>#05 - Content Carving (Análise de Mídia)</h3>
+            <p>O arquivo HTML principal carrega uma imagem JPG de uma famosa cidade australiana. Qual é o nome do arquivo dessa imagem (incluindo a extensão)?</p>
+            <div class="tshark-hint">
+                <strong>Use TShark:</strong><br>
+                tshark -r http_with_jpegs.cap -Y "http.request.uri contains jpg" -T fields -e http.request.uri
+            </div>
+            <div class="input-group">
+                <input type="text" id="ans5" placeholder="Flag: imagem.jpg">
+                <button onclick="checkAnswer(5, 'sydney.jpg')">SUBMIT</button>
+            </div>
+            <div class="status" id="status5"></div>
+        </div>
+
+    </div>
+
+    <script>
+        function checkAnswer(qNum, correctAnswer) {
+            const userInput = document.getElementById('ans' + qNum).value.trim();
+            const statusDiv = document.getElementById('status' + qNum);
+            
+            // Validação simples (case-insensitive para caminhos e strings)
+            if (userInput.toLowerCase() === correctAnswer.toLowerCase()) {
+                statusDiv.className = "status success";
+                statusDiv.innerHTML = "[+] ACCESS GRANTED: Flag Correta!";
+            } else {
+                statusDiv.className = "status error";
+                statusDiv.innerHTML = "[-] ACCESS DENIED: Tente novamente.";
+            }
+        }
+    </script>
+</body>
+</html>
