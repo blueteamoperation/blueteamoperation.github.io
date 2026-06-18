@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WIRELESS AUDITING // WI-FI CRACKING LAB</title>
+    <style>
+        :root {
+            --neon-cyan: #00f0ff;
+            --neon-magenta: #ff007f;
+            --dark-bg: #09090e;
+            --card-bg: #111122;
+            --terminal-green: #39ff14;
+            --warning-amber: #ffb700;
+        }
+
+        body {
+            background-color: var(--dark-bg);
+            color: #ffffff;
+            font-family: 'Courier New', Courier, monospace;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            border-bottom: 2px dashed var(--neon-cyan);
+            padding-bottom: 20px;
+            width: 100%;
+            max-width: 950px;
+        }
+
+        h1 {
+            color: var(--neon-cyan);
+            text-shadow: 0 0 10px var(--neon-cyan);
+            font-size: 2.3rem;
+            margin: 0;
+        }
+
+        .subtitle {
+            color: var(--neon-magenta);
+            font-weight: bold;
+            letter-spacing: 2px;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 950px;
+        }
+
+        .challenge-card {
+            background-color: var(--card-bg);
+            border: 1px solid #1f1f3a;
+            border-left: 5px solid var(--neon-magenta);
+            border-radius: 4px;
+            padding: 20px;
+            margin-bottom: 25px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.6);
+        }
+
+        .challenge-card h3 {
+            color: var(--neon-cyan);
+            margin-top: 0;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .badge {
+            font-size: 0.8rem;
+            background: #1a1a3a;
+            padding: 4px 8px;
+            border-radius: 3px;
+            color: var(--warning-amber);
+            border: 1px solid var(--warning-amber);
+        }
+
+        .instruction-box {
+            background-color: #05050a;
+            border: 1px solid #1a1a32;
+            padding: 12px;
+            border-radius: 4px;
+            color: #ffffff;
+            font-size: 0.95rem;
+            margin: 15px 0;
+            line-height: 1.4;
+        }
+
+        .instruction-box ol {
+            margin: 5px 0 0 20px;
+            padding: 0;
+        }
+
+        .input-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        input[type="text"] {
+            background-color: #000;
+            border: 1px solid var(--neon-cyan);
+            color: #fff;
+            padding: 10px;
+            font-family: inherit;
+            flex-grow: 1;
+            border-radius: 4px;
+        }
+
+        button {
+            background-color: transparent;
+            border: 1px solid var(--neon-magenta);
+            color: var(--neon-magenta);
+            padding: 10px 20px;
+            cursor: pointer;
+            font-family: inherit;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            border-radius: 4px;
+        }
+
+        button:hover {
+            background-color: var(--neon-magenta);
+            color: #000;
+            box-shadow: 0 0 15px var(--neon-magenta);
+        }
+
+        .status {
+            margin-top: 10px;
+            font-weight: bold;
+            font-size: 0.95rem;
+        }
+
+        .success { color: var(--terminal-green); }
+        .error { color: #ff3333; }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <h1>[ WIRELESS AUDITING // WPA CRACKING & DECRYPTION ]</h1>
+        <div class="subtitle">LAB: AIRCRACK-NG & WIRESHARK IEEE 802.11</div>
+        <div class="instruction-box" style="text-align: left; border-color: var(--neon-cyan);">
+            <strong>Cenário:</strong> Você coletou uma captura de rede sem fio criptografada no arquivo <code>wpa.pcap</code> contendo um handshake WPA e precisa realizar a quebra com a wordlist <code>dic</code> para depois analisar o tráfego aberto no Wireshark. Artefatos: <a href="https://blueteamoperation.github.io/MOD-6/wpa.pcap" target="_blank"> wpa.pcap </a> | <a href="https://blueteamoperation.github.io/MOD-6/dic.txt" target="_blank"> dic.txt </a>
+        </div>
+    </div>
+
+    <div class="container">
+
+        <div class="challenge-card">
+            <h3>#01 - Ataque de Dicionário com Aircrack-ng <span class="badge">Terminal Kali</span></h3>
+            <p>Utilizando o dicionário <strong>dic</strong> contra o arquivo <strong>wpa.pcap</strong> no terminal, qual foi a senha da rede encontrada pelo aircrack-ng?</p>
+            <div class="instruction-box">
+                <strong>Comando:</strong> <code>aircrack-ng wpa.pcap -w dic</code>
+            </div>
+            <div class="input-group">
+                <input type="text" id="ans1" placeholder="Flag: Senha da rede">
+                <button onclick="checkAnswer(1, 'Induction')">SUBMIT</button>
+            </div>
+            <div class="status" id="status1"></div>
+        </div>
+
+        <div class="challenge-card">
+            <h3>#02 - Revelando as Camadas Superiores <span class="badge">Wireshark Decryption</span></h3>
+            <p>Após seguir o procedimento de decodificação da rede sem fio dentro do menu de configurações do Wireshark aplicando a credencial correta, qual protocolo de aplicação principal passa a ser visível?</p>
+            <div class="instruction-box">
+                <strong>Procedimento no Wireshark:</strong>
+                <ol>
+                    <li>Abra o arquivo <strong>wpa.pcap</strong> no Wireshark.</li>
+                    <li>Vá no menu superior em <strong>Edit</strong> -> <strong>Preferences</strong> (ou Settings).</li>
+                    <li>Expanda <strong>Protocols</strong> e localize <strong>IEEE 802.11</strong>.</li>
+                    <li>Marque a opção <strong>Enable decryption</strong>.</li>
+                    <li>Clique em <strong>Decryption keys</strong> -> <strong>Edit</strong> -> Adicione uma nova chave do tipo <strong>wpa-pwd</strong> no formato <code>Senha Encontrada</code>.</li>
+                </ol>
+            </div>
+            <div class="input-group">
+                <input type="text" id="ans2" placeholder="Flag: Nome do protocolo (ex: HTTP)">
+                <button onclick="checkAnswer(2, 'HTTP')">SUBMIT</button>
+            </div>
+            <div class="status" id="status2"></div>
+        </div>
+
+        <div class="challenge-card">
+            <h3>#03 - Inspeção de Conteúdo Descriptografado <span class="badge">Análise de Frame</span></h3>
+            <p>Agora que o tráfego HTTP foi aberto com a chave de descriptografia, qual é o nome exato do arquivo que está trafegando dentro do <strong>frame de número 840</strong>?</p>
+            <div class="instruction-box">
+                <strong>Dica:</strong> Vá direto ao frame 840 no painel principal ou filtre por <code>http</code> para identificar o objeto JPG requisitado ou retornado.
+            </div>
+            <div class="input-group">
+                <input type="text" id="ans3" placeholder="Flag: nome_do_arquivo.extensão">
+                <button onclick="checkAnswer(3, '75djaws3.jpg')">SUBMIT</button>
+            </div>
+            <div class="status" id="status3"></div>
+        </div>
+
+    </div>
+
+    <script>
+        function checkAnswer(qNum, correctAnswer) {
+            const userInput = document.getElementById('ans' + qNum).value.trim();
+            const statusDiv = document.getElementById('status' + qNum);
+            
+            if (userInput.toLowerCase() === correctAnswer.toLowerCase()) {
+                statusDiv.className = "status success";
+                statusDiv.innerHTML = "[+] ACCESS GRANTED: Resposta correta validada!";
+            } else {
+                statusDiv.className = "status error";
+                statusDiv.innerHTML = "[-] ACCESS DENIED: Tente novamente.";
+            }
+        }
+    </script>
+</body>
+</html>
