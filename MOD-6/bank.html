@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WEB ATTACK FORENSICS // EXFILTRATION</title>
+    <style>
+        :root {
+            --neon-cyan: #00f0ff;
+            --neon-magenta: #ff007f;
+            --dark-bg: #09090e;
+            --card-bg: #111122;
+            --terminal-green: #39ff14;
+            --warning-amber: #ffb700;
+        }
+
+        body {
+            background-color: var(--dark-bg);
+            color: #ffffff;
+            font-family: 'Courier New', Courier, monospace;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            border-bottom: 2px dashed var(--neon-cyan);
+            padding-bottom: 20px;
+            width: 100%;
+            max-width: 950px;
+        }
+
+        h1 {
+            color: var(--neon-cyan);
+            text-shadow: 0 0 10px var(--neon-cyan);
+            font-size: 2.3rem;
+            margin: 0;
+        }
+
+        .subtitle {
+            color: var(--neon-magenta);
+            font-weight: bold;
+            letter-spacing: 2px;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 950px;
+        }
+
+        .challenge-card {
+            background-color: var(--card-bg);
+            border: 1px solid #1f1f3a;
+            border-left: 5px solid var(--neon-magenta);
+            border-radius: 4px;
+            padding: 20px;
+            margin-bottom: 25px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.6);
+        }
+
+        .challenge-card h3 {
+            color: var(--neon-cyan);
+            margin-top: 0;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .input-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        input[type="text"] {
+            background-color: #000;
+            border: 1px solid var(--neon-cyan);
+            color: #fff;
+            padding: 10px;
+            font-family: inherit;
+            flex-grow: 1;
+            border-radius: 4px;
+        }
+
+        button {
+            background-color: transparent;
+            border: 1px solid var(--neon-magenta);
+            color: var(--neon-magenta);
+            padding: 10px 20px;
+            cursor: pointer;
+            font-family: inherit;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            border-radius: 4px;
+        }
+
+        button:hover {
+            background-color: var(--neon-magenta);
+            color: #000;
+            box-shadow: 0 0 15px var(--neon-magenta);
+        }
+
+        .status {
+            margin-top: 10px;
+            font-weight: bold;
+            font-size: 0.95rem;
+        }
+
+        .success { color: var(--terminal-green); }
+        .error { color: #ff3333; }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <h1>[ WEB ATTACK FORENSICS // EXFILTRATION ]</h1>
+        <div class="subtitle">LAB CTF: INJEÇÃO SQL E FRAUDE FINANCEIRA <br> 
+  <li><a href="https://blueteamoperation.github.io/MOD-6/bank.pcap" target="_blank"><font color="white">Download: bank.pcap</font></a></li>
+        </div>
+    </div>
+
+    <div class="container">
+
+        <div class="challenge-card">
+            <h3>#01 - Vetor de Exploração Web</h3>
+            <p>Avaliando as requisições e payloads enviados para a aplicação web, houve algum ataque? Caso sim, qual a sigla do tipo de ataque identificado?</p>
+            <div class="input-group">
+                <input type="text" id="ans1" placeholder="Flag: Tipo de ataque (ex: XSS, SQLi)">
+                <button onclick="checkAnswer(1)">SUBMIT</button>
+            </div>
+            <div class="status" id="status1"></div>
+        </div>
+
+        <div class="challenge-card">
+            <h3>#02 - Bypass de Autenticação</h3>
+            <p>O atacante conseguiu logar com sucesso. Caso sim, o que ele utilizou especificamente inserido no campo de usuário e senha para quebrar a lógica da query?</p>
+            <div class="input-group">
+                <input type="text" id="ans2" placeholder="Flag: String exata de bypass">
+                <button onclick="checkAnswer(2)">SUBMIT</button>
+            </div>
+            <div class="status" id="status2"></div>
+        </div>
+
+        <div class="challenge-card">
+            <h3>#03 - Impacto / Movimentação Ilícita</h3>
+            <p>Investigando as ações pós-autenticação, houve alguma transferência bancária/financeira? Caso sim, qual o valor exato transferido?</p>
+            <div class="input-group">
+                <input type="text" id="ans3" placeholder="Flag: Apenas o valor numérico">
+                <button onclick="checkAnswer(3)">SUBMIT</button>
+            </div>
+            <div class="status" id="status3"></div>
+        </div>
+
+        <div class="challenge-card">
+            <h3>#04 - Destino dos Fundos</h3>
+            <p>Se ocorreu a transferência fraudulenta, qual é o número da conta que recebeu este valor?</p>
+            <div class="input-group">
+                <input type="text" id="ans4" placeholder="Flag: Número da conta destino">
+                <button onclick="checkAnswer(4)">SUBMIT</button>
+            </div>
+            <div class="status" id="status4"></div>
+        </div>
+
+        <div class="challenge-card">
+            <h3>#05 - Host</h3>
+            <p>Se ocorreu a transferência fraudulenta, qual é o número da conta que recebeu este valor?</p>
+            <div class="input-group">
+                <input type="text" id="ans5" placeholder="Flag: Número da conta destino">
+                <button onclick="checkAnswer(5)">SUBMIT</button>
+            </div>
+            <div class="status" id="status5"></div>
+        </div>
+
+    </div>
+
+    <script>
+        // Gabarito armazenado isoladamente para evitar quebras de aspas no HTML
+        const gabarito = {
+            1: "sqli",
+            2: "a' or 1=1--",
+            3: "100.000",
+            4: "800006",
+            5: "bankfake.lab"
+        };
+
+        function checkAnswer(qNum) {
+            const userInput = document.getElementById('ans' + qNum).value.trim();
+            const statusDiv = document.getElementById('status' + qNum);
+            const correctAnswer = gabarito[qNum];
+            
+            if (userInput.toLowerCase() === correctAnswer.toLowerCase()) {
+                statusDiv.className = "status success";
+                statusDiv.innerHTML = "[+] ACCESS GRANTED: Evidência forense validada com sucesso!";
+            } else {
+                statusDiv.className = "status error";
+                statusDiv.innerHTML = "[-] ACCESS DENIED: Resposta incorreta para a atividade analítica.";
+            }
+        }
+    </script>
+</body>
+</html>
