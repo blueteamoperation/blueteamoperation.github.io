@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DATABASE FORENSICS // NETWORK AUDIT</title>
+    <style>
+        :root {
+            --neon-cyan: #00f0ff;
+            --neon-magenta: #ff007f;
+            --dark-bg: #09090e;
+            --card-bg: #111122;
+            --terminal-green: #39ff14;
+            --warning-amber: #ffb700;
+        }
+
+        body {
+            background-color: var(--dark-bg);
+            color: #ffffff;
+            font-family: 'Courier New', Courier, monospace;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            border-bottom: 2px dashed var(--neon-cyan);
+            padding-bottom: 20px;
+            width: 100%;
+            max-width: 950px;
+        }
+
+        h1 {
+            color: var(--neon-cyan);
+            text-shadow: 0 0 10px var(--neon-cyan);
+            font-size: 2.3rem;
+            margin: 0;
+        }
+
+        .subtitle {
+            color: var(--neon-magenta);
+            font-weight: bold;
+            letter-spacing: 2px;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 950px;
+        }
+
+        .challenge-card {
+            background-color: var(--card-bg);
+            border: 1px solid #1f1f3a;
+            border-left: 5px solid var(--neon-magenta);
+            border-radius: 4px;
+            padding: 20px;
+            margin-bottom: 25px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.6);
+        }
+
+        .challenge-card h3 {
+            color: var(--neon-cyan);
+            margin-top: 0;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .input-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        input[type="text"] {
+            background-color: #000;
+            border: 1px solid var(--neon-cyan);
+            color: #fff;
+            padding: 10px;
+            font-family: inherit;
+            flex-grow: 1;
+            border-radius: 4px;
+        }
+
+        button {
+            background-color: transparent;
+            border: 1px solid var(--neon-magenta);
+            color: var(--neon-magenta);
+            padding: 10px 20px;
+            cursor: pointer;
+            font-family: inherit;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            border-radius: 4px;
+        }
+
+        button:hover {
+            background-color: var(--neon-magenta);
+            color: #000;
+            box-shadow: 0 0 15px var(--neon-magenta);
+        }
+
+        .status {
+            margin-top: 10px;
+            font-weight: bold;
+            font-size: 0.95rem;
+        }
+
+        .success { color: var(--terminal-green); }
+        .error { color: #ff3333; }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <h1>[ DATABASE FORENSICS // NETWORK TRAFFIC ]</h1>
+        <div class="subtitle">LAB CTF: AUDITORIA DE TRANSAÇÕES SQL <br>
+          <li><a href="https://blueteamoperation.github.io/MOD-6/bd.pcapng" target="_blank"><font color="white">Download Artefato: bd.pcapng</font></a></li></div>
+    </div>
+
+    <div class="container">
+
+        <!-- QUESTÃO 1 -->
+        <div class="challenge-card">
+            <h3>#01 - Mapeamento de Instância</h3>
+            <p>Inspecionando os pacotes de consulta e comandos trafegados na captura, qual é o nome do banco de dados (database) que foi selecionado para uso?</p>
+            <div class="input-group">
+                <input type="text" id="ans1" placeholder="Flag: Nome do banco">
+                <button onclick="checkAnswer(1, 'testdb')">SUBMIT</button>
+            </div>
+            <div class="status" id="status1"></div>
+        </div>
+
+        <!-- QUESTÃO 2 -->
+        <div class="challenge-card">
+            <h3>#02 - Modificação de Estrutura (DDL)</h3>
+            <p>Qual foi o nome da tabela criada na estrutura deste banco de dados através dos comandos interceptados?</p>
+            <div class="input-group">
+                <input type="text" id="ans2" placeholder="Flag: Nome da tabela">
+                <button onclick="checkAnswer(2, 'foo')">SUBMIT</button>
+            </div>
+            <div class="status" id="status2"></div>
+        </div>
+
+        <!-- QUESTÃO 3 -->
+        <div class="challenge-card">
+            <h3>#03 - Manipulação de Dados (DML)</h3>
+            <p>Quais registros (valores) foram inseridos nesta tabela? Separe os valores por vírgula e sem espaços.</p>
+            <div class="input-group">
+                <input type="text" id="ans3" placeholder="Exemplo: 1,2">
+                <button onclick="checkAnswer(3, '2,3')">SUBMIT</button>
+            </div>
+            <div class="status" id="status3"></div>
+        </div>
+
+    </div>
+
+    <script>
+        function checkAnswer(qNum, correctAnswer) {
+            const userInput = document.getElementById('ans' + qNum).value.trim();
+            const statusDiv = document.getElementById('status' + qNum);
+            
+            if (userInput.toLowerCase() === correctAnswer.toLowerCase()) {
+                statusDiv.className = "status success";
+                statusDiv.innerHTML = "[+] ACCESS GRANTED: Transação SQL validada com sucesso!";
+            } else {
+                statusDiv.className = "status error";
+                statusDiv.innerHTML = "[-] ACCESS DENIED: Resposta incorreta.";
+            }
+        }
+    </script>
+</body>
+</html>
