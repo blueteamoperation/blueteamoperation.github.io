@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CYBER LAW // CRIME CLASSIFICATION</title>
+    <style>
+        :root {
+            --neon-cyan: #00f0ff;
+            --neon-magenta: #ff007f;
+            --dark-bg: #09090e;
+            --card-bg: #111122;
+            --terminal-green: #39ff14;
+            --warning-amber: #ffb700;
+        }
+
+        body {
+            background-color: var(--dark-bg);
+            color: #ffffff;
+            font-family: 'Courier New', Courier, monospace;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            border-bottom: 2px dashed var(--neon-cyan);
+            padding-bottom: 20px;
+            width: 100%;
+            max-width: 1100px;
+        }
+
+        h1 {
+            color: var(--neon-cyan);
+            text-shadow: 0 0 10px var(--neon-cyan);
+            font-size: 2rem;
+            margin: 0;
+        }
+
+        .subtitle {
+            color: var(--neon-magenta);
+            font-weight: bold;
+            letter-spacing: 2px;
+            margin-top: 5px;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1100px;
+        }
+
+        .challenge-card {
+            background-color: var(--card-bg);
+            border: 1px solid #1f1f3a;
+            border-left: 5px solid var(--neon-magenta);
+            border-radius: 4px;
+            padding: 20px;
+            margin-bottom: 25px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.6);
+        }
+
+        .drag-instructions {
+            margin-bottom: 20px;
+            color: #ccc;
+            font-size: 0.95rem;
+            line-height: 1.5;
+        }
+
+        .drag-instructions strong {
+            color: var(--warning-amber);
+        }
+
+        .main-layout {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .pool-section {
+            background: #05050a;
+            border: 1px dashed #222244;
+            padding: 15px;
+            border-radius: 4px;
+        }
+
+        .pool-section h4 {
+            margin-top: 0;
+            color: var(--warning-amber);
+            border-bottom: 1px solid #222244;
+            padding-bottom: 8px;
+        }
+
+        .pool-zone {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            min-height: 80px;
+            padding: 10px;
+        }
+
+        .targets-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+        }
+
+        .target-column {
+            background: #0b0b18;
+            border: 1px solid #1f1f3a;
+            padding: 15px;
+            border-radius: 4px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .target-column h4 {
+            margin-top: 0;
+            text-align: center;
+            padding-bottom: 8px;
+            border-bottom: 1px solid #1f1f3a;
+        }
+
+        .pure-header { color: var(--neon-cyan); }
+        .misto-header { color: var(--neon-magenta); }
+        .comum-header { color: var(--warning-amber); }
+
+        .drop-zone {
+            min-height: 200px;
+            background: #040409;
+            border: 2px dotted #15152a;
+            border-radius: 4px;
+            padding: 10px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .drop-zone.over {
+            border-color: var(--terminal-green);
+            background: #081408;
+        }
+
+        .drag-item {
+            background: #12122d;
+            border: 1px solid #2d2d5a;
+            padding: 12px;
+            border-radius: 4px;
+            cursor: grab;
+            user-select: none;
+            font-size: 0.85rem;
+            line-height: 1.4;
+            transition: background 0.2s;
+        }
+
+        .drag-item:active {
+            cursor: grabbing;
+        }
+
+        .btn-group {
+            display: flex;
+            justify-content: flex-end;
+            margin-top: 20px;
+        }
+
+        button {
+            background-color: transparent;
+            border: 1px solid var(--neon-cyan);
+            color: var(--neon-cyan);
+            padding: 12px 24px;
+            cursor: pointer;
+            font-family: inherit;
+            font-weight: bold;
+            border-radius: 4px;
+            transition: all 0.3s;
+        }
+
+        button:hover {
+            background-color: var(--neon-cyan);
+            color: #000;
+            box-shadow: 0 0 15px var(--neon-cyan);
+        }
+
+        .status {
+            margin-top: 15px;
+            font-weight: bold;
+            font-size: 1rem;
+        }
+
+        .success { color: var(--terminal-green); }
+        .error { color: #ff3333; }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <h1>[ CYBER LAW FORENSICS // TRIAGEM DE INCIDENTES ]</h1>
+        <div class="subtitle">LAB CTF: CLASSIFICAÇÃO DOUTRINÁRIA DE CRIMES DIGITAIS</div>
+    </div>
+
+    <div class="container">
+
+        <div class="challenge-card">
+            <div class="drag-instructions">
+                <strong>Instruções do Caso Técnico:</strong> Analise as condutas criminosas listadas abaixo. Arraste e solte cada cenário para o quadrante legal correto baseado nas definições da doutrina penal brasileira:<br><br>
+                • <strong>Crime Puro:</strong> A conduta ilícita ataca diretamente a integridade ou disponibilidade do computador/sistema.<br>
+                • <strong>Crime Misto:</strong> O meio digital é usado para obter outros bens, dados pessoais ou ativos financeiros da vítima (Ex: Phishing).<br>
+                • <strong>Crime Comum:</strong> Utiliza a internet ou ferramentas digitais apenas como meio para cometer crimes que já existem tradicionalmente no Código Penal (Ex: Ameaça).
+            </div>
+
+            <div class="main-layout">
+                
+                <div class="pool-section">
+                    <h4>Cenários Criminosos Ocorridos</h4>
+                    <div class="drop-zone pool-zone" id="pool">
+                        <div class="drag-item" draggable="true" id="c-deface">Atacante realiza um Defacement (alteração de página inicial) no servidor web da instituição.</div>
+                        <div class="drag-item" draggable="true" id="c-phishing">Envio em massa de e-mails falsos imitando um banco para induzir correntistas a digitar senhas financeiras.</div>
+                        <div class="drag-item" draggable="true" id="c-ameaca">Ex-funcionário envia mensagens contendo ameaças de agressão física à diretoria através do chat corporativo.</div>
+                        <div class="drag-item" draggable="true" id="c-ddos">Disparo de ataque de negação de serviço (DDoS) para derrubar e indisponibilizar um portal de e-commerce.</div>
+                        <div class="drag-item" draggable="true" id="c-ransomware">Infecção por Ransomware focado estritamente em destruir/criptografar o banco de dados do sistema operacional.</div>
+                        <div class="drag-item" draggable="true" id="c-injuria">Invasor publica declarações difamatórias e injuriosas contra um coordenador utilizando um perfil falso no Instagram.</div>
+                        <div class="drag-item" draggable="true" id="c-malware-bancario">Desenvolvimento e disseminação de um cavalo de troia (Spyware) projetado para capturar credenciais de Pix e desviar dinheiro de contas.</div>
+                    </div>
+                </div>
+
+                <div class="targets-grid">
+                    
+                    <div class="target-column">
+                        <h4 class="pure-header">CRIME PURO</h4>
+                        <div class="drop-zone" id="target-pure"></div>
+                    </div>
+
+                    <div class="target-column">
+                        <h4 class="misto-header">CRIME MISTO</h4>
+                        <div class="drop-zone" id="target-mixed"></div>
+                    </div>
+
+                    <div class="target-column">
+                        <h4 class="comum-header">CRIME COMUM</h4>
+                        <div class="drop-zone" id="target-common"></div>
+                    </div>
+
+                </div>
+
+            </div>
+
+            <div class="btn-group">
+                <button onclick="validateCrimeClassification()">VERIFICAR ENQUADRAMENTO LEGAL</button>
+            </div>
+            <div class="status" id="status-msg"></div>
+        </div>
+
+    </div>
+
+    <script>
+        const items = document.querySelectorAll('.drag-item');
+        const zones = document.querySelectorAll('.drop-zone');
+        let draggedItem = null;
+
+        items.forEach(item => {
+            item.addEventListener('dragstart', function() { draggedItem = this; });
+        });
+
+        zones.forEach(zone => {
+            zone.addEventListener('dragover', function(e) { e.preventDefault(); });
+            zone.addEventListener('dragenter', function(e) { e.preventDefault(); this.classList.add('over'); });
+            zone.addEventListener('dragleave', function() { this.classList.remove('over'); });
+            zone.addEventListener('drop', function() { 
+                this.classList.remove('over'); 
+                this.appendChild(draggedItem); 
+            });
+        });
+
+        function validateCrimeClassification() {
+            const pureZone = document.getElementById('target-pure');
+            const mixedZone = document.getElementById('target-mixed');
+            const commonZone = document.getElementById('target-common');
+            const statusDiv = document.getElementById('status-msg');
+
+            // Mapeamento correto dos IDs dos cenários
+            const correctPure = ['c-deface', 'c-ddos', 'c-ransomware'];
+            const correctMixed = ['c-phishing', 'c-malware-bancario'];
+            const correctCommon = ['c-ameaca', 'c-injuria'];
+
+            const currentPure = Array.from(pureZone.children).map(c => c.id);
+            const currentMixed = Array.from(mixedZone.children).map(c => c.id);
+            const currentCommon = Array.from(commonZone.children).map(c => c.id);
+
+            // Validação das listas correspondentes
+            const isPureCorrect = correctPure.length === currentPure.length && correctPure.every(id => currentPure.includes(id));
+            const isMixedCorrect = correctMixed.length === currentMixed.length && correctMixed.every(id => currentMixed.includes(id));
+            const isCommonCorrect = correctCommon.length === currentCommon.length && correctCommon.every(id => currentCommon.includes(id));
+
+            if (isPureCorrect && isMixedCorrect && isCommonCorrect) {
+                statusDiv.className = "status success";
+                statusDiv.innerHTML = "[+] ACCESS GRANTED: Tipificação jurídica perfeitamente validada! Ótimo trabalho forense.";
+            } else {
+                statusDiv.className = "status error";
+                statusDiv.innerHTML = "[-] ACCESS DENIED: Enquadramento incorreto detectado. Revise os conceitos de crime Puro, Misto e Comum.";
+            }
+        }
+    </script>
+</body>
+</html>

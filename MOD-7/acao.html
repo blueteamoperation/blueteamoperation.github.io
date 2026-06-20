@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CYBER FORENSICS // ACTION VS OFFENSE</title>
+    <style>
+        :root {
+            --neon-cyan: #00f0ff;
+            --neon-magenta: #ff007f;
+            --dark-bg: #09090e;
+            --card-bg: #111122;
+            --terminal-green: #39ff14;
+            --warning-amber: #ffb700;
+        }
+
+        body {
+            background-color: var(--dark-bg);
+            color: #ffffff;
+            font-family: 'Courier New', Courier, monospace;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            border-bottom: 2px dashed var(--neon-cyan);
+            padding-bottom: 20px;
+            width: 100%;
+            max-width: 1100px;
+        }
+
+        h1 {
+            color: var(--neon-cyan);
+            text-shadow: 0 0 10px var(--neon-cyan);
+            font-size: 2rem;
+            margin: 0;
+        }
+
+        .subtitle {
+            color: var(--neon-magenta);
+            font-weight: bold;
+            letter-spacing: 2px;
+            margin-top: 5px;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1100px;
+        }
+
+        .challenge-card {
+            background-color: var(--card-bg);
+            border: 1px solid #1f1f3a;
+            border-left: 5px solid var(--neon-magenta);
+            border-radius: 4px;
+            padding: 20px;
+            margin-bottom: 25px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.6);
+        }
+
+        .drag-instructions {
+            margin-bottom: 20px;
+            color: #ccc;
+            font-size: 0.95rem;
+            line-height: 1.5;
+        }
+
+        .main-layout {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .pool-section {
+            background: #05050a;
+            border: 1px dashed #222244;
+            padding: 15px;
+            border-radius: 4px;
+        }
+
+        .pool-section h4 {
+            margin-top: 0;
+            color: var(--warning-amber);
+            border-bottom: 1px solid #222244;
+            padding-bottom: 8px;
+        }
+
+        .pool-zone {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            min-height: 100px;
+            padding: 10px;
+        }
+
+        .targets-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+        }
+
+        .target-column {
+            background: #0b0b18;
+            border: 1px solid #1f1f3a;
+            padding: 15px;
+            border-radius: 4px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .target-column h4 {
+            margin-top: 0;
+            text-align: center;
+            padding-bottom: 8px;
+            border-bottom: 1px solid #1f1f3a;
+            font-size: 1rem;
+        }
+
+        .acao-header { color: var(--neon-cyan); }
+        .delito-header { color: var(--neon-magenta); }
+
+        .drop-zone {
+            min-height: 300px;
+            background: #040409;
+            border: 2px dotted #15152a;
+            border-radius: 4px;
+            padding: 10px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .drop-zone.over {
+            border-color: var(--terminal-green);
+            background: #081408;
+        }
+
+        .drag-item {
+            background: #12122d;
+            border: 1px solid #2d2d5a;
+            padding: 12px;
+            border-radius: 4px;
+            cursor: grab;
+            user-select: none;
+            font-size: 0.85rem;
+            line-height: 1.4;
+        }
+
+        .btn-group {
+            display: flex;
+            justify-content: flex-end;
+            margin-top: 20px;
+        }
+
+        button {
+            background-color: transparent;
+            border: 1px solid var(--neon-cyan);
+            color: var(--neon-cyan);
+            padding: 12px 24px;
+            cursor: pointer;
+            font-family: inherit;
+            font-weight: bold;
+            border-radius: 4px;
+        }
+
+        button:hover {
+            background-color: var(--neon-cyan);
+            color: #000;
+            box-shadow: 0 0 15px var(--neon-cyan);
+        }
+
+        .status {
+            margin-top: 15px;
+            font-weight: bold;
+            font-size: 1rem;
+            text-align: center;
+        }
+
+        .success { color: var(--terminal-green); }
+        .error { color: #ff3333; }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <h1>[ CYBER FORENSICS // CONDUTA E TIPIFICAÇÃO ]</h1>
+        <div class="subtitle">LAB CTF: ESTRUTURAÇÃO MATERIAL E METODOLÓGICA</div>
+    </div>
+
+    <div class="container">
+
+        <div class="challenge-card">
+            <div class="drag-instructions">
+                <strong>Análise Técnica e Jurídica:</strong> Separe as ações estritamente de execução técnica dos delitos tipificados por lei. Os artefatos foram completamente embaralhados na origem para auditoria. Mova cada bloco para seu quadrante correto.
+            </div>
+
+            <div class="main-layout">
+                
+                <div class="pool-section">
+                    <h4>Evidências e Laudos de Triagem</h4>
+                    <div class="drop-zone pool-zone" id="pool">
+                        <div class="drag-item" draggable="true" id="del-invasao">Invasão de dispositivo informático (Art. 154-A do Código Penal brasileiro).</div>
+                        <div class="drag-item" draggable="true" id="act-brute">Exploração ativa de força bruta (Brute Force) contra credenciais administrativas via protocolo SSH.</div>
+                        <div class="drag-item" draggable="true" id="del-extorsao">Extorsão ou chantagem financeira condicionada à devolução do acesso aos sistemas corporativos.</div>
+                        <div class="drag-item" draggable="true" id="act-sql">Injeção de comandos arbitrários em banco de dados (SQL Injection) via parâmetros vulneráveis na URL.</div>
+                        <div class="drag-item" draggable="true" id="del-furto">Furto de propriedade intelectual, dados pessoais e segredos comerciais armazenados.</div>
+                        <div class="drag-item" draggable="true" id="act-spoofing">Falsificação de cabeçalhos de pacotes ou mensagens (Spoofing) para mascarar a verdadeira origem de conexões.</div>
+                        <div class="drag-item" draggable="true" id="del-ameaca">Crime formal de Ameaça ou intimidação eletrônica direta através de mensagens internas.</div>
+                        <div class="drag-item" draggable="true" id="act-phishing">Envio e engenharia social baseada em mensagens fraudulentas para forçar o clique do usuário.</div>
+                    </div>
+                </div>
+
+                <div class="targets-grid">
+                    
+                    <div class="target-column">
+                        <h4 class="acao-header">AÇÃO (Execução e Modus Operandi Técnico)</h4>
+                        <div class="drop-zone" id="target-acao"></div>
+                    </div>
+
+                    <div class="target-column">
+                        <h4 class="delito-header">DELITO (Enquadramento Legal e Tipificação)</h4>
+                        <div class="drop-zone" id="target-delito"></div>
+                    </div>
+
+                </div>
+
+            </div>
+
+            <div class="btn-group">
+                <button onclick="validateActionOffenseChain()">HOMOLOGAR MATRIZ PERICIAL</button>
+            </div>
+            <div class="status" id="status-msg"></div>
+        </div>
+
+    </div>
+
+    <script>
+        const items = document.querySelectorAll('.drag-item');
+        const zones = document.querySelectorAll('.drop-zone');
+        let draggedItem = null;
+
+        items.forEach(item => {
+            item.addEventListener('dragstart', function() { draggedItem = this; });
+        });
+
+        zones.forEach(zone => {
+            zone.addEventListener('dragover', function(e) { e.preventDefault(); });
+            zone.addEventListener('dragenter', function(e) { e.preventDefault(); this.classList.add('over'); });
+            zone.addEventListener('dragleave', function() { this.classList.remove('over'); });
+            zone.addEventListener('drop', function() { 
+                this.classList.remove('over'); 
+                this.appendChild(draggedItem); 
+            });
+        });
+
+        function validateActionOffenseChain() {
+            const acaoZone = document.getElementById('target-acao');
+            const delitoZone = document.getElementById('target-delito');
+            const statusDiv = document.getElementById('status-msg');
+
+            // Mapeamento das listas correspondentes
+            const expectedAcoes = ['act-brute', 'act-sql', 'act-spoofing', 'act-phishing'];
+            const expectedDelitos = ['del-invasao', 'del-extorsao', 'del-furto', 'del-ameaca'];
+
+            const currentAcoes = Array.from(acaoZone.children).map(c => c.id);
+            const currentDelitos = Array.from(delitoZone.children).map(c => c.id);
+
+            const isAcaoCorrect = expectedAcoes.length === currentAcoes.length && expectedAcoes.every(id => currentAcoes.includes(id));
+            const isDelitoCorrect = expectedDelitos.length === currentDelitos.length && expectedDelitos.every(id => currentDelitos.includes(id));
+
+            if (isAcaoCorrect && isDelitoCorrect) {
+                statusDiv.className = "status success";
+                statusDiv.innerHTML = "[+] ACCESS GRANTED: Matriz de auditoria perfeitamente estabelecida e validada!";
+            } else {
+                statusDiv.className = "status error";
+                statusDiv.innerHTML = "[-] ACCESS DENIED: Erro detectado. Certifique-se de separar a execução técnica da tipificação jurídica.";
+            }
+        }
+    </script>
+</body>
+</html>

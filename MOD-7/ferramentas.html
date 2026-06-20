@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DFIR // FORENSIC TOOLKIT CHALLENGE</title>
+    <style>
+        :root {
+            --neon-cyan: #00f0ff;
+            --neon-magenta: #ff007f;
+            --dark-bg: #09090e;
+            --card-bg: #111122;
+            --terminal-green: #39ff14;
+            --warning-amber: #ffb700;
+        }
+
+        body {
+            background-color: var(--dark-bg);
+            color: #ffffff;
+            font-family: 'Courier New', Courier, monospace;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            border-bottom: 2px dashed var(--neon-cyan);
+            padding-bottom: 20px;
+            width: 100%;
+            max-width: 1200px;
+        }
+
+        h1 {
+            color: var(--neon-cyan);
+            text-shadow: 0 0 10px var(--neon-cyan);
+            font-size: 2rem;
+            margin: 0;
+        }
+
+        .subtitle {
+            color: var(--neon-magenta);
+            font-weight: bold;
+            letter-spacing: 2px;
+            margin-top: 5px;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1200px;
+        }
+
+        .challenge-card {
+            background-color: var(--card-bg);
+            border: 1px solid #1f1f3a;
+            border-left: 5px solid var(--neon-magenta);
+            border-radius: 4px;
+            padding: 20px;
+            margin-bottom: 25px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.6);
+        }
+
+        .instructions {
+            margin-bottom: 20px;
+            color: #ccc;
+            font-size: 0.95rem;
+            line-height: 1.5;
+        }
+
+        .instructions strong {
+            color: var(--warning-amber);
+        }
+
+        .pool-section {
+            background: #05050a;
+            border: 1px dashed #222244;
+            padding: 15px;
+            border-radius: 4px;
+            margin-bottom: 25px;
+        }
+
+        .pool-section h4 {
+            margin-top: 0;
+            color: var(--warning-amber);
+            border-bottom: 1px solid #222244;
+            padding-bottom: 8px;
+        }
+
+        .pool-zone {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            min-height: 80px;
+            padding: 10px;
+        }
+
+        .targets-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+            margin-bottom: 25px;
+        }
+
+        @media (max-width: 768px) {
+            .targets-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .target-column {
+            background: #0b0b18;
+            border: 1px solid #1f1f3a;
+            padding: 15px;
+            border-radius: 4px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .target-column h4 {
+            margin-top: 0;
+            text-align: center;
+            padding-bottom: 8px;
+            border-bottom: 1px solid #1f1f3a;
+            color: var(--neon-cyan);
+            font-size: 0.95rem;
+        }
+
+        .drop-zone {
+            min-height: 100px;
+            background: #040409;
+            border: 2px dotted #15152a;
+            border-radius: 4px;
+            padding: 10px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            align-content: flex-start;
+        }
+
+        .drop-zone.over {
+            border-color: var(--terminal-green);
+            background: #081408;
+        }
+
+        .drag-item {
+            background: #12122d;
+            border: 1px solid #2d2d5a;
+            padding: 8px 12px;
+            border-radius: 4px;
+            cursor: grab;
+            user-select: none;
+            font-size: 0.85rem;
+            transition: background 0.2s;
+        }
+
+        .drag-item:active {
+            cursor: grabbing;
+        }
+
+        .btn-group {
+            display: flex;
+            justify-content: flex-end;
+        }
+
+        button {
+            background-color: transparent;
+            border: 1px solid var(--neon-cyan);
+            color: var(--neon-cyan);
+            padding: 12px 24px;
+            cursor: pointer;
+            font-family: inherit;
+            font-weight: bold;
+            border-radius: 4px;
+            transition: all 0.3s;
+        }
+
+        button:hover {
+            background-color: var(--neon-cyan);
+            color: #000;
+            box-shadow: 0 0 15px var(--neon-cyan);
+        }
+
+        .status {
+            margin-top: 15px;
+            font-weight: bold;
+            font-size: 1rem;
+            text-align: center;
+        }
+
+        .success { color: var(--terminal-green); }
+        .error { color: #ff3333; }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <h1>[ DFIR FORENSIC TOOLKIT CHALLENGE ]</h1>
+        <div class="subtitle">LAB CTF: CLASSIFICAÇÃO DE ARSENAL E FERRAMENTAL</div>
+    </div>
+
+    <div class="container">
+
+        <div class="challenge-card">
+            <div class="instructions">
+                <strong>Instruções do Exercício:</strong> Abaixo está uma listagem misturada de ferramentas utilizadas no dia a dia por analistas de Resposta a Incidentes (IR) e Peritos Digitais. Arraste cada ferramenta para sua respectiva categoria de atuação forense e valide o arsenal.
+            </div>
+
+            <div class="pool-section">
+                <h4>Arsenal de Ferramentas Modulares</h4>
+                <div class="drop-zone pool-zone" id="pool">
+                    <div class="drag-item" draggable="true" id="t-ftk">FTK Imager</div>
+                    <div class="drag-item" draggable="true" id="t-dc3dd">dc3dd</div>
+                    <div class="drag-item" draggable="true" id="t-autopsy">Autopsy</div>
+                    <div class="drag-item" draggable="true" id="t-bulk">Bulk Extractor</div>
+                    <div class="drag-item" draggable="true" id="t-volatility">Volatility</div>
+                    <div class="drag-item" draggable="true" id="t-lime">LiME</div>
+                    <div class="drag-item" draggable="true" id="t-wireshark">Wireshark</div>
+                    <div class="drag-item" draggable="true" id="t-netminer">NetworkMiner</div>
+                    <div class="drag-item" draggable="true" id="t-cellebrite">Cellebrite UFED</div>
+                    <div class="drag-item" draggable="true" id="t-mobsf">MobSF</div>
+                    <div class="drag-item" draggable="true" id="t-chainsaw">Chainsaw</div>
+                    <div class="drag-item" draggable="true" id="t-plaso">Log2Timeline / Plaso</div>
+                    <div class="drag-item" draggable="true" id="t-yara">YARA</div>
+                    <div class="drag-item" draggable="true" id="t-cuckoo">Cuckoo Sandbox</div>
+                    <div class="drag-item" draggable="true" id="t-hashdeep">Hashdeep</div>
+                    <div class="drag-item" draggable="true" id="t-sha256">sha256sum</div>
+                </div>
+            </div>
+
+            <div class="targets-grid">
+                
+                <div class="target-column">
+                    <h4>AQUISIÇÃO DE DISCO E IMAGEM</h4>
+                    <div class="drop-zone" id="cat-acq"></div>
+                </div>
+
+                <div class="target-column">
+                    <h4>ANÁLISE DE DISCO E ARQUIVOS</h4>
+                    <div class="drop-zone" id="cat-disk"></div>
+                </div>
+
+                <div class="target-column">
+                    <h4>ANÁLISE DE MEMÓRIA (RAM)</h4>
+                    <div class="drop-zone" id="cat-ram"></div>
+                </div>
+
+                <div class="target-column">
+                    <h4>ANÁLISE DE TRÁFEGO DE REDE</h4>
+                    <div class="drop-zone" id="cat-net"></div>
+                </div>
+
+                <div class="target-column">
+                    <h4>DISPOSITIVOS MÓVEIS</h4>
+                    <div class="drop-zone" id="cat-mobile"></div>
+                </div>
+
+                <div class="target-column">
+                    <h4>ANÁLISE DE LOGS E TIMELINE</h4>
+                    <div class="drop-zone" id="cat-logs"></div>
+                </div>
+
+                <div class="target-column">
+                    <h4>ANÁLISE DE MALWARE E ARTEFATOS</h4>
+                    <div class="drop-zone" id="cat-malware"></div>
+                </div>
+
+                <div class="target-column">
+                    <h4>HASHING E INTEGRIDADE</h4>
+                    <div class="drop-zone" id="cat-hash"></div>
+                </div>
+
+            </div>
+
+            <div class="btn-group">
+                <button onclick="validateToolkit()">HOMOLOGAR ARSENAL FORENSE</button>
+            </div>
+            <div class="status" id="status-msg"></div>
+        </div>
+
+    </div>
+
+    <script>
+        const items = document.querySelectorAll('.drag-item');
+        const zones = document.querySelectorAll('.drop-zone');
+        let draggedItem = null;
+
+        items.forEach(item => {
+            item.addEventListener('dragstart', function() { draggedItem = this; });
+        });
+
+        zones.forEach(zone => {
+            zone.addEventListener('dragover', function(e) { e.preventDefault(); });
+            zone.addEventListener('dragenter', function(e) { e.preventDefault(); this.classList.add('over'); });
+            zone.addEventListener('dragleave', function() { this.classList.remove('over'); });
+            zone.addEventListener('drop', function() { 
+                this.classList.remove('over'); 
+                this.appendChild(draggedItem); 
+            });
+        });
+
+        function validateToolkit() {
+            // Gabarito contendo o mapeamento exato de quais IDs pertencem a cada container
+            const solution = {
+                'cat-acq': ['t-ftk', 't-dc3dd'],
+                'cat-disk': ['t-autopsy', 't-bulk'],
+                'cat-ram': ['t-volatility', 't-lime'],
+                'cat-net': ['t-wireshark', 't-netminer'],
+                'cat-mobile': ['t-cellebrite', 't-mobsf'],
+                'cat-logs': ['t-chainsaw', 't-plaso'],
+                'cat-malware': ['t-yara', 't-cuckoo'],
+                'cat-hash': ['t-hashdeep', 't-sha256']
+            };
+
+            let allCorrect = true;
+
+            for (const [zoneId, expectedIds] of Object.entries(solution)) {
+                const zoneElement = document.getElementById(zoneId);
+                const currentIds = Array.from(zoneElement.children).map(child => child.id);
+
+                // Valida se a quantidade bate e se todos os IDs obrigatórios estão lá dentro
+                const matchCount = expectedIds.length === currentIds.length;
+                const matchContent = expectedIds.every(id => currentIds.includes(id));
+
+                if (!matchCount || !matchContent) {
+                    allCorrect = false;
+                    break;
+                }
+            }
+
+            const statusDiv = document.getElementById('status-msg');
+            if (allCorrect) {
+                statusDiv.className = "status success";
+                statusDiv.innerHTML = "[+] ACCESS GRANTED: Kit de ferramentas homologado com sucesso! Mapeamento perfeito.";
+            } else {
+                statusDiv.className = "status error";
+                statusDiv.innerHTML = "[-] ACCESS DENIED: Arsenal desalinhado. Existem ferramentas alocadas em categorias incorretas.";
+            }
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DFIR // FORENSIC PROCESS STEP-BY-STEP</title>
+    <style>
+        :root {
+            --neon-cyan: #00f0ff;
+            --neon-magenta: #ff007f;
+            --dark-bg: #09090e;
+            --card-bg: #111122;
+            --terminal-green: #39ff14;
+            --warning-amber: #ffb700;
+        }
+
+        body {
+            background-color: var(--dark-bg);
+            color: #ffffff;
+            font-family: 'Courier New', Courier, monospace;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            border-bottom: 2px dashed var(--neon-cyan);
+            padding-bottom: 20px;
+            width: 100%;
+            max-width: 1000px;
+        }
+
+        h1 {
+            color: var(--neon-cyan);
+            text-shadow: 0 0 10px var(--neon-cyan);
+            font-size: 2rem;
+            margin: 0;
+        }
+
+        .subtitle {
+            color: var(--neon-magenta);
+            font-weight: bold;
+            letter-spacing: 2px;
+            margin-top: 5px;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1000px;
+        }
+
+        .challenge-card {
+            background-color: var(--card-bg);
+            border: 1px solid #1f1f3a;
+            border-left: 5px solid var(--neon-magenta);
+            border-radius: 4px;
+            padding: 20px;
+            margin-bottom: 25px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.6);
+        }
+
+        .drag-instructions {
+            margin-bottom: 15px;
+            color: #ccc;
+            font-size: 0.95rem;
+            line-height: 1.5;
+        }
+
+        .drag-instructions strong {
+            color: var(--warning-amber);
+        }
+
+        .drag-container {
+            display: flex;
+            gap: 20px;
+            margin-top: 15px;
+            width: 100%;
+        }
+
+        .drag-column {
+            flex: 1;
+            background: #05050a;
+            border: 1px dashed #222244;
+            padding: 15px;
+            border-radius: 4px;
+        }
+
+        .drag-column h4 {
+            margin-top: 0;
+            color: var(--warning-amber);
+            text-align: center;
+            border-bottom: 1px solid #222244;
+            padding-bottom: 8px;
+        }
+
+        .drag-item {
+            background: #1a1a3a;
+            border: 1px solid var(--neon-cyan);
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 4px;
+            cursor: grab;
+            user-select: none;
+            font-size: 0.85rem;
+            line-height: 1.4;
+        }
+
+        .drop-zone {
+            min-height: 380px;
+            background: #0c0c1c;
+            border: 2px dotted #1f1f3a;
+            border-radius: 4px;
+            padding: 10px;
+        }
+
+        .drop-zone.over {
+            border-color: var(--neon-magenta);
+            background: #150b1e;
+        }
+
+        .btn-group {
+            display: flex;
+            justify-content: flex-end;
+            margin-top: 15px;
+        }
+
+        button {
+            background-color: transparent;
+            border: 1px solid var(--neon-magenta);
+            color: var(--neon-magenta);
+            padding: 10px 20px;
+            cursor: pointer;
+            font-family: inherit;
+            font-weight: bold;
+            border-radius: 4px;
+            transition: all 0.3s;
+        }
+
+        button:hover {
+            background-color: var(--neon-magenta);
+            color: #000;
+            box-shadow: 0 0 15px var(--neon-magenta);
+        }
+
+        .status {
+            margin-top: 10px;
+            font-weight: bold;
+            font-size: 0.95rem;
+            text-align: center;
+        }
+
+        .success { color: var(--terminal-green); }
+        .error { color: #ff3333; }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <h1>[ FORENSIC METHODOLOGY // METODOLOGIA CIENTÍFICA ]</h1>
+        <div class="subtitle">LAB CTF: ETAPAS DO PROCESSO FORENSE DIGITAL</div>
+    </div>
+
+    <div class="container">
+
+        <div class="challenge-card">
+            <h3>#01 - Alinhamento de Linha de Processamento (ISO 27037 / NIST)</h3>
+            <div class="drag-instructions">
+                Arraste as fases do processo forense presentes no laudo e ordene-as na coluna da direita **cronologicamente**, do início do incidente (topo) até o encerramento legal da perícia (base):
+            </div>
+
+            <div class="drag-container">
+                <div class="drag-column">
+                    <h4>Fases Desordenadas</h4>
+                    <div class="drop-zone" id="pool-zone">
+                        <div class="drag-item" draggable="true" id="phase-coleta">Coleta (Extração física/lógica e content carving dos dados)</div>
+                        <div class="drag-item" draggable="true" id="phase-apresentacao">Apresentação / Laudo (Redação do relatório pericial descritivo final)</div>
+                        <div class="drag-item" draggable="true" id="phase-identificacao">Identificação (Reconhecimento, mapeamento do escopo e busca por fontes de dados)</div>
+                        <div class="drag-item" draggable="true" id="phase-analise">Análise (Cruzamento de dados, timeline, engenharia reversa e quebra de criptografia)</div>
+                        <div class="drag-item" draggable="true" id="phase-preservacao">Preservação (Geração de hashes md5/sha256 e garantia de imutabilidade com cadeia de custódia)</div>
+                    </div>
+                </div>
+
+                <div class="drag-column">
+                    <h4>Fluxo Cronológico Pericial (Início no Topo)</h4>
+                    <div class="drop-zone" id="target-zone"></div>
+                </div>
+            </div>
+
+            <div class="btn-group">
+                <button onclick="validateForensicProcess()">VALIDAR FLUXO METODOLÓGICO</button>
+            </div>
+            <div class="status" id="status-msg"></div>
+        </div>
+
+    </div>
+
+    <script>
+        const items = document.querySelectorAll('.drag-item');
+        const zones = document.querySelectorAll('.drop-zone');
+        let draggedItem = null;
+
+        items.forEach(item => {
+            item.addEventListener('dragstart', function() { draggedItem = this; });
+        });
+
+        zones.forEach(zone => {
+            zone.addEventListener('dragover', function(e) { e.preventDefault(); });
+            zone.addEventListener('dragenter', function(e) { e.preventDefault(); this.classList.add('over'); });
+            zone.addEventListener('dragleave', function() { this.classList.remove('over'); });
+            zone.addEventListener('drop', function() { this.classList.remove('over'); this.appendChild(draggedItem); });
+        });
+
+        function validateForensicProcess() {
+            const targetZone = document.getElementById('target-zone');
+            const statusDiv = document.getElementById('status-msg');
+            
+            // Ordem cronológica exata das 5 fases
+            const expectedSequence = [
+                'phase-identificacao',
+                'phase-coleta',
+                'phase-preservacao',
+                'phase-analise',
+                'phase-apresentacao'
+            ];
+
+            const currentSequence = Array.from(targetZone.children).map(child => child.id);
+
+            const isCorrect = expectedSequence.length === currentSequence.length && 
+                              expectedSequence.every((value, index) => value === currentSequence[index]);
+
+            if (isCorrect) {
+                statusDiv.className = "status success";
+                statusDiv.innerHTML = "[+] ACCESS GRANTED: Metodologia e processo forense validados com sucesso! Rigor científico mantido.";
+            } else {
+                statusDiv.className = "status error";
+                statusDiv.innerHTML = "[-] ACCESS DENIED: Inversão de fases detectada. Alterar a ordem invalida o laudo e contamina o processo legal.";
+            }
+        }
+    </script>
+</body>
+</html>

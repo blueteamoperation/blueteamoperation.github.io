@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CYBER LAW // NORMAS NACIONAIS BRASIL</title>
+    <style>
+        :root {
+            --neon-cyan: #00f0ff;
+            --neon-magenta: #ff007f;
+            --dark-bg: #09090e;
+            --card-bg: #111122;
+            --terminal-green: #39ff14;
+            --warning-amber: #ffb700;
+        }
+
+        body {
+            background-color: var(--dark-bg);
+            color: #ffffff;
+            font-family: 'Courier New', Courier, monospace;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            border-bottom: 2px dashed var(--neon-cyan);
+            padding-bottom: 20px;
+            width: 100%;
+            max-width: 1000px;
+        }
+
+        h1 {
+            color: var(--neon-cyan);
+            text-shadow: 0 0 10px var(--neon-cyan);
+            font-size: 2rem;
+            margin: 0;
+        }
+
+        .subtitle {
+            color: var(--neon-magenta);
+            font-weight: bold;
+            letter-spacing: 2px;
+            margin-top: 5px;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1000px;
+        }
+
+        .challenge-card {
+            background-color: var(--card-bg);
+            border: 1px solid #1f1f3a;
+            border-left: 5px solid var(--neon-magenta);
+            border-radius: 4px;
+            padding: 20px;
+            margin-bottom: 25px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.6);
+        }
+
+        .instructions {
+            margin-bottom: 20px;
+            color: #ccc;
+            font-size: 0.95rem;
+            line-height: 1.5;
+        }
+
+        .instructions strong {
+            color: var(--warning-amber);
+        }
+
+        .main-layout {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .pool-section {
+            background: #05050a;
+            border: 1px dashed #222244;
+            padding: 15px;
+            border-radius: 4px;
+        }
+
+        .pool-section h4 {
+            margin-top: 0;
+            color: var(--warning-amber);
+            border-bottom: 1px solid #222244;
+            padding-bottom: 8px;
+        }
+
+        .pool-zone {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            min-height: 80px;
+            padding: 10px;
+        }
+
+        .targets-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .target-row {
+            background: #0b0b18;
+            border: 1px solid #1f1f3a;
+            padding: 15px;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .target-label {
+            width: 35%;
+            font-weight: bold;
+            color: var(--neon-cyan);
+            font-size: 0.9rem;
+            line-height: 1.3;
+        }
+
+        .drop-zone {
+            flex: 1;
+            min-height: 60px;
+            background: #040409;
+            border: 2px dotted #15152a;
+            border-radius: 4px;
+            padding: 10px;
+            display: flex;
+            align-items: center;
+        }
+
+        .drop-zone.over {
+            border-color: var(--terminal-green);
+            background: #081408;
+        }
+
+        .drag-item {
+            background: #12122d;
+            border: 1px solid #2d2d5a;
+            padding: 10px;
+            border-radius: 4px;
+            cursor: grab;
+            user-select: none;
+            font-size: 0.85rem;
+            line-height: 1.4;
+            width: 100%;
+        }
+
+        .btn-group {
+            display: flex;
+            justify-content: flex-end;
+            margin-top: 20px;
+        }
+
+        button {
+            background-color: transparent;
+            border: 1px solid var(--neon-cyan);
+            color: var(--neon-cyan);
+            padding: 12px 24px;
+            cursor: pointer;
+            font-family: inherit;
+            font-weight: bold;
+            border-radius: 4px;
+            transition: all 0.3s;
+        }
+
+        button:hover {
+            background-color: var(--neon-cyan);
+            color: #000;
+            box-shadow: 0 0 15px var(--neon-cyan);
+        }
+
+        .status {
+            margin-top: 15px;
+            font-weight: bold;
+            font-size: 1rem;
+            text-align: center;
+        }
+
+        .success { color: var(--terminal-green); }
+        .error { color: #ff3333; }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <h1>[ CYBER LAW // NORMAS NACIONAIS ]</h1>
+        <div class="subtitle">LAB CTF: MARCO LEGAL DA COMPUTAÇÃO FORENSE NO BRASIL</div>
+    </div>
+
+    <div class="container">
+
+        <div class="challenge-card">
+            <div class="instructions">
+                <strong>Análise Legal Forense:</strong> Correlacione as legislações vigentes e normas regulatórias do Brasil com seus respectivos escopos e impactos na atuação pericial eletrônica. Arraste a definição/impacto para o bloco da lei correspondente.
+            </div>
+
+            <div class="main-layout">
+                
+                <div class="pool-section">
+                    <h4>Diretrizes e Escopos Legais</h4>
+                    <div class="drop-zone pool-zone" id="pool">
+                        <div class="drag-item" draggable="true" id="escopo-dieckmann">Define crimes relacionados à invasão de dispositivos informáticos e estabelece penalidades criminais para violação de mecanismos de segurança.</div>
+                        <div class="drag-item" draggable="true" id="escopo-marco">Estabelece direitos e responsabilidades para o uso da internet no Brasil e diretrizes operacionais para preservação de registros de conexão e de acesso a aplicações.</div>
+                        <div class="drag-item" draggable="true" id="escopo-cpp">Dispõe sobre a necessidade de perícia técnica em crimes que deixam vestígios e sobre o papel do perito na obtenção de provas com integridade.</div>
+                        <div class="drag-item" draggable="true" id="escopo-cnj">Trata especificamente das diretrizes institucionais para o uso, coleta e admissibilidade de provas eletrônicas no âmbito do Poder Judiciário.</div>
+                    </div>
+                </div>
+
+                <div class="targets-grid">
+                    
+                    <div class="target-row">
+                        <div class="target-label">Lei nº 12.737/2012<br>(Lei Carolina Dieckmann)</div>
+                        <div class="drop-zone" id="target-dieckmann"></div>
+                    </div>
+
+                    <div class="target-row">
+                        <div class="target-label">Marco Civil da Internet<br>(Lei nº 12.965/2014)</div>
+                        <div class="drop-zone" id="target-marco"></div>
+                    </div>
+
+                    <div class="target-row">
+                        <div class="target-label">Código de Processo Penal<br>(Art. 158 do CPP)</div>
+                        <div class="drop-zone" id="target-cpp"></div>
+                    </div>
+
+                    <div class="target-row">
+                        <div class="target-label">Resolução 231/2016<br>(Conselho Nacional de Justiça)</div>
+                        <div class="drop-zone" id="target-cnj"></div>
+                    </div>
+
+                </div>
+
+            </div>
+
+            <div class="btn-group">
+                <button onclick="validateLegalFramework()">HOMOLOGAR ENQUADRAMENTO LEGAL</button>
+            </div>
+            <div class="status" id="status-msg"></div>
+        </div>
+
+    </div>
+
+    <script>
+        const items = document.querySelectorAll('.drag-item');
+        const zones = document.querySelectorAll('.drop-zone');
+        let draggedItem = null;
+
+        items.forEach(item => {
+            item.addEventListener('dragstart', function() { draggedItem = this; });
+        });
+
+        zones.forEach(zone => {
+            zone.addEventListener('dragover', function(e) { e.preventDefault(); });
+            zone.addEventListener('dragenter', function(e) { e.preventDefault(); this.classList.add('over'); });
+            zone.addEventListener('dragleave', function() { this.classList.remove('over'); });
+            zone.addEventListener('drop', function() { 
+                this.classList.remove('over'); 
+                this.appendChild(draggedItem); 
+            });
+        });
+
+        function validateLegalFramework() {
+            // Mapeamento das chaves de associação corretas
+            const mapping = {
+                'target-dieckmann': 'escopo-dieckmann',
+                'target-marco': 'escopo-marco',
+                'target-cpp': 'escopo-cpp',
+                'target-cnj': 'escopo-cnj'
+            };
+
+            let allCorrect = true;
+
+            for (const [zoneId, expectedId] of Object.entries(mapping)) {
+                const zoneElement = document.getElementById(zoneId);
+                const firstChild = zoneElement.children[0];
+
+                if (!firstChild || firstChild.id !== expectedId) {
+                    allCorrect = false;
+                    break;
+                }
+            }
+
+            const statusDiv = document.getElementById('status-msg');
+            if (allCorrect) {
+                statusDiv.className = "status success";
+                statusDiv.innerHTML = "[+] ACCESS GRANTED: Enquadramento jurídico perfeitamente correlacionado e validado!";
+            } else {
+                statusDiv.className = "status error";
+                statusDiv.innerHTML = "[-] ACCESS DENIED: Associação incorreta. Revise as competências de cada norma nacional.";
+            }
+        }
+    </script>
+</body>
+</html>

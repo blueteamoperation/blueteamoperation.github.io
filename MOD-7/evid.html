@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DFIR // EVIDENCE CHAIN CHALLENGE</title>
+    <style>
+        :root {
+            --neon-cyan: #00f0ff;
+            --neon-magenta: #ff007f;
+            --dark-bg: #09090e;
+            --card-bg: #111122;
+            --terminal-green: #39ff14;
+            --warning-amber: #ffb700;
+        }
+
+        body {
+            background-color: var(--dark-bg);
+            color: #ffffff;
+            font-family: 'Courier New', Courier, monospace;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            border-bottom: 2px dashed var(--neon-cyan);
+            padding-bottom: 20px;
+            width: 100%;
+            max-width: 1000px;
+        }
+
+        h1 {
+            color: var(--neon-cyan);
+            text-shadow: 0 0 10px var(--neon-cyan);
+            font-size: 2rem;
+            margin: 0;
+        }
+
+        .subtitle {
+            color: var(--neon-magenta);
+            font-weight: bold;
+            letter-spacing: 2px;
+            margin-top: 5px;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1000px;
+        }
+
+        .challenge-card {
+            background-color: var(--card-bg);
+            border: 1px solid #1f1f3a;
+            border-left: 5px solid var(--neon-magenta);
+            border-radius: 4px;
+            padding: 20px;
+            margin-bottom: 25px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.6);
+        }
+
+        .instructions {
+            margin-bottom: 20px;
+            color: #ccc;
+            font-size: 0.95rem;
+            line-height: 1.5;
+        }
+
+        .instructions strong {
+            color: var(--warning-amber);
+        }
+
+        .main-layout {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .pool-section {
+            background: #05050a;
+            border: 1px dashed #222244;
+            padding: 15px;
+            border-radius: 4px;
+        }
+
+        .pool-section h4 {
+            margin-top: 0;
+            color: var(--warning-amber);
+            border-bottom: 1px solid #222244;
+            padding-bottom: 8px;
+        }
+
+        .pool-zone {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            min-height: 80px;
+            padding: 10px;
+        }
+
+        .targets-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+        }
+
+        .target-column {
+            background: #0b0b18;
+            border: 1px solid #1f1f3a;
+            padding: 15px;
+            border-radius: 4px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .target-column h4 {
+            margin-top: 0;
+            text-align: center;
+            padding-bottom: 8px;
+            border-bottom: 1px solid #1f1f3a;
+        }
+
+        .vestigio-header { color: var(--neon-cyan); }
+        .evidencia-header { color: var(--neon-magenta); }
+
+        .drop-zone {
+            min-height: 250px;
+            background: #040409;
+            border: 2px dotted #15152a;
+            border-radius: 4px;
+            padding: 10px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .drop-zone.over {
+            border-color: var(--terminal-green);
+            background: #081408;
+        }
+
+        .drag-item {
+            background: #12122d;
+            border: 1px solid #2d2d5a;
+            padding: 12px;
+            border-radius: 4px;
+            cursor: grab;
+            user-select: none;
+            font-size: 0.85rem;
+            line-height: 1.4;
+        }
+
+        .btn-group {
+            display: flex;
+            justify-content: flex-end;
+            margin-top: 20px;
+        }
+
+        button {
+            background-color: transparent;
+            border: 1px solid var(--neon-cyan);
+            color: var(--neon-cyan);
+            padding: 12px 24px;
+            cursor: pointer;
+            font-family: inherit;
+            font-weight: bold;
+            border-radius: 4px;
+            transition: all 0.3s;
+        }
+
+        button:hover {
+            background-color: var(--neon-cyan);
+            color: #000;
+            box-shadow: 0 0 15px var(--neon-cyan);
+        }
+
+        .status {
+            margin-top: 15px;
+            font-weight: bold;
+            font-size: 1rem;
+            text-align: center;
+        }
+
+        .success { color: var(--terminal-green); }
+        .error { color: #ff3333; }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <h1>[ DIGITAL FORENSICS // EVIDENCE AND VESTIGE TRIAGE ]</h1>
+        <div class="subtitle">LAB CTF: DOUTRINA DE PRESERVAÇÃO E VALIDAÇÃO LEGAL</div>
+    </div>
+
+    <div class="container">
+
+        <div class="challenge-card">
+            <div class="instructions">
+                <strong>Análise de Caso Forense:</strong> Avalie os artefatos encontrados no sistema comprometido. Arraste e classifique os itens de acordo com o status técnico-jurídico atual:<br><br>
+                • <strong>Vestígio:</strong> Sinais, indícios ou dados brutos deixados no ambiente sem uma análise contextual completa.<br>
+                • <strong>Evidência:</strong> Vestígios analisados, correlacionados e validados que comprovam materialidade e sustentam a hipótese da investigação.
+            </div>
+
+            <div class="main-layout">
+                
+                <div class="pool-section">
+                    <h4>Artefatos e Constatações Isoladas</h4>
+                    <div class="drop-zone pool-zone" id="pool">
+                        <div class="drag-item" draggable="true" id="v-log">Um arquivo de log de conexões brutas gerado automaticamente pelo firewall da rede.</div>
+                        <div class="drag-item" draggable="true" id="e-log">O mesmo log de firewall, porém analisado e cruzado com o horário do ataque, confirmando conexões vindas do IP do invasor.</div>
+                        <div class="drag-item" draggable="true" id="v-hash">Um executável binário desconhecido encontrado temporariamente mapeado na pasta Temp do Windows.</div>
+                        <div class="drag-item" draggable="true" id="e-hash">O executável desconhecido analisado em Sandbox, gerando assinatura YARA e confirmando o comportamento de Ransomware.</div>
+                        <div class="drag-item" draggable="true" id="v-img">Uma imagem JPG salva na pasta Downloads da máquina de um funcionário sob suspeita.</div>
+                        <div class="drag-item" draggable="true" id="e-img">A imagem JPG com metadados Exif auditados, provando que continha esquemas confidenciais exfiltrados da empresa.</div>
+                    </div>
+                </div>
+
+                <div class="targets-grid">
+                    
+                    <div class="target-column">
+                        <h4 class="vestigio-header">VESTÍGIO (Dado Bruto)</h4>
+                        <div class="drop-zone" id="target-vestigio"></div>
+                    </div>
+
+                    <div class="target-column">
+                        <h4 class="evidencia-header">EVIDÊNCIA (Dado Validado)</h4>
+                        <div class="drop-zone" id="target-evidencia"></div>
+                    </div>
+
+                </div>
+
+            </div>
+
+            <div class="btn-group">
+                <button onclick="validateEvidenceChain()">HOMOLOGAR LAUDO TÉCNICO</button>
+            </div>
+            <div class="status" id="status-msg"></div>
+        </div>
+
+    </div>
+
+    <script>
+        const items = document.querySelectorAll('.drag-item');
+        const zones = document.querySelectorAll('.drop-zone');
+        let draggedItem = null;
+
+        items.forEach(item => {
+            item.addEventListener('dragstart', function() { draggedItem = this; });
+        });
+
+        zones.forEach(zone => {
+            zone.addEventListener('dragover', function(e) { e.preventDefault(); });
+            zone.addEventListener('dragenter', function(e) { e.preventDefault(); this.classList.add('over'); });
+            zone.addEventListener('dragleave', function() { this.classList.remove('over'); });
+            zone.addEventListener('drop', function() { 
+                this.classList.remove('over'); 
+                this.appendChild(draggedItem); 
+            });
+        });
+
+        function validateEvidenceChain() {
+            const vestigioZone = document.getElementById('target-vestigio');
+            const evidenciaZone = document.getElementById('target-evidencia');
+            const statusDiv = document.getElementById('status-msg');
+
+            const expectedVestigios = ['v-log', 'v-hash', 'v-img'];
+            const expectedEvidencias = ['e-log', 'e-hash', 'e-img'];
+
+            const currentVestigios = Array.from(vestigioZone.children).map(c => c.id);
+            const currentEvidencias = Array.from(evidenciaZone.children).map(c => c.id);
+
+            const isVestigioCorrect = expectedVestigios.length === currentVestigios.length && expectedVestigios.every(id => currentVestigios.includes(id));
+            const isEvidenciaCorrect = expectedEvidencias.length === currentEvidencias.length && expectedEvidencias.every(id => currentEvidencias.includes(id));
+
+            if (isVestigioCorrect && isEvidenciaCorrect) {
+                statusDiv.className = "status success";
+                statusDiv.innerHTML = "[+] ACCESS GRANTED: Cadeia de custódia e distinção de evidências homologadas perfeitamente!";
+            } else {
+                statusDiv.className = "status error";
+                statusDiv.innerHTML = "[-] ACCESS DENIED: Erro de triagem. Lembre-se: dados sem análise contextual são apenas vestígios.";
+            }
+        }
+    </script>
+</body>
+</html>
