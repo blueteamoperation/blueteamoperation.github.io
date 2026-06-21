@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>[ MBR HEX ANALYSIS ]</title>
+    <style>
+        :root {
+            --neon-cyan: #00f0ff;
+            --neon-magenta: #ff007f;
+            --dark-bg: #09090e;
+            --card-bg: #111122;
+            --terminal-green: #39ff14;
+            --warning-amber: #ffb700;
+        }
+
+        body {
+            background-color: var(--dark-bg);
+            color: #ffffff;
+            font-family: 'Courier New', Courier, monospace;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            border-bottom: 2px dashed var(--neon-cyan);
+            padding-bottom: 20px;
+            width: 100%;
+            max-width: 950px;
+        }
+
+        h1 {
+            color: var(--neon-cyan);
+            text-shadow: 0 0 10px var(--neon-cyan);
+            font-size: 2rem;
+            margin: 0;
+        }
+
+        .subtitle {
+            color: var(--neon-magenta);
+            font-weight: bold;
+            letter-spacing: 2px;
+            margin-top: 5px;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 950px;
+        }
+
+        .challenge-card {
+            background-color: var(--card-bg);
+            border: 1px solid #1f1f3a;
+            border-left: 5px solid var(--neon-magenta);
+            border-radius: 4px;
+            padding: 25px;
+            margin-bottom: 25px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.6);
+        }
+
+        .hex-dump-box {
+            background-color: #000;
+            border: 1px solid var(--neon-cyan);
+            color: var(--terminal-green);
+            padding: 20px;
+            font-size: 1.2rem;
+            letter-spacing: 2px;
+            white-space: pre;
+            overflow-x: auto;
+            border-radius: 4px;
+            margin-bottom: 25px;
+            box-shadow: inset 0 0 10px rgba(0, 240, 255, 0.1);
+        }
+
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            margin-bottom: 20px;
+        }
+
+        .field-row {
+            display: flex;
+            gap: 10px;
+        }
+
+        input[type="text"] {
+            background-color: #000;
+            border: 1px solid var(--neon-cyan);
+            color: #fff;
+            padding: 12px;
+            font-family: inherit;
+            flex-grow: 1;
+            border-radius: 4px;
+            font-size: 1rem;
+        }
+
+        input:focus {
+            outline: none;
+            box-shadow: 0 0 8px var(--neon-cyan);
+        }
+
+        button {
+            background-color: transparent;
+            border: 1px solid var(--neon-magenta);
+            color: var(--neon-magenta);
+            padding: 12px 24px;
+            cursor: pointer;
+            font-family: inherit;
+            font-weight: bold;
+            border-radius: 4px;
+            transition: all 0.3s ease;
+        }
+
+        button:hover {
+            background-color: var(--neon-magenta);
+            color: #000;
+            box-shadow: 0 0 15px var(--neon-magenta);
+        }
+
+        .status {
+            font-weight: bold;
+            font-size: 0.95rem;
+            margin-top: 4px;
+        }
+
+        .success { color: var(--terminal-green); }
+        .error { color: #ff3333; }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <h1>[ FORENSICS // MBR DUMP ]</h1>
+        <div class="subtitle">LAB MBR </div>
+    </div>
+
+    <div class="container">
+
+        <div class="challenge-card" style="border-left-color: var(--neon-cyan);">
+            <h3 style="color: var(--neon-cyan); margin-top: 0;">[ VOLUME BOOT RECORD DUMP ]</h3>
+            <div class="hex-dump-box"><code>Offset  0  1  2  3  4  5  6  7  8  9  A  B  C  D  E  F
+
+1B0  00 00 00 00 00 00 00 00 00 00 00 00 00 00 80 01
+1C0  01 00 0B 1F 3F 33 3F 00 00 00 41 99 01 00 00 00
+1D0  00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+1E0  00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+1F0  00 00 00 00 00 00 00 00 00 00 00 00 00 00 55 AA</code></div>
+        </div>
+
+        <div class="challenge-card">
+            <h3 style="margin-top: 0;">[ ANÁLISE DE GEOMETRIA DO VOLUME ]</h3>
+            <p style="font-size: 0.85rem; color: #aaa; margin-bottom: 20px;">Analise os bytes do dump acima e informe os parâmetros calculados em valor decimal:</p>
+
+            <div class="input-group">
+                <label>1. A partição analisada neste documento é bootável (ativa)? (Responda: Sim ou Não)</label>
+                <div class="field-row">
+                    <input type="text" id="ans1" placeholder="Sua resposta...">
+                    <button onclick="checkFlag(1, 'sim')">SUBMIT</button>
+                </div>
+                <div class="status" id="status1"></div>
+            </div>
+
+            <div class="input-group">
+                <label>2. Qual o Sistema de Arquivos?</label>
+                <div class="field-row">
+                    <input type="text" id="ans2" placeholder="Sua resposta...">
+                    <button onclick="checkFlag(2, 'fat32')">SUBMIT</button>
+                </div>
+                <div class="status" id="status2"></div>
+            </div>
+
+            <div class="input-group">
+                <label>3. Em que setor se inicializa a primeira partição ?</label>
+                <div class="field-row">
+                    <input type="text" id="ans3" placeholder="Sua resposta...">
+                    <button onclick="checkFlag(3, '63')">SUBMIT</button>
+                </div>
+                <div class="status" id="status3"></div>
+            </div>
+
+            <div class="input-group">
+                <label>4. Qual o tamanho da primeira partição em kb,mb,gb?</label>
+                <div class="field-row">
+                    <input type="text" id="ans4" placeholder="Sua resposta...">
+                    <button onclick="checkFlag(4, '51mb')">SUBMIT</button>
+                </div>
+                <div class="status" id="status4"></div>
+            </div>
+
+        </div>
+
+    </div>
+
+    <script>
+        function checkFlag(qNum, correct) {
+            const userInput = document.getElementById('ans' + qNum).value.trim();
+            const statusDiv = document.getElementById('status' + qNum);
+
+            if (userInput === correct) {
+                statusDiv.className = "status success";
+                statusDiv.innerHTML = "[+] ACCESS GRANTED: Estrutura lógica do BPB validada com sucesso!";
+            } else {
+                statusDiv.className = "status error";
+                statusDiv.innerHTML = "[-] ACCESS DENIED: Valor incorreto para o offset mapeado.";
+            }
+        }
+    </script>
+</body>
+</html>
