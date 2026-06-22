@@ -1,0 +1,705 @@
+<!DOCTYPE html>
+<html lang="pt-BRa<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>[ LINUX LIVE FORENSICS ]</title>
+    <style>
+        :root {
+            --neon-cyan: #00f0ff;
+            --neon-magenta: #ff007f;
+            --dark-bg: #09090e;
+            --card-bg: #111122;
+            --terminal-green: #39ff14;
+            --warning-amber: #ffb700;
+        }
+
+        body {
+            background-color: var(--dark-bg);
+            color: #ffffff;
+            font-family: 'Courier New', Courier, monospace;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            border-bottom: 2px dashed var(--neon-cyan);
+            padding-bottom: 20px;
+            width: 100%;
+            max-width: 1000px;
+        }
+
+        h1 {
+            color: var(--neon-cyan);
+            text-shadow: 0 0 10px var(--neon-cyan);
+            font-size: 2rem;
+            margin: 0;
+        }
+
+        .subtitle {
+            color: var(--neon-magenta);
+            font-weight: bold;
+            letter-spacing: 2px;
+            margin-top: 5px;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1000px;
+        }
+
+        .category-section {
+            border: 1px solid #1f1f3a;
+            background-color: var(--card-bg);
+            border-radius: 4px;
+            padding: 20px;
+            margin-bottom: 25px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.6);
+        }
+
+        .category-section h2 {
+            color: var(--neon-magenta);
+            margin-top: 0;
+            border-bottom: 1px solid #1f1f3a;
+            padding-bottom: 8px;
+            font-size: 1.2rem;
+        }
+
+        .cmd-row {
+            background-color: #05050a;
+            border-left: 3px solid var(--neon-cyan);
+            padding: 12px;
+            margin: 12px 0;
+            border-radius: 0 4px 4px 0;
+        }
+
+        .cmd-desc {
+            font-size: 0.85rem;
+            color: #aaa;
+            margin-bottom: 6px;
+        }
+
+        .cmd-display {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #000;
+            padding: 8px 12px;
+            border-radius: 4px;
+            border: 1px solid #111;
+        }
+
+        .cmd-text {
+            color: var(--terminal-green);
+            font-family: 'Consolas', monospace;
+            font-size: 0.95rem;
+            word-break: break-all;
+        }
+
+        .btn-copy {
+            background: transparent;
+            border: 1px solid var(--neon-cyan);
+            color: var(--neon-cyan);
+            padding: 4px 8px;
+            font-size: 0.75rem;
+            font-weight: bold;
+            cursor: pointer;
+            border-radius: 3px;
+            transition: all 0.2s;
+            margin-left: 10px;
+            flex-shrink: 0;
+        }
+
+        .btn-copy:hover {
+            background: var(--neon-cyan);
+            color: #000;
+            box-shadow: 0 0 8px var(--neon-cyan);
+        }
+
+        .validation-box {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        input[type="text"] {
+            background: #000;
+            border: 1px solid #222;
+            color: #fff;
+            padding: 8px;
+            font-family: inherit;
+            font-size: 0.85rem;
+            border-radius: 4px;
+            flex-grow: 1;
+        }
+
+        input:focus {
+            border-color: var(--neon-magenta);
+            outline: none;
+        }
+
+        .btn-check {
+            background: transparent;
+            border: 1px solid var(--neon-magenta);
+            color: var(--neon-magenta);
+            padding: 8px 16px;
+            font-size: 0.8rem;
+            font-weight: bold;
+            cursor: pointer;
+            border-radius: 4px;
+        }
+
+        .btn-check:hover {
+            background: var(--neon-magenta);
+            color: #000;
+        }
+
+        .status {
+            font-size: 0.8rem;
+            font-weight: bold;
+            margin-top: 5px;
+        }
+        .success { color: var(--terminal-green); }
+        .error { color: #ff3333; }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <h1>[ LINUX LIVE FORENSICS // COMMAND CONSOLE ]</h1>
+        <div class="subtitle">LAB CTF: ARSENAL DE AQUISIÇÃO E TRIAGEM A QUENTE NO UNIX</div>
+    </div>
+
+    <div class="container">
+
+        <div class="category-section">
+            <h2>1. Informações do Sistema</h2>
+            
+            <div class="cmd-row">
+                <div class="cmd-desc">Nome do host/computador:</div>
+                <div class="cmd-display">
+                    <span class="cmd-text" id="l1-1">hostname</span>
+                    <button class="btn-copy" onclick="copyCmd('l1-1')">COPY</button>
+                </div>
+            </div>
+
+            <div class="cmd-row">
+                <div class="cmd-desc">Usuário atual logado no terminal:</div>
+                <div class="cmd-display">
+                    <span class="cmd-text" id="l1-2">whoami</span>
+                    <button class="btn-copy" onclick="copyCmd('l1-2')">COPY</button>
+                </div>
+            </div>
+
+            <div class="cmd-row">
+                <div class="cmd-desc">Informações detalhadas do Kernel e arquitetura:</div>
+                <div class="cmd-display">
+                    <span class="cmd-text" id="l1-3">uname -a</span>
+                    <button class="btn-copy" onclick="copyCmd('l1-3')">COPY</button>
+                </div>
+            </div>
+
+            <div class="cmd-row">
+                <div class="cmd-desc">Versão e release da distribuição Linux:</div>
+                <div class="cmd-display">
+                    <span class="cmd-text" id="l1-4">cat /etc/*release</span>
+                    <button class="btn-copy" onclick="copyCmd('l1-4')">COPY</button>
+                </div>
+            </div>
+
+            <div class="cmd-row">
+                <div class="cmd-desc">Data, hora e fuso horário atual do sistema:</div>
+                <div class="cmd-display">
+                    <span class="cmd-text" id="l1-5">date</span>
+                    <button class="btn-copy" onclick="copyCmd('l1-5')">COPY</button>
+                </div>
+            </div>
+
+            <div class="cmd-row">
+                <div class="cmd-desc">Tempo de atividade e carga média do sistema:</div>
+                <div class="cmd-display">
+                    <span class="cmd-text" id="l1-6">uptime</span>
+                    <button class="btn-copy" onclick="copyCmd('l1-6')">COPY</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="category-section">
+            <h2>2. Usuários e Sessões</h2>
+            
+            <div class="cmd-row">
+                <div class="cmd-desc">Exibir quem está logado e o que está executando:</div>
+                <div class="cmd-display">
+                    <span class="cmd-text" id="l2-1">w</span>
+                    <button class="btn-copy" onclick="copyCmd('l2-1')">COPY</button>
+                </div>
+            </div>
+
+            <div class="cmd-row">
+                <div class="cmd-desc">Lista simplificada de usuários com sessões ativas:</div>
+                <div class="cmd-display">
+                    <span class="cmd-text" id="l2-2">who</span>
+                    <button class="btn-copy" onclick="copyCmd('l2-2')">COPY</button>
+                </div>
+            </div>
+
+            <div class="cmd-row">
+                <div class="cmd-desc">Histórico completo de logins e logouts recentes do sistema:</div>
+                <div class="cmd-display">
+                    <span class="cmd-text" id="l2-3">last</span>
+                    <button class="btn-copy" onclick="copyCmd('l2-3')">COPY</button>
+                </div>
+            </div>
+
+            <div class="cmd-row">
+                <div class="cmd-desc">Verificar usuários cadastrados no arquivo local de senhas:</div>
+                <div class="cmd-display">
+                    <span class="cmd-text" id="l2-4">cat /etc/passwd</span>
+                    <button class="btn-copy" onclick="copyCmd('l2-4')">COPY</button>
+                </div>
+            </div>
+
+            <div class="cmd-row">
+                <div class="cmd-desc">Identificação de UID, GID e grupos do usuário logado:</div>
+                <div class="cmd-display">
+                    <span class="cmd-text" id="l2-5">id</span>
+                    <button class="btn-copy" onclick="copyCmd('l2-5')">COPY</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="category-section">
+            <h2>3. Processos em Execução</h2>
+            
+            <div class="cmd-row">
+                <div class="cmd-desc">Listar todos os processos em execução no formato padrão detalhado:</div>
+                <div class="cmd-display">
+                    <span class="cmd-text" id="l3-1">ps aux</span>
+                    <button class="btn-copy" onclick="copyCmd('l3-1')">COPY</button>
+                </div>
+            </div>
+
+            <div class="cmd-row">
+                <div class="cmd-desc">Exibir a árvore de dependência hierárquica de processos (PID/PPID):</div>
+                <div class="cmd-display">
+                    <span class="cmd-text" id="l3-2">ps -efx --forest</span>
+                    <button class="btn-copy" onclick="copyCmd('l3-2')">COPY</button>
+                </div>
+            </div>
+
+            <div class="cmd-row">
+                <div class="cmd-desc">Listar arquivos e sockets de rede abertos por processos ativos:</div>
+                <div class="cmd-display">
+                    <span class="cmd-text" id="l3-3">lsof</span>
+                    <button class="btn-copy" onclick="copyCmd('l3-3')">COPY</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="category-section">
+            <h2>4. Serviços (Systemd)</h2>
+            
+            <div class="cmd-row">
+                <div class="cmd-desc">Listar todas as unidades de serviços (daemons) ativas no sistema:</div>
+                <div class="cmd-display">
+                    <span class="cmd-text" id="l4-1">systemctl list-units --type=service</span>
+                    <button class="btn-copy" onclick="copyCmd('l4-1')">COPY</button>
+                </div>
+            </div>
+
+            <div class="cmd-row">
+                <div class="cmd-desc">Verificar o estado de inicialização de todos os serviços configurados:</div>
+                <div class="cmd-display">
+                    <span class="cmd-text" id="l4-2">systemctl list-unit-files --type=service</span>
+                    <button class="btn-copy" onclick="copyCmd('l4-2')">COPY</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="category-section">
+            <h2>5. Conexões de Rede</h2>
+            
+            <div class="cmd-row">
+                <div class="cmd-desc">Exibir portas abertas em modo numérico e os PIDs associados (via ss):</div>
+                <div class="cmd-display">
+                    <span class="cmd-text" id="l5-1">ss -tulpn</span>
+                    <button class="btn-copy" onclick="copyCmd('l5-1')">COPY</button>
+                </div>
+            </div>
+
+            <div class="cmd-row">
+                <div class="cmd-desc">Mapeamento clássico de sockets de rede ativos com PID (via netstat):</div>
+                <div class="cmd-display">
+                    <span class="cmd-text" id="l5-2">netstat -antup</span>
+                    <button class="btn-copy" onclick="copyCmd('l5-2')">COPY</button>
+                </div>
+            </div>
+
+            <div class="cmd-row">
+                <div class="cmd-desc">Exibir a tabela de cache ARP/Vizinhos ativos:</div>
+                <div class="cmd-display">
+                    <span class="cmd-text" id="l5-3">ip neigh show</span>
+                    <button class="btn-copy" onclick="copyCmd('l5-3')">COPY</button>
+                </div>
+            </div>
+
+            <div class="cmd-row">
+                <div class="cmd-desc">Configuração completa de interfaces e endereçamento IP:</div>
+                <div class="cmd-display">
+                    <span class="cmd-text" id="l5-4">ip addr show</span>
+                    <button class="btn-copy" onclick="copyCmd('l5-4')">COPY</button>
+                </div>
+            </div>
+
+            <div class="cmd-row">
+                <div class="cmd-desc">Exibir tabela de roteamento do Kernel:</div>
+                <div class="cmd-display">
+                    <span class="cmd-text" id="l5-5">ip route show</span>
+                    <button class="btn-copy" onclick="copyCmd('l5-5')">COPY</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="category-section">
+            <h2>6. Compartilhamentos e Montagens</h2>
+            
+            <div class="cmd-row">
+                <div class="cmd-desc">Listar todos os sistemas de arquivos atualmente montados no host:</div>
+                <div class="cmd-display">
+                    <span class="cmd-text" id="l6-1">mount</span>
+                    <button class="btn-copy" onclick="copyCmd('l6-1')">COPY</button>
+                </div>
+            </div>
+
+            <div class="cmd-row">
+                <div class="cmd-desc">Exibir o uso de espaço e pontos de montagem de partições ativas:</div>
+                <div class="cmd-display">
+                    <span class="cmd-text" id="l6-2">df -h</span>
+                    <button class="btn-copy" onclick="copyCmd('l6-2')">COPY</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="category-section">
+            <h2>7. Tarefas Agendadas (Cron)</h2>
+            
+            <div class="cmd-row">
+                <div class="cmd-desc">Listar tarefas agendadas (cronjobs) do usuário atual:</div>
+                <div class="cmd-display">
+                    <span class="cmd-text" id="l7-1">crontab -l</span>
+                    <button class="btn-copy" onclick="copyCmd('l7-1')">COPY</button>
+                </div>
+            </div>
+
+            <div class="cmd-row">
+                <div class="cmd-desc">Auditar diretórios e arquivos de agendamento do sistema:</div>
+                <div class="cmd-display">
+                    <span class="cmd-text" id="l7-2">ls -la /etc/cron* /etc/crontab</span>
+                    <button class="btn-copy" onclick="copyCmd('l7-2')">COPY</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="category-section">
+            <h2>8. Módulos do Kernel Carregados (Drivers)</h2>
+            <div class="cmd-row">
+                <div class="cmd-desc">Listar todos os módulos ativos carregados no espaço de memória do Kernel:</div>
+                <div class="cmd-display">
+                    <span class="cmd-text" id="l8-1">lsmod</span>
+                    <button class="btn-copy" onclick="copyCmd('l8-1')">COPY</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="category-section">
+            <h2>9. Evidências de Persistência e Inicialização</h2>
+            <div class="cmd-row">
+                <div class="cmd-desc">Auditar scripts de inicialização globais do sistema:</div>
+                <div class="cmd-display">
+                    <span class="cmd-text" id="l9-1">ls -la /etc/init.d/ /etc/rc*.d/</span>
+                    <button class="btn-copy" onclick="copyCmd('l9-1')">COPY</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="category-section">
+            <h2>10. Firewall (Netfilter / Iptables)</h2>
+            <div class="cmd-row">
+                <div class="cmd-desc">Listar todas as regras de filtragem ativas nas chains em modo numérico:</div>
+                <div class="cmd-display">
+                    <span class="cmd-text" id="l10-1">iptables -L -n -v</span>
+                    <button class="btn-copy" onclick="copyCmd('l10-1')">COPY</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="category-section">
+            <h2>11. Logs de Eventos e Auditoria</h2>
+            <div class="cmd-row">
+                <div class="cmd-desc">Consultar os últimos 50 logs de autenticação e segurança do sistema (Debian/Ubuntu):</div>
+                <div class="cmd-display">
+                    <span class="cmd-text" id="l11-1">tail -n 50 /var/log/auth.log</span>
+                    <button class="btn-copy" onclick="copyCmd('l11-1')">COPY</button>
+                </div>
+            </div>
+            <div class="cmd-row">
+                <div class="cmd-desc">Consultar os últimos 50 logs de autenticação e segurança do sistema (RHEL/CentOS):</div>
+                <div class="cmd-display">
+                    <span class="cmd-text" id="l11-2">tail -n 50 /var/log/secure</span>
+                    <button class="btn-copy" onclick="copyCmd('l11-2')">COPY</button>
+                </div>
+            </div>
+            <div class="cmd-row">
+                <div class="cmd-desc">Extrair as últimas 50 entradas do log do buffer circular do kernel (via journald):</div>
+                <div class="cmd-display">
+                    <span class="cmd-text" id="l11-3">journalctl -n 50 --no-pager</span>
+                    <button class="btn-copy" onclick="copyCmd('l11-3')">COPY</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="category-section">
+            <h2>12. Arquivos Recentes e Diretórios Críticos</h2>
+            <div class="cmd-row">
+                <div class="cmd-desc">Listar a pasta temporária global ordenando por modificação recente:</div>
+                <div class="cmd-display">
+                    <span class="cmd-text" id="l12-1">ls -laht /tmp /var/tmp</span>
+                    <button class="btn-copy" onclick="copyCmd('l12-1')">COPY</button>
+                </div>
+            </div>
+            <div class="cmd-row">
+                <div class="cmd-desc">Buscar por arquivos modificados nos últimos 2 dias no diretório /etc:</div>
+                <div class="cmd-display">
+                    <span class="cmd-text" id="l12-2">find /etc -mtime -2 -ls</span>
+                    <button class="btn-copy" onclick="copyCmd('l12-2')">COPY</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="category-section">
+            <h2>13. Arquivos de Resolução de Nomes (DNS)</h2>
+            <div class="cmd-row">
+                <div class="cmd-desc">Visualizar os servidores DNS ativos configurados no host:</div>
+                <div class="cmd-display">
+                    <span class="cmd-text" id="l13-1">cat /etc/resolv.conf</span>
+                    <button class="btn-copy" onclick="copyCmd('l13-1')">COPY</button>
+                </div>
+            </div>
+            <div class="cmd-row">
+                <div class="cmd-desc">Visualizar mapeamentos estáticos locais de nomes de domínio:</div>
+                <div class="cmd-display">
+                    <span class="cmd-text" id="l13-2">cat /etc/hosts</span>
+                    <button class="btn-copy" onclick="copyCmd('l13-2')">COPY</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="category-section">
+            <h2>14. Históricos de Linha de Comando</h2>
+            <div class="cmd-row">
+                <div class="cmd-desc">Visualizar as últimas linhas executadas no histórico do shell Bash:</div>
+                <div class="cmd-display">
+                    <span class="cmd-text" id="l14-1">history | tail -n 50</span>
+                    <button class="btn-copy" onclick="copyCmd('l14-1')">COPY</button>
+                </div>
+            </div>
+            <div class="cmd-row">
+                <div class="cmd-desc">Auditar diretamente o arquivo de persistência do histórico do Bash:</div>
+                <div class="cmd-display">
+                    <span class="cmd-text" id="l14-2">cat ~/.bash_history | tail -n 50</span>
+                    <button class="btn-copy" onclick="copyCmd('l14-2')">COPY</button>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        function copyCmd(id) {
+            const textToCopy = document.getElementById(id).innerText;
+            navigator.clipboard.writeText(textToCopy).then(() => {
+                alert("[+] Comando Linux copiado!");
+            }).catch(err => {
+                console.error('Erro ao copiar comando: ', err);
+            });
+        }
+    </script>
+</body>
+</html>">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>[ WINDOWS LIVE FORENSICS ]</title>
+    <style>
+        :root {
+            --neon-cyan: #00f0ff;
+            --neon-magenta: #ff007f;
+            --dark-bg: #09090e;
+            --card-bg: #111122;
+            --terminal-green: #39ff14;
+            --warning-amber: #ffb700;
+        }
+
+        body {
+            background-color: var(--dark-bg);
+            color: #ffffff;
+            font-family: 'Courier New', Courier, monospace;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            border-bottom: 2px dashed var(--neon-cyan);
+            padding-bottom: 20px;
+            width: 100%;
+            max-width: 1000px;
+        }
+
+        h1 {
+            color: var(--neon-cyan);
+            text-shadow: 0 0 10px var(--neon-cyan);
+            font-size: 2rem;
+            margin: 0;
+        }
+
+        .subtitle {
+            color: var(--neon-magenta);
+            font-weight: bold;
+            letter-spacing: 2px;
+            margin-top: 5px;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1000px;
+        }
+
+        .category-section {
+            border: 1px solid #1f1f3a;
+            background-color: var(--card-bg);
+            border-radius: 4px;
+            padding: 20px;
+            margin-bottom: 25px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.6);
+        }
+
+        .category-section h2 {
+            color: var(--neon-magenta);
+            margin-top: 0;
+            border-bottom: 1px solid #1f1f3a;
+            padding-bottom: 8px;
+            font-size: 1.2rem;
+        }
+
+        .cmd-row {
+            background-color: #05050a;
+            border-left: 3px solid var(--neon-cyan);
+            padding: 12px;
+            margin: 12px 0;
+            border-radius: 0 4px 4px 0;
+        }
+
+        .cmd-desc {
+            font-size: 0.85rem;
+            color: #aaa;
+            margin-bottom: 6px;
+        }
+
+        .cmd-display {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #000;
+            padding: 8px 12px;
+            border-radius: 4px;
+            border: 1px solid #111;
+        }
+
+        .cmd-text {
+            color: var(--terminal-green);
+            font-family: 'Consolas', monospace;
+            font-size: 0.95rem;
+            word-break: break-all;
+        }
+
+        .btn-copy {
+            background: transparent;
+            border: 1px solid var(--neon-cyan);
+            color: var(--neon-cyan);
+            padding: 4px 8px;
+            font-size: 0.75rem;
+            font-weight: bold;
+            cursor: pointer;
+            border-radius: 3px;
+            transition: all 0.2s;
+            margin-left: 10px;
+            flex-shrink: 0;
+        }
+
+        .btn-copy:hover {
+            background: var(--neon-cyan);
+            color: #000;
+            box-shadow: 0 0 8px var(--neon-cyan);
+        }
+
+        .validation-box {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        input[type="text"] {
+            background: #000;
+            border: 1px solid #222;
+            color: #fff;
+            padding: 8px;
+            font-family: inherit;
+            font-size: 0.85rem;
+            border-radius: 4px;
+            flex-grow: 1;
+        }
+
+        input:focus {
+            border-color: var(--neon-magenta);
+            outline: none;
+        }
+
+        .btn-check {
+            background: transparent;
+            border: 1px solid var(--neon-magenta);
+            color: var(--neon-magenta);
+            padding: 8px 16px;
+            font-size: 0.8rem;
+            font-weight: bold;
+            cursor: pointer;
+            border-radius: 4px;
+        }
+
+        .btn-check:hover {
+            background: var(--neon-magenta);
+            color: #000;
+        }
+
+        .status {
+            font-size: 0.8rem;
+            font-weight: bold;
+            margin-top: 5px;
+        }
+        .success { color: var(--terminal-green); }
+        .error { color: #ff3333; }
+    </style>
+</head>
+<body>
+
+   
