@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>[ WINDOWS REGISTRY FORENSICS ]</title>
+    <style>
+        :root {
+            --neon-cyan: #00f0ff;
+            --neon-magenta: #ff007f;
+            --dark-bg: #09090e;
+            --card-bg: #111122;
+            --terminal-green: #39ff14;
+            --warning-amber: #ffb700;
+        }
+
+        body {
+            background-color: var(--dark-bg);
+            color: #ffffff;
+            font-family: 'Courier New', Courier, monospace;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            border-bottom: 2px dashed var(--neon-cyan);
+            padding-bottom: 20px;
+            width: 100%;
+            max-width: 950px;
+        }
+
+        h1 {
+            color: var(--neon-cyan);
+            text-shadow: 0 0 10px var(--neon-cyan);
+            font-size: 2rem;
+            margin: 0;
+        }
+
+        .subtitle {
+            color: var(--neon-magenta);
+            font-weight: bold;
+            letter-spacing: 2px;
+            margin-top: 5px;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 950px;
+        }
+
+        .challenge-card {
+            background-color: var(--card-bg);
+            border: 1px solid #1f1f3a;
+            border-left: 5px solid var(--neon-magenta);
+            border-radius: 4px;
+            padding: 25px;
+            margin-bottom: 25px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.6);
+        }
+
+        .challenge-card h3 {
+            color: var(--warning-amber);
+            margin-top: 0;
+            font-size: 1.1rem;
+            border-bottom: 1px solid #1f1f3a;
+            padding-bottom: 6px;
+        }
+
+        .input-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 12px;
+        }
+
+        input[type="text"] {
+            background-color: #000;
+            border: 1px solid var(--neon-cyan);
+            color: #fff;
+            padding: 10px;
+            font-family: inherit;
+            flex-grow: 1;
+            border-radius: 4px;
+            font-size: 0.95rem;
+        }
+
+        input:focus {
+            outline: none;
+            box-shadow: 0 0 8px var(--neon-cyan);
+        }
+
+        button {
+            background-color: transparent;
+            border: 1px solid var(--neon-magenta);
+            color: var(--neon-magenta);
+            padding: 10px 20px;
+            cursor: pointer;
+            font-family: inherit;
+            font-weight: bold;
+            border-radius: 4px;
+            transition: all 0.3s;
+        }
+
+        button:hover {
+            background-color: var(--neon-magenta);
+            color: #000;
+            box-shadow: 0 0 15px var(--neon-magenta);
+        }
+
+        .status {
+            margin-top: 8px;
+            font-weight: bold;
+            font-size: 0.85rem;
+        }
+
+        .success { color: var(--terminal-green); }
+        .error { color: #ff3333; }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <h1>[ REGISTRY FORENSICS // HIVES INVESTIGATION ]</h1>
+        <div class="subtitle">LAB CTF: EXTRAÇÃO DE ARTEFATOS E METADADOS DO HOST<br>
+  <li><a href="https://blueteamoperation.github.io/MOD-7/analise_reg.zip" target="_blank"><font color="white">Download: analise_reg.zip</font></a></li>
+        </div>
+    </div>
+
+    <div class="container">
+
+        <div class="challenge-card">
+            <h3>#01 - Arquivos Recentes (RecentDocs)</h3>
+            <p>Qual é o nome do documento mais recente acessado pelo usuário alvo identificado nas chaves de histórico?</p>
+            <div class="input-group">
+                <input type="text" id="ans1" placeholder="Ex: arquivo.txt">
+                <button onclick="checkFlag(1, 'userclass.txt')">SUBMIT</button>
+            </div>
+            <div class="status" id="status1"></div>
+        </div>
+
+        <div class="challenge-card">
+            <h3>#02 - Endereço IP do Host</h3>
+            <p>Qual é o endereço IPv4 estático ou dinâmico atribuído à interface principal do host nas configurações de rede do Registro?</p>
+            <div class="input-group">
+                <input type="text" id="ans2" placeholder="Ex: 192.168.0.1">
+                <button onclick="checkFlag(2, '172.16.33.175')">SUBMIT</button>
+            </div>
+            <div class="status" id="status2"></div>
+        </div>
+
+        <div class="challenge-card">
+            <h3>#03 - Gateway Padrão (GW)</h3>
+            <p>Qual é o IP do Gateway Padrão (Default Gateway) configurado para o roteamento do host?</p>
+            <div class="input-group">
+                <input type="text" id="ans3" placeholder="Ex: 192.168.0.254">
+                <button onclick="checkFlag(3, '172.16.33.2')">SUBMIT</button>
+            </div>
+            <div class="status" id="status3"></div>
+        </div>
+
+        <div class="challenge-card">
+            <h3>#04 - Instalação do Sistema Operacional</h3>
+            <p>Qual é a data original de instalação do S.O. gravada na chave de controle do Windows? (Formato: DD/MM/AAAA)</p>
+            <div class="input-group">
+                <input type="text" id="ans4" placeholder="Ex: 01/01/2026">
+                <button onclick="checkFlag(4, '21/06/2026')">SUBMIT</button>
+            </div>
+            <div class="status" id="status4"></div>
+        </div>
+
+        <div class="challenge-card">
+            <h3>#05 - Especificação de Release ID</h3>
+            <p>Qual é a versão do Release ID do sistema operacional extraída da hive SOFTWARE?</p>
+            <div class="input-group">
+                <input type="text" id="ans5" placeholder="Ex: 22H2">
+                <button onclick="checkFlag(5, '1909')">SUBMIT</button>
+            </div>
+            <div class="status" id="status5"></div>
+        </div>
+
+        <div class="challenge-card">
+            <h3>#06 - Frequência de Autenticação</h3>
+            <p>Quem foi o usuário que logou mais vezes (maior Logon Count) no host investigado?</p>
+            <div class="input-group">
+                <input type="text" id="ans6" placeholder="Nome do usuário...">
+                <button onclick="checkFlag(6, 'target')">SUBMIT</button>
+            </div>
+            <div class="status" id="status6"></div>
+        </div>
+
+        <div class="challenge-card">
+            <h3>#07 - Linha do Tempo: Último Logon</h3>
+            <p>Informe a **data** e a **hora** exatas do último login registrado para o usuário. (Formato: DD/MM/AAAA HH:MM:SS)</p>
+            <div class="input-group">
+                <input type="text" id="ans7" placeholder="Ex: 21/06/2026 19:54:33">
+                <button onclick="checkFlag(7, '21/06/2026 19:54:33')">SUBMIT</button>
+            </div>
+            <div class="status" id="status7"></div>
+        </div>
+
+        <div class="challenge-card">
+            <h3>#08 - Pergunta de Segurança (Dica do Usuário)</h3>
+            <p>Qual o nome do primeiro PET cadastrado ou referenciado pelo usuário ativo?</p>
+            <div class="input-group">
+                <input type="text" id="ans8" placeholder="Nome do pet...">
+                <button onclick="checkFlag(8, 'wolf')">SUBMIT</button>
+            </div>
+            <div class="status" id="status8"></div>
+        </div>
+
+        <div class="challenge-card">
+            <h3>#09 - Identificador de Segurança (SID)</h3>
+            <p>Qual é o SID (Security Identifier) completo do usuário ativo extraído da SAM/SOFTWARE?</p>
+            <div class="input-group">
+                <input type="text" id="ans9" placeholder="Ex: S-1-5-21-...">
+                <button onclick="checkFlag(9, 'S-1-5-21-3584927618-805617156-2222095247-1001')">SUBMIT</button>
+            </div>
+            <div class="status" id="status9"></div>
+        </div>
+
+        <div class="challenge-card">
+            <h3>#10 - Privilégios Corporativos</h3>
+            <p>A qual grupo de segurança local pertence o usuário ativo analisado?</p>
+            <div class="input-group">
+                <input type="text" id="ans10" placeholder="Ex: Users">
+                <button onclick="checkFlag(10, 'administrators')">SUBMIT</button>
+            </div>
+            <div class="status" id="status10"></div>
+        </div>
+
+        <div class="challenge-card">
+            <h3>#11 - Criação de Identidade</h3>
+            <p>Em que data a conta do usuário ativo foi originalmente criada no sistema? (Formato: DD/MM/AAAA)</p>
+            <div class="input-group">
+                <input type="text" id="ans11" placeholder="Ex: 21/06/2026">
+                <button onclick="checkFlag(11, '21/06/2026')">SUBMIT</button>
+            </div>
+            <div class="status" id="status11"></div>
+        </div>
+
+    </div>
+
+    <script>
+        function checkFlag(qNum, correctValue) {
+            const userInput = document.getElementById('ans' + qNum).value.trim().toLowerCase();
+            const statusDiv = document.getElementById('status' + qNum);
+            
+            if (userInput === correctValue.toLowerCase() || userInput.includes(correctValue.toLowerCase())) {
+                statusDiv.className = "status success";
+                statusDiv.innerHTML = "[+] ACCESS GRANTED: Artefato de registro validado com sucesso!";
+            } else {
+                statusDiv.className = "status error";
+                statusDiv.innerHTML = "[-] ACCESS DENIED: Valor divergente do mapeado nas hives.";
+            }
+        }
+    </script>
+</body>
+</html>
