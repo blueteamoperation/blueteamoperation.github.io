@@ -1,0 +1,568 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>[ WINDOWS LIVE FORENSICS ]</title>
+    <style>
+        :root {
+            --neon-cyan: #00f0ff;
+            --neon-magenta: #ff007f;
+            --dark-bg: #09090e;
+            --card-bg: #111122;
+            --terminal-green: #39ff14;
+            --warning-amber: #ffb700;
+        }
+
+        body {
+            background-color: var(--dark-bg);
+            color: #ffffff;
+            font-family: 'Courier New', Courier, monospace;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            border-bottom: 2px dashed var(--neon-cyan);
+            padding-bottom: 20px;
+            width: 100%;
+            max-width: 1000px;
+        }
+
+        h1 {
+            color: var(--neon-cyan);
+            text-shadow: 0 0 10px var(--neon-cyan);
+            font-size: 2rem;
+            margin: 0;
+        }
+
+        .subtitle {
+            color: var(--neon-magenta);
+            font-weight: bold;
+            letter-spacing: 2px;
+            margin-top: 5px;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1000px;
+        }
+
+        .category-section {
+            border: 1px solid #1f1f3a;
+            background-color: var(--card-bg);
+            border-radius: 4px;
+            padding: 20px;
+            margin-bottom: 25px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.6);
+        }
+
+        .category-section h2 {
+            color: var(--neon-magenta);
+            margin-top: 0;
+            border-bottom: 1px solid #1f1f3a;
+            padding-bottom: 8px;
+            font-size: 1.2rem;
+        }
+
+        .cmd-row {
+            background-color: #05050a;
+            border-left: 3px solid var(--neon-cyan);
+            padding: 12px;
+            margin: 12px 0;
+            border-radius: 0 4px 4px 0;
+        }
+
+        .cmd-desc {
+            font-size: 0.85rem;
+            color: #aaa;
+            margin-bottom: 6px;
+        }
+
+        .cmd-display {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #000;
+            padding: 8px 12px;
+            border-radius: 4px;
+            border: 1px solid #111;
+        }
+
+        .cmd-text {
+            color: var(--terminal-green);
+            font-family: 'Consolas', monospace;
+            font-size: 0.95rem;
+            word-break: break-all;
+        }
+
+        .btn-copy {
+            background: transparent;
+            border: 1px solid var(--neon-cyan);
+            color: var(--neon-cyan);
+            padding: 4px 8px;
+            font-size: 0.75rem;
+            font-weight: bold;
+            cursor: pointer;
+            border-radius: 3px;
+            transition: all 0.2s;
+            margin-left: 10px;
+            flex-shrink: 0;
+        }
+
+        .btn-copy:hover {
+            background: var(--neon-cyan);
+            color: #000;
+            box-shadow: 0 0 8px var(--neon-cyan);
+        }
+
+        .validation-box {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        input[type="text"] {
+            background: #000;
+            border: 1px solid #222;
+            color: #fff;
+            padding: 8px;
+            font-family: inherit;
+            font-size: 0.85rem;
+            border-radius: 4px;
+            flex-grow: 1;
+        }
+
+        input:focus {
+            border-color: var(--neon-magenta);
+            outline: none;
+        }
+
+        .btn-check {
+            background: transparent;
+            border: 1px solid var(--neon-magenta);
+            color: var(--neon-magenta);
+            padding: 8px 16px;
+            font-size: 0.8rem;
+            font-weight: bold;
+            cursor: pointer;
+            border-radius: 4px;
+        }
+
+        .btn-check:hover {
+            background: var(--neon-magenta);
+            color: #000;
+        }
+
+        .status {
+            font-size: 0.8rem;
+            font-weight: bold;
+            margin-top: 5px;
+        }
+        .success { color: var(--terminal-green); }
+        .error { color: #ff3333; }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <h1>[ WINDOWS LIVE FORENSICS // COMMAND CONSOLE ]</h1>
+        <div class="subtitle">LAB CTF: ARSENAL DE AQUISIÇÃO E TRIAGEM A QUENTE</div>
+    </div>
+
+    <div class="container">
+
+        <div class="category-section">
+            <h2>1. Informações do Sistema</h2>
+            
+            <div class="cmd-row">
+                <div class="cmd-desc">Nome do computador:</div>
+                <div class="cmd-display">
+                    <span class="cmd-text" id="c1-1">hostname</span>
+                    <button class="btn-copy" onclick="copyCmd('c1-1')">COPY</button>
+                </div>
+            </div>
+
+            <div class="cmd-row">
+                <div class="cmd-desc">Usuário atual logado:</div>
+                <div class="cmd-display">
+                    <span class="cmd-text" id="c1-2">whoami</span>
+                    <button class="btn-copy" onclick="copyCmd('c1-2')">COPY</button>
+                </div>
+            </div>
+
+            <div class="cmd-row">
+                <div class="cmd-desc">Informações detalhadas do S.O.:</div>
+                <div class="cmd-display">
+                    <span class="cmd-text" id="c1-3">systeminfo</span>
+                    <button class="btn-copy" onclick="copyCmd('c1-3')">COPY</button>
+                </div>
+            </div>
+
+            <div class="cmd-row">
+                <div class="cmd-desc">Versão, build e especificação do Windows:</div>
+                <div class="cmd-display">
+                    <span class="cmd-text" id="c1-4">wmic os get Caption,Version,BuildNumber</span>
+                    <button class="btn-copy" onclick="copyCmd('c1-4')">COPY</button>
+                </div>
+            </div>
+
+            <div class="cmd-row">
+                <div class="cmd-desc">Data e hora do sistema:</div>
+                <div class="cmd-display">
+                    <span class="cmd-text" id="c1-5">date /t & time /t</span>
+                    <button class="btn-copy" onclick="copyCmd('c1-5')">COPY</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="category-section">
+            <h2>2. Usuários e Sessões</h2>
+            
+            <div class="cmd-row">
+                <div class="cmd-desc">Verificar usuários ativos na sessão:</div>
+                <div class="cmd-display">
+                    <span class="cmd-text" id="c2-1">query user</span>
+                    <button class="btn-copy" onclick="copyCmd('c2-1')">COPY</button>
+                </div>
+            </div>
+
+            <div class="cmd-row">
+                <div class="cmd-desc">Lista de usuários locais cadastrados:</div>
+                <div class="cmd-display">
+                    <span class="cmd-text" id="c2-2">net user</span>
+                    <button class="btn-copy" onclick="copyCmd('c2-2')">COPY</button>
+                </div>
+            </div>
+
+            <div class="cmd-row">
+                <div class="cmd-desc">Membros do grupo Administradores locais:</div>
+                <div class="cmd-display">
+                    <span class="cmd-text" id="c2-3">net localgroup administrators</span>
+                    <button class="btn-copy" onclick="copyCmd('c2-3')">COPY</button>
+                </div>
+            </div>
+
+            <div class="cmd-row">
+                <div class="cmd-desc">Privilégios e grupos completos do token atual:</div>
+                <div class="cmd-display">
+                    <span class="cmd-text" id="c2-4">whoami /all</span>
+                    <button class="btn-copy" onclick="copyCmd('c2-4')">COPY</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="category-section">
+            <h2>3. Processos em Execução</h2>
+            
+            <div class="cmd-row">
+                <div class="cmd-desc">Listagem básica de processos ativos:</div>
+                <div class="cmd-display">
+                    <span class="cmd-text" id="c3-1">tasklist</span>
+                    <button class="btn-copy" onclick="copyCmd('c3-1')">COPY</button>
+                </div>
+            </div>
+
+            <div class="cmd-row">
+                <div class="cmd-desc">Processos associados a serviços do sistema:</div>
+                <div class="cmd-display">
+                    <span class="cmd-text" id="c3-2">tasklist /svc</span>
+                    <button class="btn-copy" onclick="copyCmd('c3-2')">COPY</button>
+                </div>
+            </div>
+
+            <div class="cmd-row">
+                <div class="cmd-desc">Detalhamento completo dos processos (WMIC):</div>
+                <div class="cmd-display">
+                    <span class="cmd-text" id="c3-3">wmic process list full</span>
+                    <button class="btn-copy" onclick="copyCmd('c3-3')">COPY</button>
+                </div>
+            </div>
+
+            <div class="cmd-row">
+                <div class="cmd-desc">Mapeamento de PID, PPID, Caminho e Linha de comando executada:</div>
+                <div class="cmd-display">
+                    <span class="cmd-text" id="c3-4">wmic process get ProcessId,ParentProcessId,ExecutablePath,CommandLine</span>
+                    <button class="btn-copy" onclick="copyCmd('c3-4')">COPY</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="category-section">
+            <h2>4. Serviços</h2>
+            
+            <div class="cmd-row">
+                <div class="cmd-desc">Status dos serviços ativos na máquina:</div>
+                <div class="cmd-display">
+                    <span class="cmd-text" id="c4-1">sc query</span>
+                    <button class="btn-copy" onclick="copyCmd('c4-1')">COPY</button>
+                </div>
+            </div>
+
+            <div class="cmd-row">
+                <div class="cmd-desc">Lista simplificada de serviços ativos:</div>
+                <div class="cmd-display">
+                    <span class="cmd-text" id="c4-2">net start</span>
+                    <button class="btn-copy" onclick="copyCmd('c4-2')">COPY</button>
+                </div>
+            </div>
+
+            <div class="cmd-row">
+                <div class="cmd-desc">Mapeamento estruturado de serviços, estado e binário correspondente:</div>
+                <div class="cmd-display">
+                    <span class="cmd-text" id="c4-3">wmic service get Name,State,StartMode,PathName</span>
+                    <button class="btn-copy" onclick="copyCmd('c4-3')">COPY</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="category-section">
+            <h2>5. Conexões de Rede</h2>
+            
+            <div class="cmd-row">
+                <div class="cmd-desc">Mapeamento de portas abertas, sockets ativos e PIDs:</div>
+                <div class="cmd-display">
+                    <span class="cmd-text" id="c5-1">netstat -ano</span>
+                    <button class="btn-copy" onclick="copyCmd('c5-1')">COPY</button>
+                </div>
+            </div>
+
+            <div class="cmd-row">
+                <div class="cmd-desc">Conexões de rede com binário/executável associado (Requer Admin):</div>
+                <div class="cmd-display">
+                    <span class="cmd-text" id="c5-2">netstat -abno</span>
+                    <button class="btn-copy" onclick="copyCmd('c5-2')">COPY</button>
+                </div>
+            </div>
+
+            <div class="cmd-row">
+                <div class="cmd-desc">Inspeção da tabela de cache ARP:</div>
+                <div class="cmd-display">
+                    <span class="cmd-text" id="c5-3">arp -a</span>
+                    <button class="btn-copy" onclick="copyCmd('c5-3')">COPY</button>
+                </div>
+            </div>
+
+            <div class="cmd-row">
+                <div class="cmd-desc">Configuração completa de adaptadores de rede:</div>
+                <div class="cmd-display">
+                    <span class="cmd-text" id="c5-4">ipconfig /all</span>
+                    <button class="btn-copy" onclick="copyCmd('c5-4')">COPY</button>
+                </div>
+            </div>
+
+            <div class="cmd-row">
+                <div class="cmd-desc">Tabela de roteamento de pacotes do sistema:</div>
+                <div class="cmd-display">
+                    <span class="cmd-text" id="c5-5">route print</span>
+                    <button class="btn-copy" onclick="copyCmd('c5-5')">COPY</button>
+                </div>
+            </div>
+
+            <div class="cmd-row">
+                <div class="cmd-desc">Visualização do cache de nomes NetBIOS:</div>
+                <div class="cmd-display">
+                    <span class="cmd-text" id="c5-6">nbtstat -c</span>
+                    <button class="btn-copy" onclick="copyCmd('c5-6')">COPY</button>
+                </div>
+            </div>
+
+            <div class="cmd-row">
+                <div class="cmd-desc">Compartilhamentos de rede externos ativos mapeados localmente:</div>
+                <div class="cmd-display">
+                    <span class="cmd-text" id="c5-7">net use</span>
+                    <button class="btn-copy" onclick="copyCmd('c5-7')">COPY</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="category-section">
+            <h2>6. Compartilhamentos</h2>
+            
+            <div class="cmd-row">
+                <div class="cmd-desc">Compartilhamentos locais ativos (SMB):</div>
+                <div class="cmd-display">
+                    <span class="cmd-text" id="c6-1">net share</span>
+                    <button class="btn-copy" onclick="copyCmd('c6-1')">COPY</button>
+                </div>
+            </div>
+
+            <div class="cmd-row">
+                <div class="cmd-desc">Nome e caminhos físicos dos compartilhamentos locais ativos:</div>
+                <div class="cmd-display">
+                    <span class="cmd-text" id="c6-2">wmic share get Name,Path</span>
+                    <button class="btn-copy" onclick="copyCmd('c6-2')">COPY</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="category-section">
+            <h2>7. Tarefas Agendadas</h2>
+            <div class="cmd-row">
+                <div class="cmd-desc">Listagem detalhada e verbose de tarefas agendadas no agendador do Windows:</div>
+                <div class="cmd-display">
+                    <span class="cmd-text" id="c7-1">schtasks /query /fo LIST /v</span>
+                    <button class="btn-copy" onclick="copyCmd('c7-1')">COPY</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="category-section">
+            <h2>8. Drivers Carregados</h2>
+            <div class="cmd-row">
+                <div class="cmd-desc">Listar todos os drivers instalados no kernel:</div>
+                <div class="cmd-display">
+                    <span class="cmd-text" id="c8-1">driverquery</span>
+                    <button class="btn-copy" onclick="copyCmd('c8-1')">COPY</button>
+                </div>
+            </div>
+            <div class="cmd-row">
+                <div class="cmd-desc">Exibição em modo detalhado (verbose):</div>
+                <div class="cmd-display">
+                    <span class="cmd-text" id="c8-2">driverquery /v</span>
+                    <button class="btn-copy" onclick="copyCmd('c8-2')">COPY</button>
+                </div>
+            </div>
+            <div class="cmd-row">
+                <div class="cmd-desc">Exibir informações de assinatura digital de drivers:</div>
+                <div class="cmd-display">
+                    <span class="cmd-text" id="c8-3">driverquery /si</span>
+                    <button class="btn-copy" onclick="copyCmd('c8-3')">COPY</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="category-section">
+            <h2>9. Evidências de Persistência</h2>
+            <div class="cmd-row">
+                <div class="cmd-desc">Chaves Run do Registro de Sistema (Local Machine):</div>
+                <div class="cmd-display">
+                    <span class="cmd-text" id="c9-1">reg query "HKLM\Software\Microsoft\Windows\CurrentVersion\Run"</span>
+                    <button class="btn-copy" onclick="copyCmd('c9-1')">COPY</button>
+                </div>
+            </div>
+            <div class="cmd-row">
+                <div class="cmd-desc">Chaves Run do Registro de Sistema (Current User):</div>
+                <div class="cmd-display">
+                    <span class="cmd-text" id="c9-2">reg query "HKCU\Software\Microsoft\Windows\CurrentVersion\Run"</span>
+                    <button class="btn-copy" onclick="copyCmd('c9-2')">COPY</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="category-section">
+            <h2>10. Firewall</h2>
+            <div class="cmd-row">
+                <div class="cmd-desc">Exibir status do firewall em todos os perfis de rede ativos:</div>
+                <div class="cmd-display">
+                    <span class="cmd-text" id="c10-1">netsh advfirewall show allprofiles</span>
+                    <button class="btn-copy" onclick="copyCmd('c10-1')">COPY</button>
+                </div>
+            </div>
+            <div class="cmd-row">
+                <div class="cmd-desc">Listar todas as regras de entrada e saída ativas:</div>
+                <div class="cmd-display">
+                    <span class="cmd-text" id="c10-2">netsh advfirewall firewall show rule name=all</span>
+                    <button class="btn-copy" onclick="copyCmd('c10-2')">COPY</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="category-section">
+            <h2>11. Logs de Eventos</h2>
+            <div class="cmd-row">
+                <div class="cmd-desc">Listar todos os arquivos/canais de logs de eventos do Windows:</div>
+                <div class="cmd-display">
+                    <span class="cmd-text" id="c11-1">wevtutil el</span>
+                    <button class="btn-copy" onclick="copyCmd('c11-1')">COPY</button>
+                </div>
+            </div>
+            <div class="cmd-row">
+                <div class="cmd-desc">Consultar os últimos 20 eventos do log de Segurança em texto puro:</div>
+                <div class="cmd-display">
+                    <span class="cmd-text" id="c11-2">wevtutil qe Security /c:20 /f:text</span>
+                    <button class="btn-copy" onclick="copyCmd('c11-2')">COPY</button>
+                </div>
+            </div>
+            <div class="cmd-row">
+                <div class="cmd-desc">Consultar os últimos 20 eventos do log do Sistema em texto puro:</div>
+                <div class="cmd-display">
+                    <span class="cmd-text" id="c11-3">wevtutil qe System /c:20 /f:text</span>
+                    <button class="btn-copy" onclick="copyCmd('c11-3')">COPY</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="category-section">
+            <h2>12. Arquivos Recentes</h2>
+            <div class="cmd-row">
+                <div class="cmd-desc">Listar a pasta de Downloads ordenando do arquivo mais recente para o mais antigo:</div>
+                <div class="cmd-display">
+                    <span class="cmd-text" id="c12-1">dir C:\Users\%USERNAME%\Downloads /O:-D</span>
+                    <button class="btn-copy" onclick="copyCmd('c12-1')">COPY</button>
+                </div>
+            </div>
+            <div class="cmd-row">
+                <div class="cmd-desc">Listar Área de Trabalho ordenando por data de modificação:</div>
+                <div class="cmd-display">
+                    <span class="cmd-text" id="c12-2">dir C:\Users\%USERNAME%\Desktop /O:-D</span>
+                    <button class="btn-copy" onclick="copyCmd('c12-2')">COPY</button>
+                </div>
+            </div>
+            <div class="cmd-row">
+                <div class="cmd-desc">Listar de forma recursiva a pasta temporária do Windows ordenando por data:</div>
+                <div class="cmd-display">
+                    <span class="cmd-text" id="c12-3">dir C:\Windows\Temp /S /O:-D</span>
+                    <button class="btn-copy" onclick="copyCmd('c12-3')">COPY</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="category-section">
+            <h2>13. DNS Cache</h2>
+            <div class="cmd-row">
+                <div class="cmd-desc">Exibir o cache local de resolução DNS (domínios visitados pelo host):</div>
+                <div class="cmd-display">
+                    <span class="cmd-text" id="c13-1">ipconfig /displaydns</span>
+                    <button class="btn-copy" onclick="copyCmd('c13-1')">COPY</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="category-section">
+            <h2>14. Políticas e Configurações</h2>
+            <div class="cmd-row">
+                <div class="cmd-desc">Exibir objetos de diretivas de grupo (GPO) aplicados a este computador:</div>
+                <div class="cmd-display">
+                    <span class="cmd-text" id="c14-1">gpresult /r</span>
+                    <button class="btn-copy" onclick="copyCmd('c14-1')">COPY</button>
+                </div>
+            </div>
+            <div class="cmd-row">
+                <div class="cmd-desc">Consultar as políticas de auditoria ativas de todas as subcategorias:</div>
+                <div class="cmd-display">
+                    <span class="cmd-text" id="c14-2">auditpol /get /category:*</span>
+                    <button class="btn-copy" onclick="copyCmd('c14-2')">COPY</button>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        function copyCmd(id) {
+            const textToCopy = document.getElementById(id).innerText;
+            navigator.clipboard.writeText(textToCopy).then(() => {
+                alert("[+] Comando copiado com sucesso!");
+            }).catch(err => {
+                console.error('Erro ao copiar comando: ', err);
+            });
+        }
+    </script>
+</body>
+</html>
