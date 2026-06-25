@@ -83,7 +83,7 @@
             justify-content: space-between;
         }
 
-        /* SEÇÕES (ACCORDION) */
+        /* SEÇÕES (ACCORDION REFEITO COM GRID SIMPLES) */
         .section {
             margin-bottom: 15px;
             border: 1px solid transparent;
@@ -127,7 +127,7 @@
             color: var(--terminal-green);
         }
 
-        /* SUBSEÇÕES INTERNAS (SUB-ACCORDION) */
+        /* SUBSEÇÕES INTERNAS */
         .sub-section {
             margin: 10px 0;
             border: 1px solid rgba(26, 58, 58, 0.5);
@@ -163,20 +163,36 @@
             color: var(--terminal-green);
         }
 
-        /* CONTEÚDOS OCULTOS */
-        .section-content, .sub-section-content {
-            max-height: 0;
+        /* RESOLUÇÃO DOS CONTEÚDOS OCULTOS MEDIANTE GRID INTERNO */
+        .section-wrapper, .sub-section-wrapper {
+            display: grid;
+            grid-template-rows: 0fr;
+            transition: grid-template-rows 0.3s ease-out;
             overflow: hidden;
-            transition: max-height 0.3s ease-out;
         }
 
-        .section.active > .section-content {
-            max-height: max-content;
+        .section.active > .section-wrapper,
+        .sub-section.active > .sub-section-wrapper {
+            grid-template-rows: 1fr;
+        }
+
+        .section-content {
+            min-height: 0;
+            padding: 0 15px;
+            transition: padding 0.3s ease-out;
+        }
+
+        .sub-section-content {
+            min-height: 0;
+            padding: 0 10px;
+            transition: padding 0.3s ease-out;
+        }
+
+        .section.active > .section-wrapper > .section-content {
             padding: 15px 15px;
         }
 
-        .sub-section.active > .sub-section-content {
-            max-height: max-content;
+        .sub-section.active > .sub-section-wrapper > .sub-section-content {
             padding: 10px 10px 5px 10px;
         }
 
@@ -251,280 +267,289 @@
         // Repositório de artefatos, labs e análise forense. Clique nos módulos para expandir.
     </p>
 
-    <!-- Módulo 1 -->
     <div class="section">
         <h2>📂 Módulo - 1</h2>
-        <div class="section-content">
-            <ul>
-                <li><a href="https://blueteamoperation.github.io/MOD-1/ri.html" target="_blank">Atividade 1 - Ciclo de Resposta a Incidentes.</a></li>
-                <li><a href="https://blueteamoperation.github.io/MOD-1/matriz.html" target="_blank">Atividade 2 - Matriz de Risco.</a></li>
-                <li><a href="https://blueteamoperation.github.io/MOD-1/kill.html" target="_blank">Atividade 3 - Kill Chain.</a></li>
-                <li><a href="https://blueteamoperation.github.io/MOD-1/ceh.html" target="_blank">Atividade 4 - Fases de um Ataque Metodologia C|EH.</a></li>
-                <li><a href="https://blueteamoperation.github.io/MOD-1/dfir.html" target="_blank">Atividade 5 - DFIR em Ação.</a></li>
-                <li><a href="https://blueteamoperation.github.io/MOD-1/vetores.html" target="_blank">Atividade 6 - Vetores de Ataques.</a></li>
-                <li><a href="https://blueteamoperation.github.io/MOD-1/vuln.html" target="_blank">Atividade 7 - Analisando Vulnerablidades.</a></li>
-                <li><a href="https://blueteamoperation.github.io/MOD-1/ataques.html" target="_blank">Atividade 8 - Analisando Ataques.</a></li>
-            </ul>
+        <div class="section-wrapper">
+            <div class="section-content">
+                <ul>
+                    <li><a href="https://blueteamoperation.github.io/MOD-1/ri.html" target="_blank">Atividade 1 - Ciclo de Resposta a Incidentes.</a></li>
+                    <li><a href="https://blueteamoperation.github.io/MOD-1/matriz.html" target="_blank">Atividade 2 - Matriz de Risco.</a></li>
+                    <li><a href="https://blueteamoperation.github.io/MOD-1/kill.html" target="_blank">Atividade 3 - Kill Chain.</a></li>
+                    <li><a href="https://blueteamoperation.github.io/MOD-1/ceh.html" target="_blank">Atividade 4 - Fases de um Ataque Metodologia C|EH.</a></li>
+                    <li><a href="https://blueteamoperation.github.io/MOD-1/dfir.html" target="_blank">Atividade 5 - DFIR em Ação.</a></li>
+                    <li><a href="https://blueteamoperation.github.io/MOD-1/vetores.html" target="_blank">Atividade 6 - Vetores de Ataques.</a></li>
+                    <li><a href="https://blueteamoperation.github.io/MOD-1/vuln.html" target="_blank">Atividade 7 - Analisando Vulnerablidades.</a></li>
+                    <li><a href="https://blueteamoperation.github.io/MOD-1/ataques.html" target="_blank">Atividade 8 - Analisando Ataques.</a></li>
+                </ul>
+            </div>
         </div>
     </div>
 
-    <!-- Módulo 2 -->
     <div class="section">
         <h2>📂 Módulo - 2</h2>
-        <div class="section-content">
-            <ul>
-                <li><a href="https://blueteamoperation.github.io/MOD-2/conv.html" target="_blank">Atividade 1 - Convertendo Dados.</a></li>
-                <li><a href="https://blueteamoperation.github.io/MOD-2/endian.html" target="_blank">Atividade 2 - Ordem dos Endianess.</a></li>
-                <li><a href="https://blueteamoperation.github.io/MOD-2/ascii.html" target="_blank">Atividade 3 - ASCII.</a></li>
-                <li><a href="https://blueteamoperation.github.io/MOD-2/mustang.html" target="_blank">Atividade 4 - Mustang Vermelho.</a></li>
-                <li><a href="https://blueteamoperation.github.io/MOD-2/cadeia.html" target="_blank">Atividade 5 - Cadeia de Custódia.</a></li>
-                <li><a href="https://blueteamoperation.github.io/MOD-2/magic.zip" target="_blank">Atividade 6 - Magic Numbers Files.</a></li>
-                <li><a href="https://blueteamoperation.github.io/MOD-2/magic.html" target="_blank">Atividade 7 - Magic Numbers.</a></li>
-                <li><a href="https://blueteamoperation.github.io/MOD-2/steg.html" target="_blank">Atividade 8 - Hidden.</a></li>
-                <li><a href="https://blueteamoperation.github.io/MOD-2/payload.html" target="_blank">Atividade 9 - Master Payload.</a></li>
-            </ul>
+        <div class="section-wrapper">
+            <div class="section-content">
+                <ul>
+                    <li><a href="https://blueteamoperation.github.io/MOD-2/conv.html" target="_blank">Atividade 1 - Convertendo Dados.</a></li>
+                    <li><a href="https://blueteamoperation.github.io/MOD-2/endian.html" target="_blank">Atividade 2 - Ordem dos Endianess.</a></li>
+                    <li><a href="https://blueteamoperation.github.io/MOD-2/ascii.html" target="_blank">Atividade 3 - ASCII.</a></li>
+                    <li><a href="https://blueteamoperation.github.io/MOD-2/mustang.html" target="_blank">Atividade 4 - Mustang Vermelho.</a></li>
+                    <li><a href="https://blueteamoperation.github.io/MOD-2/cadeia.html" target="_blank">Atividade 5 - Cadeia de Custódia.</a></li>
+                    <li><a href="https://blueteamoperation.github.io/MOD-2/magic.zip" target="_blank">Atividade 6 - Magic Numbers Files.</a></li>
+                    <li><a href="https://blueteamoperation.github.io/MOD-2/magic.html" target="_blank">Atividade 7 - Magic Numbers.</a></li>
+                    <li><a href="https://blueteamoperation.github.io/MOD-2/steg.html" target="_blank">Atividade 8 - Hidden.</a></li>
+                    <li><a href="https://blueteamoperation.github.io/MOD-2/payload.html" target="_blank">Atividade 9 - Master Payload.</a></li>
+                </ul>
+            </div>
         </div>
     </div>
 
-    <!-- Módulo 3 -->
     <div class="section">
         <h2>📂 Módulo - 3</h2>
-        <div class="section-content">
-            <ul>
-                <li><a href="https://blueteamoperation.github.io/MOD-3/logs_windows.evtx" target="_blank">Logs Windows</a></li>
-                <li><a href="https://blueteamoperation.github.io/MOD-3/sysmon.evtx" target="_blank">Logs Sysmon</a></li>
-                <li><a href="https://blueteamoperation.github.io/MOD-3/auth.log" target="_blank">Logs Linux</a></li>
-                <li><a href="https://blueteamoperation.github.io/MOD-3/apache.html" target="_blank">Atividade 1 - Apache Master.</a></li>
-                <li><a href="https://blueteamoperation.github.io/MOD-3/linux.html" target="_blank">Atividade 2 - LOG Linux.</a></li>
-            </ul>
+        <div class="section-wrapper">
+            <div class="section-content">
+                <ul>
+                    <li><a href="https://blueteamoperation.github.io/MOD-3/logs_windows.evtx" target="_blank">Logs Windows</a></li>
+                    <li><a href="https://blueteamoperation.github.io/MOD-3/sysmon.evtx" target="_blank">Logs Sysmon</a></li>
+                    <li><a href="https://blueteamoperation.github.io/MOD-3/auth.log" target="_blank">Logs Linux</a></li>
+                    <li><a href="https://blueteamoperation.github.io/MOD-3/apache.html" target="_blank">Atividade 1 - Apache Master.</a></li>
+                    <li><a href="https://blueteamoperation.github.io/MOD-3/linux.html" target="_blank">Atividade 2 - LOG Linux.</a></li>
+                </ul>
+            </div>
         </div>
     </div>
 
-    <!-- Módulo 4 -->
     <div class="section">
         <h2>📂 Módulo - 4</h2>
-        <div class="section-content">
-            <ul>
-                <li><a href="https://blueteamoperation.github.io/MOD-4/splunk_vpn.json.zip" target="_blank">VPN Splunk Log (Utilizado no Exercício de Filtros Básicos)</a></li>
-                <li><a href="https://blueteamoperation.github.io/MOD-4/splunk.html" target="_blank">Filtros Básicos SPL Splunk</a></li>
-                <li><a href="https://blueteamoperation.github.io/MOD-4/apache_splunk_300.json.zip" target="_blank">Log CTF-I Splunk (Utilizado no CTF-I Splunk)</a></li>
-                <li><a href="https://blueteamoperation.github.io/MOD-4/chall1.html" target="_blank">CTF I - Splunk </a></li>
-                <li><a href="https://blueteamoperation.github.io/MOD-4/apache_complex_500.json.zip" target="_blank">Log CTF-II Splunk (Utilizado no CTF-II Splunk)</a></li>
-                <li><a href="https://blueteamoperation.github.io/MOD-4/chall2.html" target="_blank">CTF II - Splunk </a></li>
-            </ul>
+        <div class="section-wrapper">
+            <div class="section-content">
+                <ul>
+                    <li><a href="https://blueteamoperation.github.io/MOD-4/splunk_vpn.json.zip" target="_blank">VPN Splunk Log (Utilizado no Exercício de Filtros Básicos)</a></li>
+                    <li><a href="https://blueteamoperation.github.io/MOD-4/splunk.html" target="_blank">Filtros Básicos SPL Splunk</a></li>
+                    <li><a href="https://blueteamoperation.github.io/MOD-4/apache_splunk_300.json.zip" target="_blank">Log CTF-I Splunk (Utilizado no CTF-I Splunk)</a></li>
+                    <li><a href="https://blueteamoperation.github.io/MOD-4/chall1.html" target="_blank">CTF I - Splunk </a></li>
+                    <li><a href="https://blueteamoperation.github.io/MOD-4/apache_complex_500.json.zip" target="_blank">Log CTF-II Splunk (Utilizado no CTF-II Splunk)</a></li>
+                    <li><a href="https://blueteamoperation.github.io/MOD-4/chall2.html" target="_blank">CTF II - Splunk </a></li>
+                </ul>
+            </div>
         </div>
     </div>
 
-    <!-- Módulo 5 -->
     <div class="section">
         <h2>📂 Módulo - 5</h2>
-        <div class="section-content">
-            <ul>
-                <li><a href="https://blueteamoperation.github.io/MOD-5/header.html" target="_blank">Conhecendo Campos do Cabeçalho de um -email.</a></li>
-                <li><a href="https://blueteamoperation.github.io/MOD-5/analise1.html" target="_blank">Análise Básica de Cabeçalho de e-mail - I.</a></li>
-                <li><a href="https://blueteamoperation.github.io/MOD-5/analise2.html" target="_blank">Análise Básica de Cabeçalho de e-mail - II.</a></li>
-            </ul>
+        <div class="section-wrapper">
+            <div class="section-content">
+                <ul>
+                    <li><a href="https://blueteamoperation.github.io/MOD-5/header.html" target="_blank">Conhecendo Campos do Cabeçalho de um -email.</a></li>
+                    <li><a href="https://blueteamoperation.github.io/MOD-5/analise1.html" target="_blank">Análise Básica de Cabeçalho de e-mail - I.</a></li>
+                    <li><a href="https://blueteamoperation.github.io/MOD-5/analise2.html" target="_blank">Análise Básica de Cabeçalho de e-mail - II.</a></li>
+                </ul>
+            </div>
         </div>
     </div>
 
-
-      <!-- Módulo 6 -->
     <div class="section">
         <h2>📂 Módulo - 6</h2>
-        <div class="section-content">
-
-            
-            <!-- Subseção 1: Simulações -->
-            <div class="sub-section">
-                <h3>🛠️ 1. Simulações de Funcionamento</h3>
-                <div class="sub-section-content">
-                    <ul>
-                        <li><a href="https://blueteamoperation.github.io/MOD-6/simula_arp.html" target="_blank">Simulação do Funcionamento do Protocolo ARP.</a></li>
-                        <li><a href="https://blueteamoperation.github.io/MOD-6/simula_icmp.html" target="_blank">Simulação do Funcionamento do Protocolo ICMP.</a></li>
-                        <li><a href="https://blueteamoperation.github.io/MOD-6/simula_ip.html" target="_blank">Simulação do Funcionamento do Protocolo IP.</a></li>
-                        <li><a href="https://blueteamoperation.github.io/MOD-6/simula_tcp.html" target="_blank">Simulação do Funcionamento do Protocolo TCP.</a></li>
-                        <li><a href="https://blueteamoperation.github.io/MOD-6/simula_udp.html" target="_blank">Simulação do Funcionamento do Protocolo UDP.</a></li>
-                        <li><a href="https://blueteamoperation.github.io/MOD-6/simula_dns.html" target="_blank">Simulação do Funcionamento do Protocolo DNS.</a></li>
-                        <li><a href="https://blueteamoperation.github.io/MOD-6/simula_http.html" target="_blank">Simulação do Funcionamento do Protocolo HTTP.</a></li>
-                        <li><a href="https://blueteamoperation.github.io/MOD-6/simula_ftp.html" target="_blank">Simulação do Funcionamento do Protocolo FTP.</a></li>
-                        <li><a href="https://blueteamoperation.github.io/MOD-6/simula_telnet.html" target="_blank">Simulação do Funcionamento do Protocolo TELNET.</a></li>
-                        <li><a href="https://blueteamoperation.github.io/MOD-6/simula_smtp.html" target="_blank">Simulação do Funcionamento do Protocolo SMTP.</a></li>
-                        <li><a href="https://blueteamoperation.github.io/MOD-6/simula_pop.html" target="_blank">Simulação do Funcionamento do Protocolo POP.</a></li>
-                        <li><a href="https://blueteamoperation.github.io/MOD-6/simula_https.html" target="_blank">Simulação do Funcionamento do Protocolo HTTPS.</a></li>
-                        <li><a href="https://blueteamoperation.github.io/MOD-6/simula_ssh.html" target="_blank">Simulação do Funcionamento do Protocolo SSH.</a></li>
-                        
-                    </ul>
-                </div>
-            </div>
-
-            <!-- Subseção 2: Acessos -->
-            <div class="sub-section">
-                <h3>🔑 2. Acessos a Servidores</h3>
-                <div class="sub-section-content">
-                    <ul>
-                        <li><a href="https://blueteamoperation.github.io/MOD-6/simula_acesso_ftp.html" target="_blank">Acessando um Servidor FTP.</a></li>
-                        <li><a href="https://blueteamoperation.github.io/MOD-6/simula_acesso_telnet.html" target="_blank">Acessando um Servidor TELNET.</a></li>
-                        <li><a href="https://blueteamoperation.github.io/MOD-6/simula_acesso_pop.html" target="_blank">Acessando Servidor POP.</a></li>
-                        <li><a href="https://blueteamoperation.github.io/MOD-6/simula_acesso_ssh.html" target="_blank">Acessando Servidor SSH.</a></li>
-                    </ul>
-                </div>
-            </div>
-
-            <!-- Subseção 3: Desafios -->
-            <div class="sub-section">
-                <h3>⚡ 3. Captura de Tráfego </h3>
-                <div class="sub-section-content">
-                    <ul>
-                        <li><a href="https://blueteamoperation.github.io/MOD-6/simula_sniffer_hub.html" target="_blank">Funcionamento Captura de Tráfego rede Utilizando HUB.</a></li>
-                        <li><a href="https://blueteamoperation.github.io/MOD-6/simula_sniffer_switch.html" target="_blank">Funcionamento Captura de Tráfego rede Utilizando SWITCH.</a></li>
-                        <li><a href="https://blueteamoperation.github.io/MOD-6/simula_sniffer_switch_hub_in_out.html" target="_blank">Funcionamento Captura de Tráfego rede Utilizando Técnica Hubbing OUT.</a></li>
-                        <li><a href="https://blueteamoperation.github.io/MOD-6/funcionamento_bridge.html" target="_blank">Funcionamento Captura de Tráfego rede Utilizando BRIDGE.</a></li>
-                        <li><a href="https://blueteamoperation.github.io/MOD-6/simula_ambiente_sniffer.html" target="_blank">Desafio I - Organize a Topologia Para Executar a Captura.</a></li>
-                        <li><a href="https://blueteamoperation.github.io/MOD-6/simula_bridge.html" target="_blank">Desafio II - Organize a Topologia Para Executar a Captura.</a></li>
-                        <li><a href="https://blueteamoperation.github.io/MOD-6/simula_hub_in_out.html" target="_blank">Desafio III - Organize a Topologia Para Executar a Captura.</a></li>
-                    </ul>
-                </div>
-            </div>
- <!-- Subseção 4: Analisadores de Protocolos -->
-            <div class="sub-section">
-                <h3>⚡ 4. Analisadores de Protocolos</h3>
-                <div class="sub-section-content">
-                    <ul>
-                        <li><a href="https://blueteamoperation.github.io/MOD-6/wiki_analisadores.html" target="_blank">Wiki - Analisadores de Protocolos.</a></li>
+        <div class="section-wrapper">
+            <div class="section-content">
                 
-                    </ul>
+                <div class="sub-section">
+                    <h3>🛠️ 1. Simulações de Funcionamento</h3>
+                    <div class="sub-section-wrapper">
+                        <div class="sub-section-content">
+                            <ul>
+                                <li><a href="https://blueteamoperation.github.io/MOD-6/simula_arp.html" target="_blank">Simulação do Funcionamento do Protocolo ARP.</a></li>
+                                <li><a href="https://blueteamoperation.github.io/MOD-6/simula_icmp.html" target="_blank">Simulação do Funcionamento do Protocolo ICMP.</a></li>
+                                <li><a href="https://blueteamoperation.github.io/MOD-6/simula_ip.html" target="_blank">Simulação do Funcionamento do Protocolo IP.</a></li>
+                                <li><a href="https://blueteamoperation.github.io/MOD-6/simula_tcp.html" target="_blank">Simulação do Funcionamento do Protocolo TCP.</a></li>
+                                <li><a href="https://blueteamoperation.github.io/MOD-6/simula_udp.html" target="_blank">Simulação do Funcionamento do Protocolo UDP.</a></li>
+                                <li><a href="https://blueteamoperation.github.io/MOD-6/simula_dns.html" target="_blank">Simulação do Funcionamento do Protocolo DNS.</a></li>
+                                <li><a href="https://blueteamoperation.github.io/MOD-6/simula_http.html" target="_blank">Simulação do Funcionamento do Protocolo HTTP.</a></li>
+                                <li><a href="https://blueteamoperation.github.io/MOD-6/simula_ftp.html" target="_blank">Simulação do Funcionamento do Protocolo FTP.</a></li>
+                                <li><a href="https://blueteamoperation.github.io/MOD-6/simula_telnet.html" target="_blank">Simulação do Funcionamento do Protocolo TELNET.</a></li>
+                                <li><a href="https://blueteamoperation.github.io/MOD-6/simula_smtp.html" target="_blank">Simulação do Funcionamento do Protocolo SMTP.</a></li>
+                                <li><a href="https://blueteamoperation.github.io/MOD-6/simula_pop.html" target="_blank">Simulação do Funcionamento do Protocolo POP.</a></li>
+                                <li><a href="https://blueteamoperation.github.io/MOD-6/simula_https.html" target="_blank">Simulação do Funcionamento do Protocolo HTTPS.</a></li>
+                                <li><a href="https://blueteamoperation.github.io/MOD-6/simula_ssh.html" target="_blank">Simulação do Funcionamento do Protocolo SSH.</a></li>
+                            </ul>
+                        </div>
+                    </div>
                 </div>
-            </div>
 
-             <!-- Subseção 5:  Analisando Pacotes -->
-            <div class="sub-section">
-                <h3>⚡ 5. Analisando Pacote com TCPDUMP</h3>
-                <div class="sub-section-content">
-                    <ul>
-                           <li><a href="https://blueteamoperation.github.io/MOD-6/tcpdump_ex.html" target="_blank">Análise - I - TCPDUMP</a></li>
-                         <li><a href="https://blueteamoperation.github.io/MOD-6/captura1.html" target="_blank"> Capturando Pacotes com TCPDUMP</a></li>
-                    
-                    </ul>
+                <div class="sub-section">
+                    <h3>🔑 2. Acessos a Servidores</h3>
+                    <div class="sub-section-wrapper">
+                        <div class="sub-section-content">
+                            <ul>
+                                <li><a href="https://blueteamoperation.github.io/MOD-6/simula_acesso_ftp.html" target="_blank">Acessando um Servidor FTP.</a></li>
+                                <li><a href="https://blueteamoperation.github.io/MOD-6/simula_acesso_telnet.html" target="_blank">Acessando um Servidor TELNET.</a></li>
+                                <li><a href="https://blueteamoperation.github.io/MOD-6/simula_acesso_pop.html" target="_blank">Acessando Servidor POP.</a></li>
+                                <li><a href="https://blueteamoperation.github.io/MOD-6/simula_acesso_ssh.html" target="_blank">Acessando Servidor SSH.</a></li>
+                            </ul>
+                        </div>
+                    </div>
                 </div>
-            </div>
 
-  <!-- Subseção 6:  Analisando Pacotes -->
-            <div class="sub-section">
-                <h3>⚡ 6. Analisando Pacote com TSHARK</h3>
-                <div class="sub-section-content">
-                    <ul>
-                         <li><a href="https://blueteamoperation.github.io/MOD-6/tshark_lab.html" target="_blank"> Analisando Pacotes com TSHARK</a></li>
-                        
-                     
-                
-                    </ul>
+                <div class="sub-section">
+                    <h3>⚡ 3. Captura de Tráfego </h3>
+                    <div class="sub-section-wrapper">
+                        <div class="sub-section-content">
+                            <ul>
+                                <li><a href="https://blueteamoperation.github.io/MOD-6/simula_sniffer_hub.html" target="_blank">Funcionamento Captura de Tráfego rede Utilizando HUB.</a></li>
+                                <li><a href="https://blueteamoperation.github.io/MOD-6/simula_sniffer_switch.html" target="_blank">Funcionamento Captura de Tráfego rede Utilizando SWITCH.</a></li>
+                                <li><a href="https://blueteamoperation.github.io/MOD-6/simula_sniffer_switch_hub_in_out.html" target="_blank">Funcionamento Captura de Tráfego rede Utilizando Técnica Hubbing OUT.</a></li>
+                                <li><a href="https://blueteamoperation.github.io/MOD-6/funcionamento_bridge.html" target="_blank">Funcionamento Captura de Tráfego rede Utilizando BRIDGE.</a></li>
+                                <li><a href="https://blueteamoperation.github.io/MOD-6/simula_ambiente_sniffer.html" target="_blank">Desafio I - Organize a Topologia Para Executar a Captura.</a></li>
+                                <li><a href="https://blueteamoperation.github.io/MOD-6/simula_bridge.html" target="_blank">Desafio II - Organize a Topologia Para Executar a Captura.</a></li>
+                                <li><a href="https://blueteamoperation.github.io/MOD-6/simula_hub_in_out.html" target="_blank">Desafio III - Organize a Topologia Para Executar a Captura.</a></li>
+                            </ul>
+                        </div>
+                    </div>
                 </div>
-            </div>
 
-<!-- Subseção 7:  Analisando Pacotes -->
-            <div class="sub-section">
-                <h3>⚡ 7. Analisando Pacote com Wireshark</h3>
-                <div class="sub-section-content">
-                    <ul>
-                         <li><a href="https://blueteamoperation.github.io/MOD-6/wireshark.html" target="_blank"> Analisando Pacotes com Wireshark</a></li>
-                    </ul>
+                <div class="sub-section">
+                    <h3>⚡ 4. Analisadores de Protocolos</h3>
+                    <div class="sub-section-wrapper">
+                        <div class="sub-section-content">
+                            <ul>
+                                <li><a href="https://blueteamoperation.github.io/MOD-6/wiki_analisadores.html" target="_blank">Wiki - Analisadores de Protocolos.</a></li>
+                            </ul>
+                        </div>
+                    </div>
                 </div>
-            </div>
 
-            <!-- Subseção 8:  Analisando Pacotes -->
-            <div class="sub-section">
-                <h3>⚡ 8. Analisando Pacote com NetworkMiner</h3>
-                <div class="sub-section-content">
-                    <ul>
-                         <li><a href="https://blueteamoperation.github.io/MOD-6/networkminer.html" target="_blank"> Analisando Pacotes com NetworkMiner</a></li>
-                    </ul>
+                <div class="sub-section">
+                    <h3>⚡ 5. Analisando Pacote com TCPDUMP</h3>
+                    <div class="sub-section-wrapper">
+                        <div class="sub-section-content">
+                            <ul>
+                                <li><a href="https://blueteamoperation.github.io/MOD-6/tcpdump_ex.html" target="_blank">Análise - I - TCPDUMP</a></li>
+                                <li><a href="https://blueteamoperation.github.io/MOD-6/captura1.html" target="_blank"> Capturando Pacotes com TCPDUMP</a></li>
+                            </ul>
+                        </div>
+                    </div>
                 </div>
-            </div>
- <!-- Subseção 9:  Analisando Pacotes -->
-            <div class="sub-section">
-                <h3>⚡ 9. Decriptando WPA</h3>
-                <div class="sub-section-content">
-                    <ul>
-                         <li><a href="https://blueteamoperation.github.io/MOD-6/wpa.html" target="_blank"> Decriptando WPA</a></li>
-                    </ul>
-                </div>
-            </div>
-<!-- Subseção 10:  Analisando Pacotes -->
-            <div class="sub-section">
-                <h3>⚡ 10. Aplicando Chave RSA</h3>
-                <div class="sub-section-content">
-                    <ul>
-                         <li><a href="https://blueteamoperation.github.io/MOD-6/rsa.html" target="_blank">Aplicando Chave RSA</a></li>
-                    </ul>
-                </div>
-            </div>
 
-
-
-            <!-- Subseção 11:  Analisando Pacotes -->
-            <div class="sub-section">
-                <h3>⚡ 11. Aplicando PreMaster SSL</h3>
-                <div class="sub-section-content">
-                    <ul>
-                         <li><a href="https://blueteamoperation.github.io/MOD-6/ssl.html" target="_blank">Aplicando PreMaster SSL</a></li>
-                    </ul>
+                <div class="sub-section">
+                    <h3>⚡ 6. Analisando Pacote com TSHARK</h3>
+                    <div class="sub-section-wrapper">
+                        <div class="sub-section-content">
+                            <ul>
+                                <li><a href="https://blueteamoperation.github.io/MOD-6/tshark_lab.html" target="_blank"> Analisando Pacotes com TSHARK</a></li>
+                            </ul>
+                        </div>
+                    </div>
                 </div>
+
+                <div class="sub-section">
+                    <h3>⚡ 7. Analisando Pacote com Wireshark</h3>
+                    <div class="sub-section-wrapper">
+                        <div class="sub-section-content">
+                            <ul>
+                                <li><a href="https://blueteamoperation.github.io/MOD-6/wireshark.html" target="_blank"> Analisando Pacotes com Wireshark</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="sub-section">
+                    <h3>⚡ 8. Analisando Pacote com NetworkMiner</h3>
+                    <div class="sub-section-wrapper">
+                        <div class="sub-section-content">
+                            <ul>
+                                <li><a href="https://blueteamoperation.github.io/MOD-6/networkminer.html" target="_blank"> Analisando Pacotes com NetworkMiner</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="sub-section">
+                    <h3>⚡ 9. Decriptando WPA</h3>
+                    <div class="sub-section-wrapper">
+                        <div class="sub-section-content">
+                            <ul>
+                                <li><a href="https://blueteamoperation.github.io/MOD-6/wpa.html" target="_blank"> Decriptando WPA</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="sub-section">
+                    <h3>⚡ 10. Aplicando Chave RSA</h3>
+                    <div class="sub-section-wrapper">
+                        <div class="sub-section-content">
+                            <ul>
+                                <li><a href="https://blueteamoperation.github.io/MOD-6/rsa.html" target="_blank">Aplicando Chave RSA</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="sub-section">
+                    <h3>⚡ 11. Aplicando PreMaster SSL</h3>
+                    <div class="sub-section-wrapper">
+                        <div class="sub-section-content">
+                            <ul>
+                                <li><a href="https://blueteamoperation.github.io/MOD-6/ssl.html" target="_blank">Aplicando PreMaster SSL</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
             </div>
-  </div>
+        </div>
     </div>
 
- <!-- Estudos de Casos -->
     <div class="section">
         <h2>📂 Estudos de Casos - Network Forensics</h2>
-        <div class="section-content">
-            <ul>
-                <li><a href="https://blueteamoperation.github.io/MOD-6/portscan.html" target="_blank"> Case I - Port Scan.</a></li>
-                  <li><a href="https://blueteamoperation.github.io/MOD-6/icmp_c2.html" target="_blank"> Case II - ICMP Túnel.</a></li>
-                   <li><a href="https://blueteamoperation.github.io/MOD-6/bruteforce_web.html" target="_blank"> Case III - Ataque WEB.</a></li>
-                   <li><a href="https://blueteamoperation.github.io/MOD-6/dhcp_lab.html" target="_blank"> Case IV - DHCP Server.</a></li>
-                <li><a href="https://blueteamoperation.github.io/MOD-6/psql.html" target="_blank"> Case V - SGBD.</a></li>
-                   <li><a href="https://blueteamoperation.github.io/MOD-6/bank.html" target="_blank"> Case VI - Bank.</a></li>
-            </ul>
+        <div class="section-wrapper">
+            <div class="section-content">
+                <ul>
+                    <li><a href="https://blueteamoperation.github.io/MOD-6/portscan.html" target="_blank"> Case I - Port Scan.</a></li>
+                    <li><a href="https://blueteamoperation.github.io/MOD-6/icmp_c2.html" target="_blank"> Case II - ICMP Túnel.</a></li>
+                    <li><a href="https://blueteamoperation.github.io/MOD-6/bruteforce_web.html" target="_blank"> Case III - Ataque WEB.</a></li>
+                    <li><a href="https://blueteamoperation.github.io/MOD-6/dhcp_lab.html" target="_blank"> Case IV - DHCP Server.</a></li>
+                    <li><a href="https://blueteamoperation.github.io/MOD-6/psql.html" target="_blank"> Case V - SGBD.</a></li>
+                    <li><a href="https://blueteamoperation.github.io/MOD-7/reg_win.html" target="_blank"> Case VI - Bank.</a></li>
+                </ul>
+            </div>
         </div>
     </div>
 
-    <!-- Módulo 7 -->
     <div class="section">
         <h2>📂 Módulo 7 - Introdução a Perícia Digital</h2>
-        <div class="section-content">
-            <ul>
-                <li><a href="https://blueteamoperation.github.io/MOD-7/leis.html" target="_blank"> Leis no Brasil.</a></li>
-                  <li><a href="https://blueteamoperation.github.io/MOD-7/crimes.html" target="_blank"> Classificação dos Crimes.</a></li>
-                   <li><a href="https://blueteamoperation.github.io/MOD-7/acao.html" target="_blank"> Tipificação dos Crimes.</a></li>
-                   <li><a href="https://blueteamoperation.github.io/MOD-7/evid.html" target="_blank"> Vestígios ou Evidências.</a></li>
-                <li><a href="https://blueteamoperation.github.io/MOD-7/processo_forense.html" target="_blank"> Processo Forense.</a></li>
-                   <li><a href="https://blueteamoperation.github.io/MOD-7/volatil.html" target="_blank"> Ordem da Volatilidade.</a></li>
-                <li><a href="https://blueteamoperation.github.io/MOD-7/ferramentas.html" target="_blank"> Ferramentas Utilizadas na Perícia Digital.</a></li>
-                 <li><a href="https://blueteamoperation.github.io/MOD-7/mbr.html" target="_blank"> Analisando MBR.</a></li>
-                 <li><a href="https://blueteamoperation.github.io/MOD-7/livewin.html" target="_blank"> Comandos Úteis Aquisição A Quente Windows.</a></li>
-                <li><a href="https://blueteamoperation.github.io/MOD-7/live_linux.html" target="_blank"> Comandos Úteis Aquisição A Quente Linux.</a></li>
-            </ul>
+        <div class="section-wrapper">
+            <div class="section-content">
+                <ul>
+                    <li><a href="https://blueteamoperation.github.io/MOD-7/leis.html" target="_blank"> Leis no Brasil.</a></li>
+                    <li><a href="https://blueteamoperation.github.io/MOD-7/crimes.html" target="_blank"> Classificação dos Crimes.</a></li>
+                    <li><a href="https://blueteamoperation.github.io/MOD-7/acao.html" target="_blank"> Tipificação dos Crimes.</a></li>
+                    <li><a href="https://blueteamoperation.github.io/MOD-7/evid.html" target="_blank"> Vestígios ou Evidências.</a></li>
+                    <li><a href="https://blueteamoperation.github.io/MOD-7/processo_forense.html" target="_blank"> Processo Forense.</a></li>
+                    <li><a href="https://blueteamoperation.github.io/MOD-7/volatil.html" target="_blank"> Ordem da Volatilidade.</a></li>
+                    <li><a href="https://blueteamoperation.github.io/MOD-7/ferramentas.html" target="_blank"> Ferramentas Utilizadas na Perícia Digital.</a></li>
+                    <li><a href="https://blueteamoperation.github.io/MOD-7/mbr.html" target="_blank"> Analisando MBR.</a></li>
+                    <li><a href="https://blueteamoperation.github.io/MOD-7/livewin.html" target="_blank"> Comandos Úteis Aquisição A Quente Windows.</a></li>
+                    <li><a href="https://blueteamoperation.github.io/MOD-7/live_linux.html" target="_blank"> Comandos Úteis Aquisição A Quente Linux.</a></li>
+                </ul>
+            </div>
         </div>
     </div>
 
-          <!-- Subseção 7: Análises -->
-            <div class="sub-section">
-                <h3>🛠️ 1. Análises Iniciais </h3>
-                <div class="sub-section-content">
-                    <ul>
-                        <li><a href="https://blueteamoperation.github.io/MOD-7/reg_win.html" target="_blank">Análise de Hives de Registro Windows - I .</a></li>
-                        <li><a href="https://blueteamoperation.github.io/MOD-7/reg_exfilt.html" target="_blank">Análise de Hives de Registro Windows - II.</a></li>
-                        <li><a href="https://blueteamoperation.github.io/MOD-7/analise1_vol2.html" target="_blank">Análise de Memória RAM com Volatility 2.6 - I.</a></li>
-   <li><a href="https://blueteamoperation.github.io/MOD-7/analise2_vol2.html" target="_blank">Análise de Memória RAM com Volatility 2.6 - II.</a></li>
-                       
-                        
-                        
-                    </ul>
-                </div>
+    <div class="sub-section" style="margin-bottom: 30px;">
+        <h3>🛠️ 1. Análises Iniciais </h3>
+        <div class="sub-section-wrapper">
+            <div class="sub-section-content">
+                <ul>
+                    <li><a href="https://blueteamoperation.github.io/MOD-7/reg_win.html" target="_blank">Análise de Hives de Registro Windows - I .</a></li>
+                    <li><a href="https://blueteamoperation.github.io/MOD-7/reg_exfilt.html" target="_blank">Análise de Hives de Registro Windows - II.</a></li>
+                    <li><a href="https://blueteamoperation.github.io/MOD-7/analise1_vol2.html" target="_blank">Análise de Memória RAM com Volatility 2.6 - I.</a></li>
+                    <li><a href="https://blueteamoperation.github.io/MOD-7/analise2_vol2.html" target="_blank">Análise de Memória RAM com Volatility 2.6 - II.</a></li>
+                </ul>
             </div>
+        </div>
+    </div>
 
-    
-    
     <div class="footer">
         --- END OF SESSION --- <br>
         BlueTeamOps • DFIR • Cyber Defense
@@ -532,33 +557,19 @@
 </div>
 
 <script>
-    // Gerenciador dos Módulos Principais (Accordion)
+    // Gerenciador limpo e agnóstico de conteúdo usando CSS Grid nativo
     const mainSections = document.querySelectorAll('.section h2');
     mainSections.forEach(header => {
         header.addEventListener('click', () => {
-            const currentSection = header.parentElement;
-            
-            // Fecha as outras seções se quiser um efeito sanfona limpo (opcional)
-            // Se preferir deixar várias abertas, mantenha apenas o toggle.
-            currentSection.classList.toggle('active');
+            header.parentElement.classList.toggle('active');
         });
     });
 
-    // Gerenciador das Subseções Internas do Módulo 6 (Sub-Accordion)
     const subSections = document.querySelectorAll('.sub-section h3');
     subSections.forEach(subHeader => {
         subHeader.addEventListener('click', (e) => {
-            e.stopPropagation(); // Previne o bubbling para o h2 pai
-            
-            const currentSub = subHeader.parentElement;
-            currentSub.classList.toggle('active');
-            
-            // AJUSTE CRÍTICO: Força o container pai (Módulo 6) a recalcular a altura
-            const parentContent = currentSub.closest('.section-content');
-            if (parentContent) {
-                // Como usamos max-content no CSS, reajustamos para renderizar o overflow
-                parentContent.style.maxHeight = 'max-content';
-            }
+            e.stopPropagation(); // Evita re-trigger no pai
+            subHeader.parentElement.classList.toggle('active');
         });
     });
 </script>
