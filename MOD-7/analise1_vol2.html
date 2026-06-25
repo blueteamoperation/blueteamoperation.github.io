@@ -143,7 +143,7 @@
     <div class="container">
 
         <div class="challenge-card">
-            <span class="plugin-tag">volatility -f mem.raw pstree</span>
+            <span class="plugin-tag">volatility -f analise.bin</span>
             <h3>#01 - Processos Filhos do Explorer</h3>
             <p>Identifique os PIDs dos dois processos que foram gerados diretamente como processos filhos do <code>explorer.exe</code>. (Separe os PIDs por vírgula)</p>
             <div class="input-group">
@@ -154,7 +154,7 @@
         </div>
 
         <div class="challenge-card">
-            <span class="plugin-tag">volatility -f mem.raw pslist</span>
+            <span class="plugin-tag">volatility -f analise.bin</span>
             <h3>#02 - Processo Encerrado (Exit Time)</h3>
             <p>Qual é o nome do executável e o PID do processo que já havia sido finalizado/encerrado no momento do dump de memória? (Formato: nome,pid)</p>
             <div class="input-group">
@@ -165,7 +165,7 @@
         </div>
 
         <div class="challenge-card">
-            <span class="plugin-tag">volatility -f mem.raw imageinfo</span>
+            <span class="plugin-tag">volatility -f analise.bin</span>
             <h3>#03 - Identificação do Host</h3>
             <p>Qual é o nome (Hostname) do computador do qual a memória RAM foi extraída?</p>
             <div class="input-group">
@@ -176,7 +176,7 @@
         </div>
 
         <div class="challenge-card">
-            <span class="plugin-tag">volatility -f mem.raw envars</span>
+            <span class="plugin-tag">volatility -f analise.bin</span>
             <h3>#04 - Identificação de Usuário</h3>
             <p>Qual é o nome do usuário ativo do sistema operacional associado às variáveis de ambiente avaliadas?</p>
             <div class="input-group">
@@ -187,7 +187,7 @@
         </div>
 
         <div class="challenge-card">
-            <span class="plugin-tag">volatility -f mem.raw psxview</span>
+            <span class="plugin-tag">volatility -f analise.bin</span>
             <h3>#05 - Processo Oculto (DKOM)</h3>
             <p>Determine o PID e o nome do processo oculto desvinculado das listas de auditoria padrão estruturais. (Formato: pid,nome)</p>
             <div class="input-group">
@@ -198,7 +198,7 @@
         </div>
 
         <div class="challenge-card">
-            <span class="plugin-tag">volatility -f mem.raw netscan</span>
+            <span class="plugin-tag">volatility -f analise.bin</span>
             <h3>#06 - Sockets de Rede do Processo Oculto</h3>
             <p>Quais são os endereços IPs e portas envolvidos na atividade de rede do processo oculto? (Formato: IP_Local:Porta,IP_Remoto:Porta)</p>
             <div class="input-group">
@@ -209,7 +209,7 @@
         </div>
 
         <div class="challenge-card">
-            <span class="plugin-tag">hexdump -C dumped_proc.bin | head -n 10</span>
+            <span class="plugin-tag">volatility -f analise.bin</span>
             <h3>#07 - Análise do Binário Extraído (Hexdump)</h3>
             <p>Após realizar o *procdump* do binário malicioso oculto, verifique as 10 linhas iniciais e informe os **últimos 8 bytes** presentes na décima linha extraída: (Formato: tudo em minúsculo e separado por espaços)</p>
             <div class="input-group">
