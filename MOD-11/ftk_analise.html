@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>[ FTK ]</title>
+    <style>
+        :root {
+            --neon-cyan: #00f0ff;
+            --neon-magenta: #ff007f;
+            --dark-bg: #09090e;
+            --card-bg: #111122;
+            --terminal-green: #39ff14;
+            --warning-amber: #ffb700;
+        }
+
+        body {
+            background-color: var(--dark-bg);
+            color: #ffffff;
+            font-family: 'Courier New', Courier, monospace;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            border-bottom: 2px dashed var(--neon-cyan);
+            padding-bottom: 20px;
+            width: 100%;
+            max-width: 950px;
+        }
+
+        h1 {
+            color: var(--neon-cyan);
+            text-shadow: 0 0 10px var(--neon-cyan);
+            font-size: 2rem;
+            margin: 0;
+        }
+
+        .subtitle {
+            color: var(--neon-magenta);
+            font-weight: bold;
+            letter-spacing: 2px;
+            margin-top: 5px;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 950px;
+        }
+
+        .challenge-card {
+            background-color: var(--card-bg);
+            border: 1px solid #1f1f3a;
+            border-left: 5px solid var(--neon-magenta);
+            border-radius: 4px;
+            padding: 25px;
+            margin-bottom: 25px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.6);
+        }
+
+        .challenge-card h3 {
+            color: var(--warning-amber);
+            margin-top: 0;
+            font-size: 1.1rem;
+            border-bottom: 1px solid #1f1f3a;
+            padding-bottom: 6px;
+        }
+
+        .plugin-tag {
+            display: inline-block;
+            background: #000;
+            color: var(--neon-cyan);
+            padding: 2px 8px;
+            font-size: 0.8rem;
+            border-radius: 3px;
+            border: 1px solid var(--neon-cyan);
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+
+        .input-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 12px;
+        }
+
+        input[type="text"] {
+            background-color: #000;
+            border: 1px solid var(--neon-cyan);
+            color: #fff;
+            padding: 10px;
+            font-family: inherit;
+            flex-grow: 1;
+            border-radius: 4px;
+            font-size: 0.95rem;
+        }
+
+        input:focus {
+            outline: none;
+            box-shadow: 0 0 8px var(--neon-cyan);
+        }
+
+        button {
+            background-color: transparent;
+            border: 1px solid var(--neon-magenta);
+            color: var(--neon-magenta);
+            padding: 10px 20px;
+            cursor: pointer;
+            font-family: inherit;
+            font-weight: bold;
+            border-radius: 4px;
+            transition: all 0.3s;
+        }
+
+        button:hover {
+            background-color: var(--neon-magenta);
+            color: #000;
+            box-shadow: 0 0 15px var(--neon-magenta);
+        }
+
+        .status {
+            margin-top: 8px;
+            font-weight: bold;
+            font-size: 0.85rem;
+        }
+
+        .success { color: var(--terminal-green); }
+        .error { color: #ff3333; }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <h1>[ FTK IMAGER // BASIC ]</h1>
+        <div class="subtitle">Aretfato: ForensicWorkstationWin26 - C:\Users\faruk\Desktop\Artefatos\imagens_forense\server.dd</div>
+    </div>
+
+    <div class="container">
+
+        <div class="challenge-card">
+            <span class="plugin-tag">server.dd</span>
+            <h3>#01 - Kernel</h3>
+            <p>Qual é o kernel do SO analisado?</p>
+            <div class="input-group">
+                <input type="text" id="ans1" placeholder="Ex: 4.2.16-4.0">
+                <button onclick="checkFlag(1, '2.2.14-5.0')">SUBMIT</button>
+            </div>
+            <div class="status" id="status1"></div>
+        </div>
+
+        <div class="challenge-card">
+            <span class="plugin-tag">server.dd</span>
+            <h3>#02 - Versão</h3>
+            <p>Qual é o Sistema e a Versão?</p>
+            <div class="input-group">
+                <input type="text" id="ans2" placeholder="Ex: Debian 10">
+                <button onclick="checkFlag(2, 'Red Hat 6.2')">SUBMIT</button>
+            </div>
+            <div class="status" id="status2"></div>
+        </div>
+
+        <div class="challenge-card">
+            <span class="plugin-tag">server.dd</span>
+            <h3>#03 - Host</h3>
+            <p>Qual é o nome do host?</p>
+            <div class="input-group">
+                <input type="text" id="ans3" placeholder="linux">
+                <button onclick="checkFlag(3, 'able2')">SUBMIT</button>
+            </div>
+            <div class="status" id="status3"></div>
+        </div>
+
+         <div class="challenge-card">
+            <span class="plugin-tag">server.dd</span>
+            <h3>#04 - Invasor</h3>
+            <p>Qual o usuário criado pelo invasor?</p>
+            <div class="input-group">
+                <input type="text" id="ans4" placeholder="johndoe">
+                <button onclick="checkFlag(4, 'r00t')">SUBMIT</button>
+            </div>
+            <div class="status" id="status4"></div>
+        </div>
+
+
+ <div class="challenge-card">
+            <span class="plugin-tag">server.dd</span>
+            <h3>#05 - FTP</h3>
+            <p>Quantos arquivos estão disponiveis para download no servidor FTP?</p>
+            <div class="input-group">
+                <input type="text" id="ans5" placeholder="10">
+                <button onclick="checkFlag(5, '2')">SUBMIT</button>
+            </div>
+            <div class="status" id="status5"></div>
+        </div>
+
+
+<div class="challenge-card">
+            <span class="plugin-tag">server.dd</span>
+            <h3>#06 - Ping</h3>
+            <p>Quantos IPs foram pingados pelo usuário root?</p>
+            <div class="input-group">
+                <input type="text" id="ans6" placeholder="5">
+                <button onclick="checkFlag(6, '2')">SUBMIT</button>
+            </div>
+            <div class="status" id="status6"></div>
+        </div>
+
+<div class="challenge-card">
+            <span class="plugin-tag">server.dd</span>
+            <h3>#07 - Server</h3>
+            <p>Qual é o IP do servidor FTP?</p>
+            <div class="input-group">
+                <input type="text" id="ans7" placeholder="1.11.51.210">
+                <button onclick="checkFlag(7, '192.168.55.110')">SUBMIT</button>
+            </div>
+            <div class="status" id="status7"></div>
+        </div>
+ </div>
+
+    <script>
+        function checkFlag(qNum, correctValue) {
+            // Remove espaços extras para evitar erros bobos de digitação do aluno
+            const userInput = document.getElementById('ans' + qNum).value.trim().replace(/\s+/g, ' ').toLowerCase();
+            const target = correctValue.toLowerCase();
+
+            const statusDiv = document.getElementById('status' + qNum);
+            
+            if (userInput === target || userInput.includes(target)) {
+                statusDiv.className = "status success";
+                statusDiv.innerHTML = "[+] ACCESS GRANTED: Artefato de memória RAM validado com sucesso!";
+            } else {
+                statusDiv.className = "status error";
+                statusDiv.innerHTML = "[-] ACCESS DENIED: Estrutura divergente ou erro de parsing na análise.";
+            }
+        }
+    </script>
+</body>
+</html>
