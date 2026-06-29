@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>[ Windows ]</title>
+    <style>
+        :root {
+            --neon-cyan: #00f0ff;
+            --neon-magenta: #ff007f;
+            --dark-bg: #09090e;
+            --card-bg: #111122;
+            --terminal-green: #39ff14;
+            --warning-amber: #ffb700;
+        }
+
+        body {
+            background-color: var(--dark-bg);
+            color: #ffffff;
+            font-family: 'Courier New', Courier, monospace;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            border-bottom: 2px dashed var(--neon-cyan);
+            padding-bottom: 20px;
+            width: 100%;
+            max-width: 950px;
+        }
+
+        h1 {
+            color: var(--neon-cyan);
+            text-shadow: 0 0 10px var(--neon-cyan);
+            font-size: 2rem;
+            margin: 0;
+        }
+
+        .subtitle {
+            color: var(--neon-magenta);
+            font-weight: bold;
+            letter-spacing: 2px;
+            margin-top: 5px;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 950px;
+        }
+
+        .challenge-card {
+            background-color: var(--card-bg);
+            border: 1px solid #1f1f3a;
+            border-left: 5px solid var(--neon-magenta);
+            border-radius: 4px;
+            padding: 25px;
+            margin-bottom: 25px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.6);
+        }
+
+        .challenge-card h3 {
+            color: var(--warning-amber);
+            margin-top: 0;
+            font-size: 1.1rem;
+            border-bottom: 1px solid #1f1f3a;
+            padding-bottom: 6px;
+        }
+
+        .plugin-tag {
+            display: inline-block;
+            background: #000;
+            color: var(--neon-cyan);
+            padding: 2px 8px;
+            font-size: 0.8rem;
+            border-radius: 3px;
+            border: 1px solid var(--neon-cyan);
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+
+        .input-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 12px;
+        }
+
+        input[type="text"] {
+            background-color: #000;
+            border: 1px solid var(--neon-cyan);
+            color: #fff;
+            padding: 10px;
+            font-family: inherit;
+            flex-grow: 1;
+            border-radius: 4px;
+            font-size: 0.95rem;
+        }
+
+        input:focus {
+            outline: none;
+            box-shadow: 0 0 8px var(--neon-cyan);
+        }
+
+        button {
+            background-color: transparent;
+            border: 1px solid var(--neon-magenta);
+            color: var(--neon-magenta);
+            padding: 10px 20px;
+            cursor: pointer;
+            font-family: inherit;
+            font-weight: bold;
+            border-radius: 4px;
+            transition: all 0.3s;
+        }
+
+        button:hover {
+            background-color: var(--neon-magenta);
+            color: #000;
+            box-shadow: 0 0 15px var(--neon-magenta);
+        }
+
+        .status {
+            margin-top: 8px;
+            font-weight: bold;
+            font-size: 0.85rem;
+        }
+
+        .success { color: var(--terminal-green); }
+        .error { color: #ff3333; }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <h1>[ Windows Prefetch // BASIC ]</h1>
+        <div class="subtitle">Aretfato: ForensicWorkstationWin26 - C:\Users\faruk\Desktop\Artefatos\Prefetch</div>
+    </div>
+
+    <div class="container">
+
+        <div class="challenge-card">
+            <span class="plugin-tag">server.dd</span>
+            <h3>#01 - Firefox</h3>
+            <p>Quantas vezes o Firefox foi executado ?</p>
+            <div class="input-group">
+                <input type="text" id="ans1" placeholder="10">
+                <button onclick="checkFlag(1, '15')">SUBMIT</button>
+            </div>
+            <div class="status" id="status1"></div>
+        </div>
+
+        <div class="challenge-card">
+            <span class="plugin-tag">server.dd</span>
+            <h3>#02 - Navegação</h3>
+            <p>Qual foi a última vez que o firefox foi executado, informe data e horário?</p>
+            <div class="input-group">
+                <input type="text" id="ans2" placeholder="Ex: 11/01/2021 11:01:21">
+                <button onclick="checkFlag(2, '19/04/2025 18:02:28')">SUBMIT</button>
+            </div>
+            <div class="status" id="status2"></div>
+        </div>
+
+        <div class="challenge-card">
+            <span class="plugin-tag">server.dd</span>
+            <h3>#03 - S-S-ID</h3>
+            <p>Ignore o volume e informe o caminho do arquivo de cache associado ao firefox e diretamente relacionado ao usuário principal da máquina. (Atenção , substitua a "\" por "-")</p>
+            <div class="input-group">
+                <input type="text" id="ans3" placeholder="-caminho-caminho-caminho...">
+                <button onclick="checkFlag(3,'-WINDOWS-SERVICEPROFILES-LOCALSERVICE-APPDATA-LOCAL-FONTCACHE-~FONTCACHE-S-1-5-21-321011808-3761883066-353627080-1000.DAT')">SUBMIT</button>
+            </div>
+            <div class="status" id="status3"></div>
+        </div>
+
+         
+ </div>
+
+    <script>
+        function checkFlag(qNum, correctValue) {
+            // Remove espaços extras para evitar erros bobos de digitação do aluno
+            const userInput = document.getElementById('ans' + qNum).value.trim().replace(/\s+/g, ' ').toLowerCase();
+            const target = correctValue.toLowerCase();
+
+            const statusDiv = document.getElementById('status' + qNum);
+            
+            if (userInput === target || userInput.includes(target)) {
+                statusDiv.className = "status success";
+                statusDiv.innerHTML = "[+] ACCESS GRANTED: Artefato de memória RAM validado com sucesso!";
+            } else {
+                statusDiv.className = "status error";
+                statusDiv.innerHTML = "[-] ACCESS DENIED: Estrutura divergente ou erro de parsing na análise.";
+            }
+        }
+    </script>
+</body>
+</html>
