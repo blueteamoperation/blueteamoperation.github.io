@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>[ Windows ]</title>
+    <style>
+        :root {
+            --neon-cyan: #00f0ff;
+            --neon-magenta: #ff007f;
+            --dark-bg: #09090e;
+            --card-bg: #111122;
+            --terminal-green: #39ff14;
+            --warning-amber: #ffb700;
+        }
+
+        body {
+            background-color: var(--dark-bg);
+            color: #ffffff;
+            font-family: 'Courier New', Courier, monospace;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            border-bottom: 2px dashed var(--neon-cyan);
+            padding-bottom: 20px;
+            width: 100%;
+            max-width: 950px;
+        }
+
+        h1 {
+            color: var(--neon-cyan);
+            text-shadow: 0 0 10px var(--neon-cyan);
+            font-size: 2rem;
+            margin: 0;
+        }
+
+        .subtitle {
+            color: var(--neon-magenta);
+            font-weight: bold;
+            letter-spacing: 2px;
+            margin-top: 5px;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 950px;
+        }
+
+        .challenge-card {
+            background-color: var(--card-bg);
+            border: 1px solid #1f1f3a;
+            border-left: 5px solid var(--neon-magenta);
+            border-radius: 4px;
+            padding: 25px;
+            margin-bottom: 25px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.6);
+        }
+
+        .challenge-card h3 {
+            color: var(--warning-amber);
+            margin-top: 0;
+            font-size: 1.1rem;
+            border-bottom: 1px solid #1f1f3a;
+            padding-bottom: 6px;
+        }
+
+        .plugin-tag {
+            display: inline-block;
+            background: #000;
+            color: var(--neon-cyan);
+            padding: 2px 8px;
+            font-size: 0.8rem;
+            border-radius: 3px;
+            border: 1px solid var(--neon-cyan);
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+
+        .input-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 12px;
+        }
+
+        input[type="text"] {
+            background-color: #000;
+            border: 1px solid var(--neon-cyan);
+            color: #fff;
+            padding: 10px;
+            font-family: inherit;
+            flex-grow: 1;
+            border-radius: 4px;
+            font-size: 0.95rem;
+        }
+
+        input:focus {
+            outline: none;
+            box-shadow: 0 0 8px var(--neon-cyan);
+        }
+
+        button {
+            background-color: transparent;
+            border: 1px solid var(--neon-magenta);
+            color: var(--neon-magenta);
+            padding: 10px 20px;
+            cursor: pointer;
+            font-family: inherit;
+            font-weight: bold;
+            border-radius: 4px;
+            transition: all 0.3s;
+        }
+
+        button:hover {
+            background-color: var(--neon-magenta);
+            color: #000;
+            box-shadow: 0 0 15px var(--neon-magenta);
+        }
+
+        .status {
+            margin-top: 8px;
+            font-weight: bold;
+            font-size: 0.85rem;
+        }
+
+        .success { color: var(--terminal-green); }
+        .error { color: #ff3333; }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <h1>[ MFT // BASIC ]</h1>
+        <div class="subtitle">Artefato: ForensicWorkstationWin26 - C:\Users\faruk\Desktop\Artefatos\mft</div>
+    </div>
+
+    <div class="container">
+
+        <div class="challenge-card">
+            <span class="plugin-tag">mft</span>
+            <h3>#01 - Desktop </h3>
+            <p>Existe um arquivo suspeito na área de trabalho, qual é o nome deste arquivo?</p>
+            <div class="input-group">
+                <input type="text" id="ans1" placeholder="file">
+                <button onclick="checkFlag(1, 'aula.txt')">SUBMIT</button>
+            </div>
+            <div class="status" id="status1"></div>
+        </div>
+
+        <div class="challenge-card">
+            <span class="plugin-tag">mft</span>
+            <h3>#02 - Data e Hora</h3>
+            <p>Qual a verdadeira data e hora de criação do arquivo suspeito?</p>
+            <div class="input-group">
+                <input type="text" id="ans2" placeholder="2000-04-10 00:00:00">
+                <button onclick="checkFlag(2, '2026-06-30 12:00:00')">SUBMIT</button>
+            </div>
+            <div class="status" id="status2"></div>
+        </div>
+
+        <div class="challenge-card">
+            <span class="plugin-tag">mft</span>
+            <h3>#03 - Antiforense</h3>
+            <p>Qual técnica antiforense foi utilizada?</p>
+            <div class="input-group">
+                <input type="text" id="ans3" placeholder="técnica">
+                <button onclick="checkFlag(3, 'Timestomped')">SUBMIT</button>
+            </div>
+            <div class="status" id="status3"></div>
+        </div>
+
+ </div>
+
+    <script>
+        function checkFlag(qNum, correctValue) {
+            // Remove espaços extras para evitar erros bobos de digitação do aluno
+            const userInput = document.getElementById('ans' + qNum).value.trim().replace(/\s+/g, ' ').toLowerCase();
+            const target = correctValue.toLowerCase();
+
+            const statusDiv = document.getElementById('status' + qNum);
+            
+            if (userInput === target || userInput.includes(target)) {
+                statusDiv.className = "status success";
+                statusDiv.innerHTML = "[+] ACCESS GRANTED: Artefato de memória RAM validado com sucesso!";
+            } else {
+                statusDiv.className = "status error";
+                statusDiv.innerHTML = "[-] ACCESS DENIED: Estrutura divergente ou erro de parsing na análise.";
+            }
+        }
+    </script>
+</body>
+</html>
