@@ -1,0 +1,798 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Mini CTF - Firefox Places.sqlite</title>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: Arial, Helvetica, sans-serif;
+      background: #0f172a;
+      color: #e5e7eb;
+      line-height: 1.6;
+    }
+
+    header {
+      background: linear-gradient(135deg, #1e293b, #312e81);
+      padding: 40px 20px;
+      text-align: center;
+      border-bottom: 3px solid #38bdf8;
+    }
+
+    header h1 {
+      margin: 0;
+      font-size: 2.2rem;
+      color: #ffffff;
+    }
+
+    header p {
+      max-width: 900px;
+      margin: 15px auto 0;
+      color: #cbd5e1;
+      font-size: 1.05rem;
+    }
+
+    main {
+      max-width: 1100px;
+      margin: 30px auto;
+      padding: 0 20px 40px;
+    }
+
+    .card {
+      background: #111827;
+      border: 1px solid #334155;
+      border-radius: 14px;
+      padding: 22px;
+      margin-bottom: 22px;
+      box-shadow: 0 8px 18px rgba(0,0,0,0.25);
+    }
+
+    .card h2 {
+      margin-top: 0;
+      color: #38bdf8;
+      font-size: 1.4rem;
+    }
+
+    .info-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 14px;
+      margin-top: 18px;
+    }
+
+    .info-box {
+      background: #020617;
+      border-left: 4px solid #38bdf8;
+      padding: 14px;
+      border-radius: 8px;
+    }
+
+    .question {
+      background: #020617;
+      border: 1px solid #1e293b;
+      border-radius: 12px;
+      padding: 20px;
+      margin-bottom: 18px;
+    }
+
+    .question h3 {
+      margin-top: 0;
+      color: #facc15;
+      font-size: 1.15rem;
+    }
+
+    label {
+      display: block;
+      margin: 14px 0 6px;
+      font-weight: bold;
+      color: #cbd5e1;
+    }
+
+    input[type="text"], textarea {
+      width: 100%;
+      background: #0f172a;
+      color: #f8fafc;
+      border: 1px solid #475569;
+      border-radius: 8px;
+      padding: 12px;
+      font-size: 1rem;
+      outline: none;
+    }
+
+    textarea {
+      min-height: 90px;
+      resize: vertical;
+    }
+
+    input[type="text"]:focus, textarea:focus {
+      border-color: #38bdf8;
+      box-shadow: 0 0 0 2px rgba(56,189,248,0.25);
+    }
+
+    details {
+      margin-top: 12px;
+      background: #111827;
+      border: 1px solid #334155;
+      border-radius: 8px;
+      padding: 10px 12px;
+    }
+
+    summary {
+      cursor: pointer;
+      color: #93c5fd;
+      font-weight: bold;
+    }
+
+    code, pre {
+      background: #020617;
+      color: #a7f3d0;
+      border: 1px solid #1e293b;
+      border-radius: 8px;
+    }
+
+    code {
+      padding: 2px 6px;
+    }
+
+    pre {
+      padding: 15px;
+      overflow-x: auto;
+      white-space: pre-wrap;
+    }
+
+    .bonus {
+      border: 1px solid #f97316;
+      background: #1c1917;
+    }
+
+    .bonus h2 {
+      color: #fb923c;
+    }
+
+    .footer {
+      text-align: center;
+      color: #94a3b8;
+      padding: 25px;
+      border-top: 1px solid #334155;
+      font-size: 0.9rem;
+    }
+
+    .print-btn {
+      display: inline-block;
+      margin-top: 15px;
+      background: #38bdf8;
+      color: #020617;
+      border: none;
+      border-radius: 8px;
+      padding: 12px 18px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    .print-btn:hover {
+      background: #7dd3fc;
+    }
+
+
+    .actions {
+      position: sticky;
+      bottom: 0;
+      background: rgba(15,23,42,0.96);
+      border: 1px solid #334155;
+      border-radius: 14px;
+      padding: 18px;
+      margin-top: 24px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      align-items: center;
+      justify-content: space-between;
+      box-shadow: 0 -8px 18px rgba(0,0,0,0.25);
+      z-index: 10;
+    }
+
+    .check-btn, .reset-btn {
+      border: none;
+      border-radius: 8px;
+      padding: 12px 18px;
+      font-weight: bold;
+      cursor: pointer;
+      font-size: 1rem;
+    }
+
+    .check-btn {
+      background: #22c55e;
+      color: #020617;
+    }
+
+    .check-btn:hover {
+      background: #86efac;
+    }
+
+    .reset-btn {
+      background: #475569;
+      color: #f8fafc;
+    }
+
+    .reset-btn:hover {
+      background: #64748b;
+    }
+
+    .score-box {
+      color: #f8fafc;
+      font-weight: bold;
+    }
+
+    .progress-wrap {
+      width: 100%;
+      background: #020617;
+      border: 1px solid #334155;
+      border-radius: 999px;
+      overflow: hidden;
+      height: 16px;
+      margin-top: 10px;
+    }
+
+    .progress-bar {
+      width: 0%;
+      height: 100%;
+      background: linear-gradient(90deg, #38bdf8, #22c55e);
+      transition: width .3s ease;
+    }
+
+    .feedback {
+      margin-top: 12px;
+      padding: 10px 12px;
+      border-radius: 8px;
+      display: none;
+      font-weight: bold;
+    }
+
+    .feedback.ok {
+      display: block;
+      background: rgba(34,197,94,0.12);
+      border: 1px solid #22c55e;
+      color: #86efac;
+    }
+
+    .feedback.bad {
+      display: block;
+      background: rgba(239,68,68,0.12);
+      border: 1px solid #ef4444;
+      color: #fca5a5;
+    }
+
+    .answer-reveal {
+      display: block;
+      margin-top: 6px;
+      color: #cbd5e1;
+      font-weight: normal;
+    }
+
+    @media print {
+      body {
+        background: #ffffff;
+        color: #000000;
+      }
+      header, .card, .question, details {
+        background: #ffffff !important;
+        color: #000000 !important;
+        box-shadow: none;
+      }
+      input, textarea {
+        background: #ffffff !important;
+        color: #000000 !important;
+        border: 1px solid #000000;
+      }
+      .print-btn {
+        display: none;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Mini CTF - Firefox Places.sqlite</h1>
+    <p>Atividade prática de análise forense de histórico de navegação do Mozilla Firefox.</p>
+    <button class="print-btn" onclick="window.print()">Imprimir / Salvar em PDF</button>
+  </header>
+
+  <main>
+    <section class="card">
+      <h2>Cenário</h2>
+      <p>
+        Durante uma investigação de possível incidente de segurança, a equipe de resposta a incidentes obteve o arquivo
+        <strong>places.sqlite</strong> pertencente ao perfil do Mozilla Firefox de um usuário.
+      </p>
+      <p>
+        Sua missão é analisar o histórico de navegação, identificar acessos suspeitos e reconstruir parte da linha do tempo da atividade do usuário. 
+      </p>
+
+      <div class="info-grid">
+        <div class="info-box"><strong>Artefato:</strong><br>ctf.sqlite</div>
+        <div class="info-box"><strong>Navegador:</strong><br>Mozilla Firefox</div>
+        <div class="info-box"><strong>Tipo de análise:</strong><br>Browser Forensics</div>
+        <div class="info-box"><strong>Nível:</strong><br>Introdutório / Intermediário</div>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2>Instruções</h2>
+      <p>Responda às questões com base apenas na análise do banco de dados fornecido.</p>
+      <p>Você pode utilizar ferramentas como:</p>
+      <ul>
+        <li>DB Browser for SQLite</li>
+        <li>SQLiteStudio</li>
+        <li>Autopsy</li>
+        <li>Hindsight</li>
+      </ul>
+      <p>Evite abrir o arquivo diretamente pelo Firefox para não alterar o artefato.</p>
+      <br> <b>Recurso:</b> ForesnsicWorkstationWin26 - C:\Users\faruk\Desktop\Artefatos\browsers\ctf.places
+    </section>
+
+  
+
+    <form>
+      <div class="question">
+        <h3>Questão 1</h3>
+        <p>Quantas visitas foram registradas no histórico de navegação?</p>
+        <label>Resposta:</label>
+        <input type="text" name="q1" />
+        <div class="feedback" id="fb-q1"></div>
+        <details><summary>Dica</summary><p>Cada linha da tabela <code>moz_historyvisits</code> representa uma visita.</p></details>
+      </div>
+
+      <div class="question">
+        <h3>Questão 2</h3>
+        <p>Quantas URLs diferentes existem cadastradas no histórico?</p>
+        <label>Resposta:</label>
+        <input type="text" name="q2" />
+        <div class="feedback" id="fb-q2"></div>
+        <details><summary>Dica</summary><p>Verifique a quantidade de registros na tabela <code>moz_places</code>.</p></details>
+      </div>
+
+      <div class="question">
+        <h3>Questão 3</h3>
+        <p>Qual foi a primeira navegação registrada pelo navegador?</p>
+        <label>Resposta:</label>
+        <input type="text" name="q3" />
+        <div class="feedback" id="fb-q3"></div>
+        <details><summary>Dica</summary><p>Ordene as visitas pelo campo <code>visit_date</code> em ordem crescente.</p></details>
+      </div>
+
+      <div class="question">
+        <h3>Questão 4</h3>
+        <p>Em que data e horário ocorreu a primeira navegação?</p>
+        <label>Resposta:</label>
+        <input type="text" name="q4" placeholder="AAAA-MM-DD HH:MM" />
+        <div class="feedback" id="fb-q4"></div>
+        <details><summary>Dica</summary><p>Converta <code>visit_date/1000000</code> usando <code>datetime(..., 'unixepoch')</code>.</p></details>
+      </div>
+
+      <div class="question">
+        <h3>Questão 5</h3>
+        <p>Qual foi a última navegação registrada?</p>
+        <label>Resposta:</label>
+        <input type="text" name="q5" />
+        <div class="feedback" id="fb-q5"></div>
+        <details><summary>Dica</summary><p>Ordene as visitas pelo campo <code>visit_date</code> em ordem decrescente.</p></details>
+      </div>
+
+      <div class="question">
+        <h3>Questão 6</h3>
+        <p>Em que data e horário ocorreu a última navegação?</p>
+        <label>Resposta:</label>
+        <input type="text" name="q6" placeholder="AAAA-MM-DD HH:MM" />
+        <div class="feedback" id="fb-q6"></div>
+        <details><summary>Dica</summary><p>Use a mesma conversão de timestamp usada na primeira visita.</p></details>
+      </div>
+
+      <div class="question">
+        <h3>Questão 7</h3>
+        <p>Qual URL recebeu o maior número de visitas?</p>
+        <label>Resposta:</label>
+        <input type="text" name="q7" />
+        <div class="feedback" id="fb-q7"></div>
+        <details><summary>Dica</summary><p>Agrupe por URL e ordene pela contagem de visitas.</p></details>
+      </div>
+
+      <div class="question">
+        <h3>Questão 8</h3>
+        <p>Quantas visitas essa URL recebeu?</p>
+        <label>Resposta:</label>
+        <input type="text" name="q8" />
+        <div class="feedback" id="fb-q8"></div>
+        <details><summary>Dica</summary><p>Utilize <code>COUNT(*)</code> junto com <code>GROUP BY</code>.</p></details>
+      </div>
+
+      <div class="question">
+        <h3>Questão 9</h3>
+        <p>Qual domínio relacionado à documentação técnica para desenvolvedores aparece diversas vezes durante a navegação?</p>
+        <label>Resposta:</label>
+        <input type="text" name="q9" />
+        <div class="feedback" id="fb-q9"></div>
+        <details><summary>Dica</summary><p>Observe URLs de documentação técnica entre as mais acessadas.</p></details>
+      </div>
+
+      <div class="question">
+        <h3>Questão 10</h3>
+        <p>Qual plataforma conhecida pelo compartilhamento de códigos de programação está presente na navegação?</p>
+        <label>Resposta:</label>
+        <input type="text" name="q10" />
+        <div class="feedback" id="fb-q10"></div>
+        <details><summary>Dica</summary><p>Pesquisa básica google.</p></details>
+      </div>
+
+      <div class="question">
+        <h3>Questão 11</h3>
+        <p>Foi identificado algum indício de download de um arquivo contendo informações sensíveis? Caso positivo, informe o nome do arquivo.</p>
+        <label>Resposta:</label>
+        <input type="text" name="q11" />
+        <div class="feedback" id="fb-q11"></div>
+        <details><summary>Dica</summary><p>Procure por URLs contendo <code>download</code>, <code>.zip</code>, <code>.rar</code> ou nomes relacionados a dados.</p></details>
+      </div>
+
+      <div class="question">
+        <h3>Questão 12</h3>
+        <p>Qual serviço de compartilhamento de conteúdo foi utilizado durante a navegação?</p>
+        <label>Resposta:</label>
+        <input type="text" name="q12" />
+        <div class="feedback" id="fb-q12"></div>
+        <details><summary>Dica</summary><p>Procure por serviços usados para publicar textos, códigos ou comandos.</p></details>
+      </div>
+
+      <div class="question">
+        <h3>Questão 13</h3>
+        <p>Qual serviço de e-mail criptografado aparece no histórico?</p>
+        <label>Resposta:</label>
+        <input type="text" name="q13" />
+        <div class="feedback" id="fb-q13"></div>
+        <details><summary>Dica</summary><p>Procure por provedores de e-mail associados à privacidade.</p></details>
+      </div>
+
+      <div class="question">
+        <h3>Questão 14</h3>
+        <p>Qual serviço de armazenamento e compartilhamento em nuvem foi acessado?</p>
+        <label>Resposta:</label>
+        <input type="text" name="q14" />
+        <div class="feedback" id="fb-q14"></div>
+        <details><summary>Dica</summary><p>Identifique plataformas conhecidas de compartilhamento de arquivos.</p></details>
+      </div>
+
+      <div class="question">
+        <h3>Questão 15</h3>
+        <p>Foi identificado acesso a um possível Web Shell? Caso positivo, informe o endereço IP ou domínio acessado.</p>
+        <label>Resposta:</label>
+        <input type="text" name="q15" />
+        <div class="feedback" id="fb-q15"></div>
+        <details><summary>Dica</summary><p>Procure URLs com parâmetros de execução de comandos, como <code>cmd=</code>.</p></details>
+      </div>
+
+      <div class="question">
+        <h3>Questão 16</h3>
+        <p>Qual comando foi utilizado para identificar o usuário do sistema através do Web Shell?</p>
+        <label>Resposta:</label>
+        <input type="text" name="q16" />
+        <div class="feedback" id="fb-q16"></div>
+        <details><summary>Dica</summary><p>Observe os comandos simples de reconhecimento enviados pela URL.</p></details>
+      </div>
+
+      <div class="question">
+        <h3>Questão 17</h3>
+        <p>Qual comando indica a compactação de arquivos antes da possível exfiltração?</p>
+        <label>Resposta:</label>
+        <input type="text" name="q17" />
+        <div class="feedback" id="fb-q17"></div>
+        <details><summary>Dica</summary><p>Procure comandos contendo <code>tar</code>, <code>gzip</code> ou extensão <code>.tgz</code>.</p></details>
+      </div>
+
+      <div class="question">
+        <h3>Questão 18</h3>
+        <p>Qual protocolo aparenta ter sido utilizado para a exfiltração dos dados?</p>
+        <label>Resposta:</label>
+        <input type="text" name="q18" />
+        <div class="feedback" id="fb-q18"></div>
+        <details><summary>Dica</summary><p>Observe comandos relacionados à transferência segura de arquivos.</p></details>
+      </div>
+
+      <div class="question">
+        <h3>Questão 19</h3>
+        <p>Qual foi o destino remoto utilizado durante a exfiltração?</p>
+        <label>Resposta:</label>
+        <input type="text" name="q19" />
+        <div class="feedback" id="fb-q19"></div>
+        <details><summary>Dica</summary><p>Procure por padrões como <code>usuario@IP:/diretorio</code>.</p></details>
+      </div>
+
+      <div class="question">
+        <h3>Questão 20</h3>
+        <p>Qual ferramenta ofensiva relacionada ao PowerShell aparece no histórico?</p>
+        <label>Resposta:</label>
+        <input type="text" name="q20" />
+        <div class="feedback" id="fb-q20"></div>
+        <details><summary>Dica</summary><p>Procure por frameworks ofensivos conhecidos associados ao PowerShell.</p></details>
+      </div>
+
+      <div class="question">
+        <h3>Questão 21</h3>
+        <p>Qual linguagem de programação foi amplamente pesquisada pelo usuário?</p>
+        <label>Resposta:</label>
+        <input type="text" name="q21" />
+        <div class="feedback" id="fb-q21"></div>
+        <details><summary>Dica</summary><p>Observe páginas de documentação acessadas com frequência.</p></details>
+      </div>
+
+      <div class="question">
+        <h3>Questão 22</h3>
+        <p>Qual tecnologia de banco de dados aparece frequentemente durante a navegação?</p>
+        <label>Resposta:</label>
+        <input type="text" name="q22" />
+        <div class="feedback" id="fb-q22"></div>
+        <details><summary>Dica</summary><p>Procure por documentação de banco de dados leve e embutido.</p></details>
+      </div>
+
+      <section class="card bonus">
+        <h2>Desafio Bônus</h2>
+        <p>Reconstrua a sequência cronológica dos eventos suspeitos contendo, no mínimo:</p>
+        <ul>
+          <li>Primeiro acesso registrado;</li>
+          <li>Primeiro acesso suspeito;</li>
+          <li>Download do arquivo;</li>
+          <li>Acesso ao Web Shell;</li>
+          <li>Comando de reconhecimento executado;</li>
+          <li>Compactação dos arquivos;</li>
+          <li>Exfiltração dos dados;</li>
+          <li>Última navegação registrada.</li>
+        </ul>
+        <label>Resposta:</label>
+        <textarea name="bonus"></textarea>
+      </section>
+
+      <section class="actions">
+        <div>
+          <button type="button" class="check-btn" onclick="verificarRespostas()">Verificar Respostas</button>
+          <button type="button" class="reset-btn" onclick="limparRespostas()">Limpar</button>
+        </div>
+        <div class="score-box" id="resultadoFinal">Pontuação: 0 / 22</div>
+        <div class="progress-wrap">
+          <div class="progress-bar" id="progressBar"></div>
+        </div>
+      </section>
+
+    </form>
+  </main>
+
+  <div class="footer">
+    Mini CTF de Browser Forensics - Firefox places.sqlite
+  </div>
+
+<script>
+  const gabarito = {
+    q1: {
+      resposta: "1620",
+      aceitar: ["1620"]
+    },
+    q2: {
+      resposta: "316",
+      aceitar: ["316"]
+    },
+    q3: {
+      resposta: "https://www.google.com/search?q=volatility+linux",
+      aceitar: [
+        "https://www.google.com/search?q=volatility+linux",
+        "www.google.com/search?q=volatility+linux",
+        "google.com/search?q=volatility+linux"
+      ]
+    },
+    q4: {
+      resposta: "2026-06-16 10:40",
+      aceitar: [
+        "2026-06-16 10:40:07",
+        "2026-06-16 10:40:00",
+        "16/06/2026 10:40:07"
+      ]
+    },
+    q5: {
+      resposta: "https://developer.mozilla.org/pt-BR/docs/Web/HTTP/page/14",
+      aceitar: [
+        "https://developer.mozilla.org/pt-br/docs/web/http/page/14",
+        "developer.mozilla.org/pt-br/docs/web/http/page/14"
+      ]
+    },
+    q6: {
+      resposta: "2026-06-16 14:58:57",
+      aceitar: [
+        "2026-06-16 14:58:57",  
+        "2026-06-16 14:58",
+        "16/06/2026 14:58:57",
+        "16/06/2026 14:58"
+      ]
+    },
+    q7: {
+      resposta: "https://docs.python.org/3/library/sqlite3.html",
+      aceitar: [
+        "https://docs.python.org/3/library/sqlite3.html",
+        "docs.python.org/3/library/sqlite3.html"
+      ]
+    },
+    q8: {
+      resposta: "156",
+      aceitar: ["156"]
+    },
+    q9: {
+      resposta: "developer.mozilla.org",
+      aceitar: [
+        "developer.mozilla.org",
+        "mdn",
+        "mozilla developer network",
+        "developer.mozilla.org/pt-br/docs/web/http"
+      ]
+    },
+    q10: {
+      resposta: "github.com",
+      aceitar: [
+        "github.com",
+        "https://github.com",
+        "github"
+      ]
+    },
+    q11: {
+      resposta: "clientes_ceap.zip",
+      aceitar: [
+        "clientes_ceap.zip",
+        "https://anonfiles-dark.example/download/clientes_ceap.zip",
+        "anonfiles-dark.example/download/clientes_ceap.zip"
+      ]
+    },
+    q12: {
+      resposta: "Pastebin",
+      aceitar: [
+        "pastebin",
+        "pastebin.com"
+      ]
+    },
+    q13: {
+      resposta: "ProtonMail",
+      aceitar: [
+        "protonmail",
+        "proton mail",
+        "protonmail.com"
+      ]
+    },
+    q14: {
+      resposta: "mega-share.example",
+      aceitar: [
+        "mega-share.example",
+        "mega",
+        "mega share",
+        "https://mega-share.example/folder/7kz9df#backup-financeiro"
+      ]
+    },
+    q15: {
+      resposta: "203.0.113.50",
+      aceitar: [
+        "203.0.113.50",
+        "http://203.0.113.50",
+        "http://203.0.113.50/shell.php"
+      ]
+    },
+    q16: {
+      resposta: "whoami",
+      aceitar: [
+        "whoami"
+      ]
+    },
+    q17: {
+      resposta: "tar czf /tmp/docs.tgz /home",
+      aceitar: [
+        "tar czf /tmp/docs.tgz /home",
+        "tar%20czf%20/tmp/docs.tgz%20/home"
+      ]
+    },
+    q18: {
+      resposta: "SCP",
+      aceitar: [
+        "scp",
+        "secure copy"
+      ]
+    },
+    q19: {
+      resposta: "backup@198.51.100.77:/drop",
+      aceitar: [
+        "backup@198.51.100.77:/drop",
+        "198.51.100.77:/drop",
+        "backup@198.51.100.77"
+      ]
+    },
+    q20: {
+      resposta: "PowerSploit",
+      aceitar: [
+        "powersploit",
+        "github.com/powershellmafia/powersploit"
+      ]
+    },
+    q21: {
+      resposta: "Python",
+      aceitar: [
+        "python"
+      ]
+    },
+    q22: {
+      resposta: "SQLite",
+      aceitar: [
+        "sqlite",
+        "sqlite3"
+      ]
+    }
+  };
+
+  function normalizar(valor) {
+    return (valor || "")
+      .toString()
+      .trim()
+      .toLowerCase()
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .replace(/^https?:\/\//, "")
+      .replace(/\/$/, "")
+      .replace(/\s+/g, " ");
+  }
+
+  function respostaValida(valor, item) {
+    const respostaAluno = normalizar(valor);
+    return item.aceitar.some(resp => normalizar(resp) === respostaAluno);
+  }
+
+  function verificarRespostas() {
+    let acertos = 0;
+    const total = Object.keys(gabarito).length;
+
+    Object.keys(gabarito).forEach((campo) => {
+      const input = document.querySelector(`[name="${campo}"]`);
+      const feedback = document.getElementById(`fb-${campo}`);
+      const item = gabarito[campo];
+
+      if (!input || !feedback) return;
+
+      const correta = respostaValida(input.value, item);
+
+      feedback.className = correta ? "feedback ok" : "feedback bad";
+      feedback.innerHTML = correta
+        ? "✔ Correto"
+        : `✘ Incorreto `;
+
+      if (correta) acertos++;
+    });
+
+    const percentual = Math.round((acertos / total) * 100);
+    document.getElementById("resultadoFinal").innerText =
+      `Pontuação: ${acertos} / ${total} (${percentual}%)`;
+    document.getElementById("progressBar").style.width = percentual + "%";
+  }
+
+  function limparRespostas() {
+    Object.keys(gabarito).forEach((campo) => {
+      const input = document.querySelector(`[name="${campo}"]`);
+      const feedback = document.getElementById(`fb-${campo}`);
+      if (input) input.value = "";
+      if (feedback) {
+        feedback.className = "feedback";
+        feedback.innerHTML = "";
+      }
+    });
+
+    const bonus = document.querySelector('[name="bonus"]');
+    if (bonus) bonus.value = "";
+
+    document.getElementById("resultadoFinal").innerText = "Pontuação: 0 / 22";
+    document.getElementById("progressBar").style.width = "0%";
+  }
+</script>
+
+</body>
+</html>
