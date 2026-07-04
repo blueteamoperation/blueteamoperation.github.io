@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<title>Caso Forense: Exfiltração de Documento Secreto</title>
+<style>
+    body { margin: 0; font-family: Arial, sans-serif; background: #111; color: #e6e6e6; }
+    header { background: #1b1b1b; border-bottom: 3px solid #5b2cff; padding: 25px; text-align: center; }
+    header h1 { margin: 0; color: #fff; text-transform: uppercase; letter-spacing: 2px; }
+    header p { color: #aaa; }
+    .container { width: 90%; max-width: 1000px; margin: 30px auto; background: #1a1a1a; padding: 25px; border-radius: 10px; box-shadow: 0 0 20px #000; }
+    .case-box { background: #222; border-left: 5px solid #5b2cff; padding: 20px; margin-bottom: 30px; line-height: 1.6; }
+    .question { background: #242424; border: 1px solid #333; padding: 18px; margin-bottom: 18px; border-radius: 8px; }
+    .question h3 { margin-top: 0; color: #cfc3ff; }
+    input { width: 100%; padding: 12px; background: #101010; color: #fff; border: 1px solid #444; border-radius: 5px; margin-top: 8px; font-size: 15px; box-sizing: border-box; }
+    button { margin-top: 12px; background: #5b2cff; color: white; border: none; padding: 10px 18px; border-radius: 5px; cursor: pointer; font-weight: bold; }
+    button:hover { background: #7654ff; }
+    .result { margin-top: 10px; font-weight: bold; }
+    .correct { color: #00ff88; }
+    .wrong { color: #ff4d4d; }
+    .score { text-align: center; font-size: 22px; margin-top: 30px; padding: 15px; background: #111; border: 1px solid #5b2cff; border-radius: 8px; }
+    .timeline h2 { color: #cfc3ff; }
+    .eventos { border-left: 4px solid #5b2cff; padding-left: 25px; margin-top: 25px; }
+    .evento { margin-bottom: 28px; background: #1a1a1a; padding: 15px; border-radius: 8px; border: 1px solid #333; }
+    .evento h3 { margin-top: 0; color: #00ff88; }
+    footer { text-align: center; color: #777; padding: 20px; font-size: 13px; }
+</style>
+</head>
+<body>
+
+<header>
+    <h1>Caso Forense: Exfiltração de Documento Secreto</h1>
+    <p>Laboratório de Computação Forense - Ambiente Windows</p>
+</header>
+
+<div class="container">
+
+    <div class="case-box" id="caseIntro">
+        <h2>Contexto do Caso</h2>
+        <p>
+            A empresa identificou uma possível exfiltração de documento sigiloso realizada a partir
+            de um computador localizado no laboratório corporativo. O principal suspeito é
+            <strong>Leoncio</strong>, que teria utilizado a estação para compartilhar um arquivo secreto
+            com uma pessoa externa à organização.
+        </p>
+
+        <p>O artefato coletado para análise é:</p>
+
+        <p>
+            <strong>lab.raw</strong><br>
+            Localização:
+            <code>/home/investigator/analises/Cases/lab/</code><br>
+            Estação:
+            <strong>ForensicsWorkstationPurple26</strong>
+        </p>
+
+        <p>Sua missão é analisar as evidências e responder às questões abaixo.</p>
+    </div>
+
+    <div id="questions"></div>
+
+    <div class="score" id="scoreBox">
+        Pontuação: <span id="score">0</span> / 8
+    </div>
+
+</div>
+
+<footer>
+    Blue Team Labs - CTF Forense Windows
+</footer>
+
+<script>
+const questions = [
+    { q: "1 - Qual o nome da outra parte envolvida na exfiltração?", a: "valda curupira" },
+    { q: "2 - Qual o nome do documento compartilhado?", a: "projeto.pdf" },
+    { q: "3 - Em que data e hora Leoncio compartilhou o documento?", a: "03/07/2026 22:00:05" },
+    { q: "4 - Para que empresa a parte que recebeu o documento trabalha?", a: "games corp" },
+    { q: "5 - Existe um servidor de e-mail. Qual serviço ou protocolo estava ativo no momento?", a: "imap" },
+    { q: "6 - Qual a unidade e nome do dispositivo de onde o arquivo foi pego?", a: "d: gamescorp" },
+    { q: "7 - Em que data e hora o dispositivo foi acessado por Leoncio?", a: "03/07/2023 21:57:32" },
+    { q: "8 - Que horas Leoncio acessou o arquivo na máquina?", a: "21:59:53" }
+];
+
+let score = 0;
+let answered = {};
+
+function normalize(text) {
+    return text.toLowerCase().trim().replace(/\s+/g, " ");
+}
+
+function loadQuestions() {
+    const area = document.getElementById("questions");
+
+    questions.forEach((item, index) => {
+        const div = document.createElement("div");
+        div.className = "question";
+
+        div.innerHTML = `
+            <h3>${item.q}</h3>
+            <input type="text" id="answer-${index}" placeholder="Digite sua resposta">
+            <button onclick="checkAnswer(${index})">Validar Resposta</button>
+            <div class="result" id="result-${index}"></div>
+        `;
+
+        area.appendChild(div);
+    });
+}
+
+function checkAnswer(index) {
+    const input = document.getElementById(`answer-${index}`);
+    const result = document.getElementById(`result-${index}`);
+
+    const userAnswer = normalize(input.value);
+    const correctAnswer = normalize(questions[index].a);
+
+    if (userAnswer === correctAnswer) {
+        result.textContent = "Resposta correta.";
+        result.className = "result correct";
+
+        if (!answered[index]) {
+            score++;
+            answered[index] = true;
+            document.getElementById("score").textContent = score;
+        }
+
+        input.disabled = true;
+
+        if (score === questions.length) {
+            showTimeline();
+        }
+
+    } else {
+        result.textContent = "Resposta incorreta.";
+        result.className = "result wrong";
+    }
+}
+
+function showTimeline() {
+    document.getElementById("questions").style.display = "none";
+    document.getElementById("scoreBox").style.display = "none";
+    document.getElementById("caseIntro").style.display = "none";
+
+    const container = document.querySelector(".container");
+
+    const timeline = document.createElement("div");
+    timeline.className = "case-box timeline";
+
+    timeline.innerHTML = `
+        <h2 style="text-align:center;color:#00ff88;">INVESTIGAÇÃO CONCLUÍDA</h2>
+        <p style="text-align:center;font-size:18px;">
+            Todas as respostas foram validadas e os eventos foram reconstruídos em ordem cronológica.
+        </p>
+
+        <hr style="border-color:#444;margin:30px 0;">
+
+        <h2>Linha do Tempo da Investigação</h2>
+
+        <div class="eventos">
+
+            <div class="evento">
+                <h3>03/07/2023 21:57:32</h3>
+                <p>
+                    Leoncio acessou o dispositivo removível
+                    <strong>D: GAMESCORP</strong>, unidade de onde o arquivo foi obtido.
+                </p>
+            </div>
+
+            <div class="evento">
+                <h3>03/07/2026 21:59:53</h3>
+                <p>
+                    O arquivo <strong>projeto.pdf</strong> foi acessado na máquina
+                    <strong>ForensicsWorkstationPurple26</strong>.
+                </p>
+            </div>
+
+            <div class="evento">
+                <h3>03/07/2026 22:00:05</h3>
+                <p>
+                    Leoncio compartilhou o documento <strong>projeto.pdf</strong>
+                    com <strong>Valda Curupira</strong>.
+                </p>
+            </div>
+
+            <div class="evento">
+                <h3>Destino da Exfiltração</h3>
+                <p>
+                    A outra parte envolvida foi <strong>Valda Curupira</strong>,
+                    funcionária da empresa <strong>Games Corp</strong>.
+                </p>
+            </div>
+
+            <div class="evento">
+                <h3>Servidor de E-mail</h3>
+                <p>
+                    Foi identificado um servidor de e-mail com o serviço/protocolo
+                    <strong>IMAP</strong> ativo no momento da comunicação.
+                </p>
+            </div>
+
+        </div>
+
+        <hr style="border-color:#444;margin:30px 0;">
+
+        <h2>Conclusão Pericial</h2>
+        <p>
+            As evidências indicam que Leoncio utilizou o computador do laboratório da empresa
+            para acessar o dispositivo <strong>D: GAMESCORP</strong>, abrir o arquivo
+            <strong>projeto.pdf</strong> e compartilhá-lo com <strong>Valda Curupira</strong>,
+            colaboradora da <strong>Games Corp</strong>.
+        </p>
+
+        <p>
+            A sequência temporal dos artefatos é compatível com um caso de
+            <strong>exfiltração de documento sigiloso</strong>.
+        </p>
+    `;
+
+    container.appendChild(timeline);
+
+    window.scrollTo({
+        top: 0,
+        behavior: "smooth"
+    });
+}
+
+loadQuestions();
+</script>
+
+</body>
+</html>
