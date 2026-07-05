@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<title>Mini CTF Linux - Análise Forense</title>
+<style>
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: #101010;
+    color: #e6e6e6;
+}
+
+header {
+    background: #151515;
+    border-bottom: 3px solid #00ff88;
+    padding: 25px;
+    text-align: center;
+}
+
+header h1 {
+    margin: 0;
+    color: #ffffff;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+}
+
+header p {
+    color: #aaa;
+}
+
+.container {
+    width: 90%;
+    max-width: 1000px;
+    margin: 30px auto;
+    background: #1a1a1a;
+    padding: 25px;
+    border-radius: 10px;
+    box-shadow: 0 0 20px #000;
+}
+
+.case-box {
+    background: #222;
+    border-left: 5px solid #00ff88;
+    padding: 20px;
+    margin-bottom: 30px;
+    line-height: 1.6;
+}
+
+.question {
+    background: #242424;
+    border: 1px solid #333;
+    padding: 18px;
+    margin-bottom: 18px;
+    border-radius: 8px;
+}
+
+.question h3 {
+    margin-top: 0;
+    color: #b8ffd9;
+}
+
+input {
+    width: 100%;
+    padding: 12px;
+    background: #101010;
+    color: #fff;
+    border: 1px solid #444;
+    border-radius: 5px;
+    margin-top: 8px;
+    font-size: 15px;
+    box-sizing: border-box;
+}
+
+button {
+    margin-top: 12px;
+    background: #00aa66;
+    color: white;
+    border: none;
+    padding: 10px 18px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+button:hover {
+    background: #00cc7a;
+}
+
+.result {
+    margin-top: 10px;
+    font-weight: bold;
+}
+
+.correct {
+    color: #00ff88;
+}
+
+.wrong {
+    color: #ff4d4d;
+}
+
+.score {
+    text-align: center;
+    font-size: 22px;
+    margin-top: 30px;
+    padding: 15px;
+    background: #111;
+    border: 1px solid #00ff88;
+    border-radius: 8px;
+}
+
+.timeline h2 {
+    color: #b8ffd9;
+}
+
+.eventos {
+    border-left: 4px solid #00ff88;
+    padding-left: 25px;
+    margin-top: 25px;
+}
+
+.evento {
+    margin-bottom: 28px;
+    background: #1a1a1a;
+    padding: 15px;
+    border-radius: 8px;
+    border: 1px solid #333;
+}
+
+.evento h3 {
+    margin-top: 0;
+    color: #00ff88;
+}
+
+code {
+    background: #111;
+    padding: 3px 6px;
+    border-radius: 4px;
+    color: #00ff88;
+}
+
+footer {
+    text-align: center;
+    color: #777;
+    padding: 20px;
+    font-size: 13px;
+}
+</style>
+</head>
+<body>
+
+<header>
+    <h1>Mini CTF Linux - Análise Forense</h1>
+    <p>Investigação de artefato Linux - DSL</p>
+</header>
+
+<div class="container">
+
+    <div class="case-box" id="caseIntro">
+        <h2>Contexto do Caso</h2>
+
+        <p>
+            Durante uma investigação interna, a equipe de segurança identificou atividades suspeitas
+            em uma máquina Linux utilizada em um ambiente corporativo. O sistema apresentou indícios
+            de acesso remoto, reconhecimento de serviços, uso de FTP e possível tentativa de apagar
+            rastros por parte de um usuário com privilégios elevados.
+        </p>
+
+        <p>
+            A imagem forense disponibilizada para análise é:
+        </p>
+
+        <p>
+            <strong>Artefato:</strong> <code>C:\Users\faruk\Desktop\Artefatos\Cases\dsl.7z</code><br>
+            <strong>Sistema:</strong> ForensicWorkstationWin26 <br>
+            <strong>Objetivo:</strong> Identificar usuários, acessos remotos, serviços expostos,
+            comandos executados e possíveis ações antiforenses.
+        </p>
+
+        <p>
+            Responda às questões abaixo com base na análise do artefato.
+        </p>
+    </div>
+
+    <div id="questions"></div>
+
+    <div class="score" id="scoreBox">
+        Pontuação: <span id="score">0</span> / 8
+    </div>
+
+</div>
+
+<footer>
+    Blue Team Labs - Linux Forensics CTF
+</footer>
+
+<script>
+const questions = [
+    {
+        q: "1 - Quantas partições haviam no sistema?",
+        a: "3"
+    },
+    {
+        q: "2 - Qual o último usuário adicionado?",
+        a: "john"
+    },
+    {
+        q: "3 - Qual o IP do servidor FTP acessado?",
+        a: "172.16.33.200"
+    },
+    {
+        q: "4 - O host permitia acesso SSH com usuário root?",
+        a: "sim"
+    },
+    {
+        q: "5 - Dois IPs estavam executando o reconhecimento do servidor web. Quais são, respectivamente?",
+        a: "172.16.33.156,172.16.33.171"
+    },
+    {
+        q: "6 - Quem foi o último usuário a logar via SSH?",
+        a: "dsl"
+    },
+    {
+        q: "7 - O usuário logado como root estava buscando por que tipos de arquivos, respectivamente?",
+        a: "xlsx,pdf"
+    },
+    {
+        q: "8 - Qual comando de técnica antiforense o usuário root utilizou?",
+        a: "history -c"
+    }
+];
+
+let score = 0;
+let answered = {};
+
+function normalize(text) {
+    return text
+        .toLowerCase()
+        .trim()
+        .replace(/\s+/g, " ")
+        .replace(/\s*,\s*/g, ",");
+}
+
+function loadQuestions() {
+    const area = document.getElementById("questions");
+
+    questions.forEach((item, index) => {
+        const div = document.createElement("div");
+        div.className = "question";
+
+        div.innerHTML = `
+            <h3>${item.q}</h3>
+            <input type="text" id="answer-${index}" placeholder="Digite sua resposta">
+            <button onclick="checkAnswer(${index})">Validar Resposta</button>
+            <div class="result" id="result-${index}"></div>
+        `;
+
+        area.appendChild(div);
+    });
+}
+
+function checkAnswer(index) {
+    const input = document.getElementById(`answer-${index}`);
+    const result = document.getElementById(`result-${index}`);
+
+    const userAnswer = normalize(input.value);
+    const correctAnswer = normalize(questions[index].a);
+
+    if (userAnswer === correctAnswer) {
+        result.textContent = "Resposta correta.";
+        result.className = "result correct";
+
+        if (!answered[index]) {
+            score++;
+            answered[index] = true;
+            document.getElementById("score").textContent = score;
+        }
+
+        input.disabled = true;
+
+        if (score === questions.length) {
+            showTimeline();
+        }
+
+    } else {
+        result.textContent = "Resposta incorreta.";
+        result.className = "result wrong";
+    }
+}
+
+function showTimeline() {
+    document.getElementById("questions").style.display = "none";
+    document.getElementById("scoreBox").style.display = "none";
+    document.getElementById("caseIntro").style.display = "none";
+
+    const container = document.querySelector(".container");
+
+    const timeline = document.createElement("div");
+    timeline.className = "case-box timeline";
+
+    timeline.innerHTML = `
+        <h2 style="text-align:center;color:#00ff88;">INVESTIGAÇÃO CONCLUÍDA</h2>
+
+        <p style="text-align:center;font-size:18px;">
+            Todas as respostas foram validadas. A sequência dos eventos foi reconstruída com base nos artefatos Linux.
+        </p>
+
+        <hr style="border-color:#444;margin:30px 0;">
+
+        <h2>Linha do Tempo da Investigação</h2>
+
+        <div class="eventos">
+
+            <div class="evento">
+                <h3>Estrutura do Sistema</h3>
+                <p>
+                    A análise do artefato <strong>dsl.ad1</strong> revelou que o sistema possuía
+                    <strong>3 partições</strong>.
+                </p>
+            </div>
+
+            <div class="evento">
+                <h3>Criação de Usuário</h3>
+                <p>
+                    O último usuário adicionado ao sistema foi <strong>john</strong>.
+                </p>
+            </div>
+
+            <div class="evento">
+                <h3>Acesso FTP</h3>
+                <p>
+                    Foi identificado acesso a um servidor FTP no endereço
+                    <strong>172.16.33.200</strong>.
+                </p>
+            </div>
+
+            <div class="evento">
+                <h3>Configuração SSH</h3>
+                <p>
+                    O host permitia autenticação SSH utilizando o usuário
+                    <strong>root</strong>.
+                </p>
+            </div>
+
+            <div class="evento">
+                <h3>Reconhecimento Web</h3>
+                <p>
+                    Dois IPs foram identificados executando reconhecimento contra o servidor web:
+                    <strong>172.16.33.156</strong> e <strong>172.16.33.171</strong>.
+                </p>
+            </div>
+
+            <div class="evento">
+                <h3>Último Login SSH</h3>
+                <p>
+                    O último usuário a realizar login via SSH foi <strong>dsl</strong>.
+                </p>
+            </div>
+
+            <div class="evento">
+                <h3>Busca por Arquivos</h3>
+                <p>
+                    O usuário root realizou buscas por arquivos dos tipos
+                    <strong>xlsx</strong> e <strong>pdf</strong>.
+                </p>
+            </div>
+
+            <div class="evento">
+                <h3>Ação Antiforense</h3>
+                <p>
+                    Foi identificado o uso do comando
+                    <strong>history -c</strong>, indicando tentativa de limpar o histórico de comandos.
+                </p>
+            </div>
+
+        </div>
+
+        <hr style="border-color:#444;margin:30px 0;">
+
+        <h2>Conclusão Pericial</h2>
+
+        <p>
+            A análise do artefato <strong>dsl.ad1</strong> indica que a máquina Linux foi utilizada
+            em um contexto de acesso remoto, reconhecimento de servidor web e interação com um
+            servidor FTP. Também foram encontrados indícios de busca por documentos sensíveis,
+            especialmente arquivos <strong>.xlsx</strong> e <strong>.pdf</strong>.
+        </p>
+
+        <p>
+            A presença do comando <strong>history -c</strong> reforça a hipótese de tentativa de
+            ocultação de atividades, caracterizando uma ação antiforense realizada pelo usuário root.
+        </p>
+    `;
+
+    container.appendChild(timeline);
+
+    window.scrollTo({
+        top: 0,
+        behavior: "smooth"
+    });
+}
+
+loadQuestions();
+</script>
+
+</body>
+</html>
