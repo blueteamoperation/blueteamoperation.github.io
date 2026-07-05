@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DFIR Lab - IoC vs IoA</title>
+    <style>
+        :root {
+            --bg-color: #08090c;
+            --card-bg: #111319;
+            --cyan: #00f0ff;
+            --magenta: #ff007f;
+            --text-color: #e2e8f0;
+            --border: #222533;
+            --success: #39ff14;
+            --gray: #6b7280;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: 'Courier New', Courier, monospace;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            border-bottom: 2px solid var(--cyan);
+            padding-bottom: 20px;
+            margin-bottom: 30px;
+        }
+
+        h1 {
+            color: var(--cyan);
+            margin: 0 0 5px 0;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .score-board {
+            display: flex;
+            justify-content: space-between;
+            background: var(--card-bg);
+            padding: 15px 20px;
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            margin-bottom: 25px;
+        }
+
+        .score {
+            color: var(--success);
+            font-weight: bold;
+        }
+
+        .matrix-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .challenge-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-left: 4px solid var(--gray);
+            border-radius: 4px;
+            padding: 18px;
+        }
+
+        .challenge-card.correct {
+            border-left-color: var(--success);
+        }
+
+        .challenge-card.wrong {
+            border-left-color: var(--magenta);
+        }
+
+        .meta {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.8em;
+            color: var(--cyan);
+            margin-bottom: 10px;
+        }
+
+        .artifact-box {
+            background: #040507;
+            padding: 12px;
+            border-radius: 4px;
+            border: 1px dashed #333;
+            margin: 12px 0;
+            font-size: 0.95em;
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 12px;
+            margin-top: 15px;
+        }
+
+        button {
+            background: transparent;
+            padding: 8px 20px;
+            cursor: pointer;
+            font-weight: bold;
+            font-family: inherit;
+            text-transform: uppercase;
+            border-radius: 3px;
+        }
+
+        button.btn-ioc {
+            border: 1px solid var(--cyan);
+            color: var(--cyan);
+        }
+        button.btn-ioc:hover:not(:disabled) {
+            background: var(--cyan);
+            color: #000;
+        }
+
+        button.btn-ioa {
+            border: 1px solid var(--magenta);
+            color: var(--magenta);
+        }
+        button.btn-ioa:hover:not(:disabled) {
+            background: var(--magenta);
+            color: #000;
+        }
+
+        button:disabled {
+            border-color: #333 !important;
+            color: #444 !important;
+            cursor: not-allowed;
+            background: transparent !important;
+        }
+
+        .feedback-msg {
+            margin-top: 12px;
+            font-size: 0.9em;
+            display: none;
+        }
+        
+        .feedback-msg.show {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <h1>[ Threat Lab: Prática de IOC e IOA ]</h1>
+    </header>
+
+    <div class="score-board">
+        <div>STATUS: VALIDANDO ARTEFATOS</div>
+        <div>SCORE: <span id="score" class="score">0</span> / <span id="total">0</span></div>
+    </div>
+
+    <div class="matrix-grid" id="matrix-container">
+        </div>
+</div>
+
+<script>
+// Base de dados exatamente igual ao texto fornecido
+const dataset = [
+    // --- IOCs ---
+    { id: 1, type: "IOC", name: "1. Hash malicioso", desc: "MD5/SHA-256 de um ransomware conhecido." },
+    { id: 2, type: "IOC", name: "2. Endereço IP malicioso", desc: "Comunicação com 185.220.101.45 (C2)." },
+    { id: 3, type: "IOC", name: "3. Domínio malicioso", desc: "update-security-fake-check.com." },
+    { id: 4, type: "IOC", name: "4. URL maliciosa", desc: "Download realizado em /payload.exe malicioso." },
+    { id: 5, type: "IOC", name: "5. Arquivo suspeito", desc: "invoice.exe localizado em %TEMP%." },
+    { id: 6, type: "IOC", name: "6. Chave de Registro", desc: "Alteração chave HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Run\\malware." },
+    { id: 7, type: "IOC", name: "7. Processo conhecido", desc: "mimikatz.exe encontrado na memória." },
+    { id: 8, type: "IOC", name: "8. Assinatura YARA", desc: "Regra Yara identifica uma família de malware." },
+    { id: 9, type: "IOC", name: "9. Certificado digital", desc: "Certificado associado a malware conhecido." },
+    { id: 10, type: "IOC", name: "10. E-mail malicioso", desc: "Remetente ou assunto identificado em campanha de phishing." },
+
+    // --- IOAs ---
+    { id: 11, type: "IOA", name: "1. PowerShell ofuscado", desc: "powershell -enc ... sendo executado." },
+    { id: 12, type: "IOA", name: "2. Movimento lateral", desc: "Uso inesperado de PsExec, SMB ou WMI entre hosts." },
+    { id: 13, type: "IOA", name: "3. Brute Force", desc: "Centenas de tentativas de login seguidas de sucesso." },
+    { id: 14, type: "IOA", name: "4. Criação de usuário", desc: "Novo usuário administrador criado fora do horário normal." },
+    { id: 15, type: "IOA", name: "5. Dump de credenciais", desc: "Execução do LSASS Dump ou acesso suspeito ao processo LSASS." },
+    { id: 16, type: "IOA", name: "6. Persistência", desc: "Criação de tarefa agendada ou serviço desconhecido." },
+    { id: 17, type: "IOA", name: "7. Desativação de segurança", desc: "Tentativa de parar o Defender, EDR ou antivírus." },
+    { id: 18, type: "IOA", name: "8. Exfiltração", desc: "Grande volume de dados enviado para IP externo." },
+    { id: 19, type: "IOA", name: "9. Descoberta do ambiente", desc: "Execução sequencial de whoami, ipconfig, net user, net group, netstat." },
+    { id: 20, type: "IOA", name: "10. Execução incomum", desc: "cmd.exe iniciado por winword.exe ou excel.exe após abrir um documento." }
+];
+
+function shuffle(array) {
+    return array.sort(() => Math.random() - 0.5);
+}
+
+function initLab() {
+    const container = document.getElementById('matrix-container');
+    const randomizedData = shuffle([...dataset]);
+    document.getElementById('total').innerText = randomizedData.length;
+
+    randomizedData.forEach((item, index) => {
+        const card = document.createElement('div');
+        card.className = 'challenge-card';
+        card.id = `card-${item.id}`;
+
+        card.innerHTML = `
+            <div class="meta">
+                <span>ITEM #${index + 1}</span>
+                <span>${item.name}</span>
+            </div>
+            <div class="artifact-box"><code>${item.desc}</code></div>
+            <div class="btn-group" id="actions-${item.id}">
+                <button class="btn-ioc" onclick="validate(${item.id}, 'IOC')">IOC</button>
+                <button class="btn-ioa" onclick="validate(${item.id}, 'IOA')">IOA</button>
+            </div>
+            <div class="feedback-msg" id="feed-${item.id}"></div>
+        `;
+        container.appendChild(card);
+    });
+}
+
+let currentScore = 0;
+
+function validate(id, selected) {
+    const targetItem = dataset.find(i => i.id === id);
+    const card = document.getElementById(`card-${id}`);
+    const feedback = document.getElementById(`feed-${id}`);
+    const actions = document.getElementById(`actions-${id}`);
+    
+    const buttons = actions.getElementsByTagName('button');
+    buttons[0].disabled = true;
+    buttons[1].disabled = true;
+
+    feedback.classList.add('show');
+
+    if (selected === targetItem.type) {
+        card.classList.add('correct');
+        feedback.style.color = "var(--success)";
+        feedback.innerHTML = `[+] Correto!`;
+        currentScore++;
+        document.getElementById('score').innerText = currentScore;
+    } else {
+        card.classList.add('wrong');
+        feedback.style.color = "var(--magenta)";
+        feedback.innerHTML = `[-] Incorreto. Resposta certa: ${targetItem.type}`;
+    }
+}
+
+window.onload = initLab;
+</script>
+
+</body>
+</html>

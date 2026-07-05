@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MITRE ATT&CK - Custom Lab</title>
+    <style>
+        :root {
+            --bg-color: #060709;
+            --card-bg: #0d0f14;
+            --cyan: #00f0ff;
+            --magenta: #ff007f;
+            --text-color: #e2e8f0;
+            --border: #1e2230;
+            --success: #39ff14;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: 'Courier New', Courier, monospace;
+            margin: 0;
+            padding: 20px;
+            user-select: none;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            border-bottom: 2px solid var(--cyan);
+            padding-bottom: 15px;
+            margin-bottom: 25px;
+        }
+
+        h1 {
+            color: var(--cyan);
+            margin: 0;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .dashboard {
+            display: flex;
+            justify-content: space-between;
+            background: var(--card-bg);
+            padding: 12px 20px;
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            margin-bottom: 20px;
+            font-weight: bold;
+        }
+
+        .pool-section {
+            background: var(--card-bg);
+            border: 1px dashed var(--cyan);
+            padding: 15px;
+            border-radius: 4px;
+            margin-bottom: 30px;
+        }
+
+        .pool-title {
+            color: var(--cyan);
+            margin: 0 0 15px 0;
+            text-transform: uppercase;
+            font-size: 1em;
+        }
+
+        .cards-pool {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            min-height: 60px;
+        }
+
+        .tactic-card {
+            background: #161923;
+            border: 1px solid var(--cyan);
+            color: #fff;
+            padding: 10px 14px;
+            border-radius: 3px;
+            cursor: grab;
+            font-size: 0.85em;
+            font-weight: bold;
+            text-transform: uppercase;
+            text-align: center;
+        }
+
+        .tactic-card:active {
+            cursor: grabbing;
+        }
+
+        .tactic-card.dragging {
+            opacity: 0.3;
+        }
+
+        .matrix-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+        }
+
+        @media (max-width: 900px) {
+            .matrix-grid { grid-template-columns: repeat(2, 1fr); }
+        }
+
+        .scenario-box {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            padding: 15px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            min-height: 160px;
+            transition: all 0.2s;
+        }
+
+        .scenario-box.drag-over {
+            border-color: var(--cyan);
+            background: #0f172a;
+        }
+
+        .scenario-text {
+            font-size: 0.9em;
+            line-height: 1.4;
+            color: #cbd5e1;
+            margin-bottom: 8px;
+        }
+
+        .dropzone {
+            background: #050608;
+            border: 1px dashed #334155;
+            border-radius: 3px;
+            min-height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8em;
+            color: #64748b;
+            padding: 4px;
+        }
+
+        .dropzone .tactic-card {
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        .feedback-text {
+            font-size: 0.85em;
+            font-weight: bold;
+            margin-top: 6px;
+            display: none;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <h1>[ MITRE ATT&CK: TARGETED LAB ]</h1>
+    </header>
+
+    <div class="dashboard">
+        <div>STATUS: MONITORAMENTO DE ATIVIDADE</div>
+        <div>PROGRESSO: <span id="score-count" style="color: var(--success)">0</span> / 11 ACERTOS</div>
+    </div>
+
+    <div class="pool-section">
+        <h3 class="pool-title">Táticas (Arraste para o cenário correto):</h3>
+        <div class="cards-pool" id="tactics-pool"></div>
+    </div>
+
+    <div class="matrix-grid" id="matrix-grid"></div>
+</div>
+
+<script>
+// Dados com cenários reais construídos a partir dos seus termos de infraestrutura
+const masterDatabase = [
+    { id: "m1", tactic: "Reconnaissance", text: "O atacante executa um scanning com nmap direcionado ao bloco de IPs externos do servidor web para identificar portas abertas e serviços vulneráveis expostos." },
+    { id: "m2", tactic: "Initial Access", text: "Um e-mail falso contendo uma campanha maliciosa de spearphishing é enviado para o setor de RH com um link simulando a atualização de benefícios." },
+    { id: "m3", tactic: "Execution", text: "Após o usuário abrir o documento, uma macro oculta invoca um comando via command script (cmd) no background para iniciar o agente de varredura." },
+    { id: "m4", tactic: "Persistence", text: "O artefato malicioso altera as configurações do sistema para modificar o registro do Windows, adicionando uma entrada na pasta Run para garantir o início automático com o SO." },
+    { id: "m5", tactic: "Credential Access", text: "O invasor inicia uma atividade em massa de brute force apontada para a porta 22 (SSH) tentando quebrar a credencial do usuário admin por dicionário." },
+    { id: "m6", tactic: "Discovery", text: "A rotina do script realiza um acount discovery rodando comandos nativos para listar todas as contas de usuários e grupos locais presentes no host comprometido." },
+    { id: "m7", tactic: "Lateral Movement", text: "Abusando de credenciais administrativas coletadas, o atacante usa remote services como conexões RDP e WinRM legítimas para pular para os servidores vizinhos na DMZ." },
+    { id: "m8", tactic: "Collection", text: "Uma rotina automatizada em background varre as pastas de rede executando uma coleta automatica de documentos sensíveis, juntando tudo em um container temporário." },
+    { id: "m9", tactic: "Command and Control", text: "A sessão interativa com a máquina estabelece uma comunicação reversa persistente com o servidor remoto utilizando um canal encriptado via HTTPS para despistar firewalls." },
+    { id: "m10", tactic: "Exfiltration", text: "O script inicia a extração de dados e descarrega todos os arquivos corporativos confidenciais diretamente através de conexões de C2 externas sob o controle da operação." },
+    { id: "m11", tactic: "Impact", text: "Na etapa final, o malware executa a criptografia forçada dos arquivos e a manipulacao de dados operacionais essenciais para sabotar os backups e paralisar o servidor." }
+];
+
+function shuffle(array) {
+    return array.sort(() => Math.random() - 0.5);
+}
+
+function initLab() {
+    const pool = document.getElementById('tactics-pool');
+    const grid = document.getElementById('matrix-grid');
+
+    // 1. Injeta os cards de táticas 100% limpos
+    const shuffledTactics = shuffle([...masterDatabase]);
+    shuffledTactics.forEach(item => {
+        const card = document.createElement('div');
+        card.className = 'tactic-card';
+        card.id = item.id;
+        card.draggable = true;
+        card.innerText = item.tactic;
+
+        card.addEventListener('dragstart', dragStart);
+        card.addEventListener('dragend', dragEnd);
+        pool.appendChild(card);
+    });
+
+    // 2. Injeta os pequenos cenários no grid
+    const shuffledScenarios = shuffle([...masterDatabase]);
+    shuffledScenarios.forEach((item, idx) => {
+        const box = document.createElement('div');
+        box.className = 'scenario-box';
+        box.innerHTML = `
+            <div class="scenario-text"><strong>#${idx + 1}</strong> - ${item.text}</div>
+            <div class="dropzone" id="zone-${item.id}">Arraste a tática aqui</div>
+            <div class="feedback-text" id="feed-${item.id}"></div>
+        `;
+
+        const dropzone = box.querySelector('.dropzone');
+        dropzone.addEventListener('dragover', dragOver);
+        dropzone.addEventListener('dragenter', dragEnter);
+        dropzone.addEventListener('dragleave', dragLeave);
+        dropzone.addEventListener('drop', dragDrop);
+
+        grid.appendChild(box);
+    });
+}
+
+function dragStart(e) {
+    this.classList.add('dragging');
+    e.dataTransfer.setData('text/plain', this.id);
+}
+
+function dragEnd() {
+    this.classList.remove('dragging');
+}
+
+function dragOver(e) { e.preventDefault(); }
+function dragEnter(e) { e.preventDefault(); this.parentElement.classList.add('drag-over'); }
+function dragLeave() { this.parentElement.classList.remove('drag-over'); }
+
+function dragDrop(e) {
+    e.preventDefault();
+    this.parentElement.classList.remove('drag-over');
+    
+    const cardId = e.dataTransfer.getData('text/plain');
+    const draggableCard = document.getElementById(cardId);
+    
+    const zoneId = this.id;
+    const targetItemId = zoneId.replace('zone-', ''); 
+
+    if (this.children.length > 0 && this.firstElementChild.classList.contains('tactic-card')) {
+        document.getElementById('tactics-pool').appendChild(this.firstElementChild);
+    }
+
+    this.innerHTML = "";
+    this.appendChild(draggableCard);
+
+    const feedbackEl = document.getElementById(`feed-${targetItemId}`);
+    feedbackEl.style.display = "block";
+
+    if (cardId === targetItemId) {
+        draggableCard.style.borderColor = "var(--success)";
+        draggableCard.style.background = "#142618";
+        draggableCard.draggable = false; 
+        
+        feedbackEl.style.color = "var(--success)";
+        feedbackEl.innerText = "[+] CORRETO";
+    } else {
+        draggableCard.style.borderColor = "var(--magenta)";
+        draggableCard.style.background = "#2a141b";
+        
+        feedbackEl.style.color = "var(--magenta)";
+        feedbackEl.innerText = "[-] INCORRETO";
+    }
+
+    updateLiveScore();
+}
+
+function updateLiveScore() {
+    const zones = document.querySelectorAll('.dropzone');
+    let correctCount = 0;
+    
+    zones.forEach(z => {
+        const card = z.firstElementChild;
+        const targetId = z.id.replace('zone-', '');
+        if (card && card.id === targetId) {
+            correctCount++;
+        }
+    });
+
+    document.getElementById('score-count').innerText = correctCount;
+}
+
+window.onload = initLab;
+</script>
+
+</body>
+</html>
