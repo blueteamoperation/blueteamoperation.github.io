@@ -1,1 +1,260 @@
-CTI
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ThreatIntelOps | Cyber Threat Intelligence</title>
+
+    <style>
+        :root {
+            --bg-color: #050505;
+            --container-bg: #0c0b0a;
+            --accent-color: #ff6600; /* Laranja Cyberpunk */
+            --accent-glow: rgba(255, 102, 0, 0.3);
+            --text-gray: #b3b3b3;
+            --border-color: #3a1a00;
+            --terminal-orange: #ff8833;
+        }
+
+        body {
+            margin: 0;
+            font-family: 'Courier New', Courier, monospace;
+            background: var(--bg-color);
+            color: var(--text-gray);
+            line-height: 1.6;
+        }
+
+        /* Efeito de Scanline de Monitor Antigo */
+        body::before {
+            content: " ";
+            display: block;
+            position: fixed;
+            top: 0; left: 0; bottom: 0; right: 0;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.3) 50%), 
+                        linear-gradient(90deg, rgba(255, 102, 0, 0.02), rgba(0, 0, 0, 0.02), rgba(255, 102, 0, 0.02));
+            z-index: 9999;
+            pointer-events: none;
+            background-size: 100% 4px, 3px 100%;
+        }
+
+        /* BANNER */
+        .header-banner {
+            width: 100%;
+            height: 350px;
+            overflow: hidden;
+            border-bottom: 3px solid var(--accent-color);
+            position: relative;
+            background: #000;
+        }
+
+        .header-banner img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            filter: grayscale(100%) contrast(140%) brightness(30%) sepia(100%) hue-rotate(-15deg) saturate(500%);
+        }
+
+        /* CONTAINER */
+        .container {
+            max-width: 900px;
+            margin: -50px auto 50px;
+            padding: 40px;
+            background: var(--container-bg);
+            border: 1px solid var(--border-color);
+            position: relative;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.9);
+        }
+
+        /* TÍTULO PRINCIPAL */
+        h1.main-title {
+            color: var(--accent-color);
+            font-size: 24px;
+            text-transform: uppercase;
+            letter-spacing: 5px;
+            margin-bottom: 5px;
+            text-shadow: 0 0 10px var(--accent-glow);
+        }
+
+        .status-bar {
+            font-size: 10px;
+            color: var(--accent-color);
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 15px;
+            margin-bottom: 30px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        /* SEÇÕES */
+        .section {
+            margin-bottom: 15px;
+            border: 1px solid transparent;
+            transition: border 0.3s ease;
+        }
+
+        .section.active {
+            border: 1px solid rgba(255, 102, 0, 0.2);
+            background: rgba(255, 102, 0, 0.01);
+        }
+
+        .section h2 {
+            font-size: 14px;
+            color: var(--accent-color);
+            background: rgba(255, 102, 0, 0.05);
+            padding: 12px 15px;
+            border-left: 4px solid var(--accent-color);
+            text-transform: uppercase;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 0;
+            cursor: pointer;
+            user-select: none;
+            transition: background 0.3s;
+        }
+
+        .section h2:hover {
+            background: rgba(255, 102, 0, 0.15);
+        }
+
+        .section h2::after {
+            content: "[ + ]";
+            font-size: 12px;
+            opacity: 0.7;
+            font-family: monospace;
+        }
+
+        .section.active h2::after {
+            content: "[ - ]";
+            color: var(--terminal-orange);
+        }
+
+        /* RESOLUÇÃO DOS CONTEÚDOS OCULTOS */
+        .section-wrapper {
+            display: grid;
+            grid-template-rows: 0fr;
+            transition: grid-template-rows 0.3s ease-out;
+            overflow: hidden;
+        }
+
+        .section.active > .section-wrapper {
+            grid-template-rows: 1fr;
+        }
+
+        .section-content {
+            min-height: 0;
+            padding: 0 15px;
+            transition: padding 0.3s ease-out;
+        }
+
+        .section.active > .section-wrapper > .section-content {
+            padding: 15px 15px;
+        }
+
+        /* LINKS / LISTA */
+        ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        li {
+            margin: 12px 0;
+            border-bottom: 1px dashed var(--border-color);
+            padding-bottom: 5px;
+        }
+
+        li::before {
+            content: "> ";
+            color: var(--accent-color);
+        }
+
+        a {
+            text-decoration: none;
+            color: #eee;
+            transition: 0.3s;
+            font-size: 14px;
+        }
+
+        a:hover {
+            color: var(--accent-color);
+            padding-left: 10px;
+            text-shadow: 0 0 8px rgba(255, 102, 0, 0.6);
+        }
+
+        /* FOOTER */
+        .footer {
+            text-align: center;
+            font-size: 10px;
+            color: #553311;
+            margin-top: 60px;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+
+        .id-badge {
+            font-size: 10px;
+            color: #555;
+            position: absolute;
+            top: 10px;
+            right: 10px;
+        }
+
+    </style>
+</head>
+<body>
+
+<div class="header-banner">
+    <img src="https://raw.githubusercontent.com/blueteamoperation/blueteamoperation.github.io/refs/heads/main/header.png" alt="Threat Intel Header">
+</div>
+
+<div class="container">
+    <div class="id-badge">FILE_ID: CTI-OPS-2026</div>
+    
+    <h1 class="main-title">CYBER THREAT INTELLIGENCE</h1>
+    <div class="status-bar">
+        <span>STATUS: MONITORING_THREATS</span>
+        <span>LAB: CTI_TERMINAL_01</span>
+        <span>AUTH: ANALYST_ACCESS</span>
+    </div>
+
+    <p style="font-size: 13px; color: #666; margin-bottom: 30px;">
+        // Repositório de inteligência de ameaças, vetores de ataque e IoCs. Clique no módulo para expandir.
+    </p>
+
+    <div class="section">
+        <h2>📂 Módulo 1 - Fundamentos de Cyber Threat Intelligence (CTI)</h2>
+        <div class="section-wrapper">
+            <div class="section-content">
+                <ul>
+                    <li><a href="#" target="_blank">Atividade 1 - O Ciclo de Inteligência de Ameaças.</a></li>
+                    <li><a href="#" target="_blank">Atividade 2 - Tipos de CTI: Estratégica, Tática, Operacional e Técnica.</a></li>
+                    <li><a href="#" target="_blank">Atividade 3 - Mapeamento de Adversários com MITRE ATT&CK.</a></li>
+                    <li><a href="#" target="_blank">Atividade 4 - Modelagem de Ameaças com a Cyber Kill Chain.</a></li>
+                    <li><a href="#" target="_blank">Atividade 5 - O Modelo Diamante para Análise de Intrusão.</a></li>
+                    <li><a href="#" target="_blank">Atividade 6 - Coleta, Análise e Disseminação de IoCs (Indicadores de Comprometimento).</a></li>
+                    <li><a href="#" target="_blank">Atividade 7 - Plataformas de CTI (MISP, OpenCTI e feeds OSINT).</a></li>
+                    <li><a href="#" target="_blank">Atividade 8 - Análise de Campanhas de Grupos APT (Advanced Persistent Threats).</a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <div class="footer">
+        --- END OF SESSION --- <br>
+        ThreatIntelOps • CTI • Cyber Defense
+    </div>
+</div>
+
+<script>
+    // Gerenciador nativo de abertura da seção
+    const mainSections = document.querySelectorAll('.section h2');
+    mainSections.forEach(header => {
+        header.addEventListener('click', () => {
+            header.parentElement.classList.toggle('active');
+        });
+    });
+</script>
+
+</body>
+</html>
