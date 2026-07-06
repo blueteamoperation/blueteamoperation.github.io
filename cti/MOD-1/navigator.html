@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Intell Lab - MITRE Navigator CTF</title>
+    <style>
+        :root {
+            --bg-color: #0d0d0d;
+            --card-bg: #141414;
+            --orange: #ff6600;
+            --text-color: #e5e5e5;
+            --border: #262626;
+            --success: #39ff14;
+            --error: #ff0055;
+            --gray: #737373;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: 'Courier New', Courier, monospace;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            border-bottom: 2px solid var(--orange);
+            padding-bottom: 20px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 15px rgba(255, 102, 0, 0.1);
+        }
+
+        h1 {
+            color: var(--orange);
+            margin: 0 0 5px 0;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        p.subtitle {
+            color: var(--gray);
+            margin: 0;
+            font-size: 0.9em;
+        }
+
+        .score-board {
+            display: flex;
+            justify-content: space-between;
+            background: var(--card-bg);
+            padding: 15px 20px;
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            margin-bottom: 25px;
+            border-left: 3px solid var(--orange);
+            font-weight: bold;
+        }
+
+        .score {
+            color: var(--success);
+        }
+
+        .matrix-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .challenge-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-left: 4px solid var(--gray);
+            border-radius: 4px;
+            padding: 20px;
+            transition: all 0.2s;
+        }
+
+        .challenge-card.correct {
+            border-left-color: var(--success);
+            background: #0c260f;
+        }
+
+        .challenge-card.wrong {
+            border-left-color: var(--error);
+            background: #2b000e;
+        }
+
+        .plugin-tag {
+            display: inline-block;
+            background: #262626;
+            color: var(--orange);
+            font-size: 0.75em;
+            padding: 2px 8px;
+            border-radius: 3px;
+            font-weight: bold;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+        }
+
+        h3 {
+            margin: 0 0 10px 0;
+            color: #fff;
+        }
+
+        .challenge-card p {
+            margin: 0 0 15px 0;
+            font-size: 0.95em;
+            line-height: 1.4;
+            color: #d4d4d4;
+        }
+
+        .input-group {
+            display: flex;
+            gap: 10px;
+        }
+
+        input[type="text"] {
+            flex-grow: 1;
+            background: #080808;
+            border: 1px solid var(--border);
+            color: #fff;
+            padding: 10px;
+            font-family: inherit;
+            border-radius: 3px;
+        }
+
+        input[type="text"]:focus {
+            outline: none;
+            border-color: var(--orange);
+        }
+
+        button {
+            background: transparent;
+            border: 1px solid var(--orange);
+            color: var(--orange);
+            padding: 10px 24px;
+            cursor: pointer;
+            font-weight: bold;
+            font-family: inherit;
+            text-transform: uppercase;
+            border-radius: 3px;
+            transition: all 0.2s;
+        }
+
+        button:hover:not(:disabled) {
+            background: var(--orange);
+            color: #000;
+            box-shadow: 0 0 10px rgba(255, 102, 0, 0.5);
+        }
+
+        button:disabled {
+            border-color: #333 !important;
+            color: #555 !important;
+            cursor: not-allowed;
+            background: transparent !important;
+        }
+
+        .status {
+            margin-top: 12px;
+            font-size: 0.85em;
+            font-weight: bold;
+            display: none;
+            letter-spacing: 0.5px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <h1>[ THREAT INTEL CTF: MITRE NAVIGATOR ]</h1>
+        <p class="subtitle">Utilize as camadas de sobreposição no MITRE Navigator para mapear os grupos APT28, APT33 e APT42 e extrair as flags.</p>
+    </header>
+
+    <div class="score-board">
+        <div>STATUS: OPERAÇÃO DE ANÁLISE COMPARTILHADA</div>
+        <div>FLAGS: <span id="score" class="score">0</span> / 3</div>
+    </div>
+
+    <div class="matrix-grid">
+        
+        <div class="challenge-card" id="card-1">
+            <span class="plugin-tag">Tácticas em Comum</span>
+            <h3>#01 - Intersecção Global</h3>
+            <p>Quantas técnicas em comum os grupos APT28, 33 e 42 compartilham de forma cruzada na matriz?</p>
+            <div class="input-group">
+                <input type="text" id="ans1" placeholder="Informe apenas o número...">
+                <button id="btn-1" onclick="checkFlag(1, '5')">SUBMIT</button>
+            </div>
+            <div class="status" id="status1"></div>
+        </div>
+
+        <div class="challenge-card" id="card-2">
+            <span class="plugin-tag">C2 / Comando e Controle</span>
+            <h3>#02 - Persistência de Tráfego</h3>
+            <p>Na tática de Comando e Controle (Command and Control), qual é a técnica em comum explicitamente compartilhada pelos 3 grupos analisados?</p>
+            <div class="input-group">
+                <input type="text" id="ans2" placeholder="Nome exato da técnica...">
+                <button id="btn-2" onclick="checkFlag(2, 'Ingress Tool Transfer')">SUBMIT</button>
+            </div>
+            <div class="status" id="status2"></div>
+        </div>
+
+        <div class="challenge-card" id="card-3">
+            <span class="plugin-tag">Acesso Inicial</span>
+            <h3>#03 - Vetor de Entrada</h3>
+            <p>Na tática de Acesso Inicial (Initial Access), qual é a técnica compartilhada por todos os 3 grupos de ameaça na infiltração do perímetro?</p>
+            <div class="input-group">
+                <input type="text" id="ans3" placeholder="Nome exato da técnica...">
+                <button id="btn-3" onclick="checkFlag(3, 'Valid Accounts')">SUBMIT</button>
+            </div>
+            <div class="status" id="status3"></div>
+        </div>
+
+    </div>
+</div>
+
+<script>
+// Objeto para controle de acertos pontuais por card
+const points = { 1: 0, 2: 0, 3: 0 };
+
+function checkFlag(qNum, correctValue) {
+    // Captura o input, limpa espaços duplicados e deixa o tracking padrão para strings normais
+    const userInput = document.getElementById('ans' + qNum).value.trim().replace(/\s+/g, ' ').toLowerCase();
+    const target = correctValue.toLowerCase();
+
+    const cardDiv = document.getElementById('card-' + qNum);
+    const statusDiv = document.getElementById('status' + qNum);
+    const buttonEl = document.getElementById('btn-' + qNum);
+    const inputEl = document.getElementById('ans' + qNum);
+    
+    statusDiv.style.display = "block";
+
+    if (userInput === target) {
+        cardDiv.className = "challenge-card correct";
+        statusDiv.style.color = "var(--success)";
+        statusDiv.innerHTML = "[+] ACCESS GRANTED: Inteligência de ameaça validada com sucesso!";
+        
+        // Trava os inputs deste card para evitar re-submissão
+        buttonEl.disabled = true;
+        inputEl.disabled = true;
+        
+        points[qNum] = 1;
+    } else {
+        cardDiv.className = "challenge-card wrong";
+        statusDiv.style.color = "var(--error)";
+        statusDiv.innerHTML = "[-] ACCESS DENIED: Técnica divergente ou erro de parsing na análise do Navigator.";
+        points[qNum] = 0;
+    }
+
+    updateGlobalScore();
+}
+
+function updateGlobalScore() {
+    const totalScore = points[1] + points[2] + points[3];
+    document.getElementById('score').innerText = totalScore;
+}
+</script>
+
+</body>
+</html>
