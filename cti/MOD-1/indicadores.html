@@ -3,246 +3,205 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Intell Lab - IoC vs IoA</title>
+    <title>MITRE ATT&CK - Targeted Yellow-Black Lab</title>
     <style>
         :root {
-            --bg-color: #050505;
-            --container-bg: #0c0b0a;
-            --accent-color: #ff6600; /* Laranja Cyberpunk */
-            --accent-glow: rgba(255, 102, 0, 0.3);
-            --text-gray: #b3b3b3;
-            --border-color: #3a1a00;
-            --terminal-orange: #ff8833;
+            --bg-color: #0d0d0d;
+            --card-bg: #141414;
+            --yellow: #ffcc00;
+            --yellow-dim: #997a00;
+            --text-color: #e5e5e5;
+            --border: #262626;
+            --success: #39ff14;
+            --error: #ff0055;
         }
 
         body {
-            margin: 0;
+            background-color: var(--bg-color);
+            color: var(--text-color);
             font-family: 'Courier New', Courier, monospace;
-            background: var(--bg-color);
-            color: var(--text-gray);
-            line-height: 1.6;
-        }
-
-        /* Efeito de Scanline de Monitor Antigo */
-        body::before {
-            content: " ";
-            display: block;
-            position: fixed;
-            top: 0; left: 0; bottom: 0; right: 0;
-            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.3) 50%), 
-                        linear-gradient(90deg, rgba(255, 102, 0, 0.02), rgba(0, 0, 0, 0.02), rgba(255, 102, 0, 0.02));
-            z-index: 9999;
-            pointer-events: none;
-            background-size: 100% 4px, 3px 100%;
-        }
-
-        /* BANNER */
-        .header-banner {
-            width: 100%;
-            height: 350px;
-            overflow: hidden;
-            border-bottom: 3px solid var(--accent-color);
-            position: relative;
-            background: #000;
-        }
-
-        .header-banner img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            filter: grayscale(100%) contrast(140%) brightness(30%) sepia(100%) hue-rotate(-15deg) saturate(500%);
-        }
-
-        /* CONTAINER */
-        .container {
-            max-width: 900px;
-            margin: -50px auto 50px;
-            padding: 40px;
-            background: var(--container-bg);
-            border: 1px solid var(--border-color);
-            position: relative;
-            box-shadow: 0 20px 50px rgba(0,0,0,0.9);
-        }
-
-        /* TÍTULO PRINCIPAL */
-        h1.main-title {
-            color: var(--accent-color);
-            font-size: 24px;
-            text-transform: uppercase;
-            letter-spacing: 5px;
-            margin-bottom: 5px;
-            text-shadow: 0 0 10px var(--accent-glow);
-        }
-
-        .status-bar {
-            font-size: 10px;
-            color: var(--accent-color);
-            border-bottom: 1px solid var(--border-color);
-            padding-bottom: 15px;
-            margin-bottom: 30px;
-            display: flex;
-            justify-content: space-between;
-        }
-
-        /* SEÇÕES */
-        .section {
-            margin-bottom: 15px;
-            border: 1px solid transparent;
-            transition: border 0.3s ease;
-        }
-
-        .section.active {
-            border: 1px solid rgba(255, 102, 0, 0.2);
-            background: rgba(255, 102, 0, 0.01);
-        }
-
-        .section h2 {
-            font-size: 14px;
-            color: var(--accent-color);
-            background: rgba(255, 102, 0, 0.05);
-            padding: 12px 15px;
-            border-left: 4px solid var(--accent-color);
-            text-transform: uppercase;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
             margin: 0;
-            cursor: pointer;
+            padding: 20px;
             user-select: none;
-            transition: background 0.3s;
         }
 
-        .section h2:hover {
-            background: rgba(255, 102, 0, 0.15);
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
         }
 
-        .section h2::after {
-            content: "[ + ]";
-            font-size: 12px;
-            opacity: 0.7;
-            font-family: monospace;
-        }
-
-        .section.active h2::after {
-            content: "[ - ]";
-            color: var(--terminal-orange);
-        }
-
-        /* RESOLUÇÃO DOS CONTEÚDOS OCULTOS */
-        .section-wrapper {
-            display: grid;
-            grid-template-rows: 0fr;
-            transition: grid-template-rows 0.3s ease-out;
-            overflow: hidden;
-        }
-
-        .section.active > .section-wrapper {
-            grid-template-rows: 1fr;
-        }
-
-        .section-content {
-            min-height: 0;
-            padding: 0 15px;
-            transition: padding 0.3s ease-out;
-        }
-
-        .section.active > .section-wrapper > .section-content {
-            padding: 15px 15px;
-        }
-
-        /* LINKS / LISTA */
-        ul {
-            list-style: none;
-            padding: 0;
-            margin: 0;
-        }
-
-        li {
-            margin: 12px 0;
-            border-bottom: 1px dashed var(--border-color);
-            padding-bottom: 5px;
-        }
-
-        li::before {
-            content: "> ";
-            color: var(--accent-color);
-        }
-
-        a {
-            text-decoration: none;
-            color: #eee;
-            transition: 0.3s;
-            font-size: 14px;
-        }
-
-        a:hover {
-            color: var(--accent-color);
-            padding-left: 10px;
-            text-shadow: 0 0 8px rgba(255, 102, 0, 0.6);
-        }
-
-        /* FOOTER */
-        .footer {
+        header {
             text-align: center;
-            font-size: 10px;
-            color: #553311;
-            margin-top: 60px;
-            letter-spacing: 2px;
+            border-bottom: 2px solid var(--yellow);
+            padding-bottom: 15px;
+            margin-bottom: 25px;
+            box-shadow: 0 4px 15px rgba(255, 204, 0, 0.1);
+        }
+
+        h1 {
+            color: var(--yellow);
+            margin: 0;
             text-transform: uppercase;
+            letter-spacing: 2px;
         }
 
-        .id-badge {
-            font-size: 10px;
-            color: #555;
-            position: absolute;
-            top: 10px;
-            right: 10px;
+        .dashboard {
+            display: flex;
+            justify-content: space-between;
+            background: var(--card-bg);
+            padding: 12px 20px;
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            margin-bottom: 20px;
+            font-weight: bold;
+            border-left: 3px solid var(--yellow);
         }
 
+        .pool-section {
+            background: var(--card-bg);
+            border: 1px dashed var(--yellow);
+            padding: 15px;
+            border-radius: 4px;
+            margin-bottom: 30px;
+        }
+
+        .pool-title {
+            color: var(--yellow);
+            margin: 0 0 15px 0;
+            text-transform: uppercase;
+            font-size: 1em;
+            letter-spacing: 1px;
+        }
+
+        .cards-pool {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            min-height: 60px;
+        }
+
+        .tactic-card {
+            background: #1a1a1a;
+            border: 1px solid var(--yellow);
+            color: #fff;
+            padding: 10px 16px;
+            border-radius: 3px;
+            cursor: grab;
+            font-size: 0.85em;
+            font-weight: bold;
+            text-transform: uppercase;
+            text-align: center;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
+            transition: transform 0.1s;
+        }
+
+        .tactic-card:active {
+            cursor: grabbing;
+        }
+
+        .tactic-card.dragging {
+            opacity: 0.2;
+        }
+
+        .matrix-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+        }
+
+        @media (max-width: 900px) {
+            .matrix-grid { grid-template-columns: repeat(2, 1fr); }
+        }
+        @media (max-width: 600px) {
+            .matrix-grid { grid-template-columns: 1fr; }
+        }
+
+        .scenario-box {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            padding: 15px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            min-height: 160px;
+            transition: all 0.2s;
+        }
+
+        .scenario-box.drag-over {
+            border-color: var(--yellow);
+            background: #261f00;
+        }
+
+        .scenario-text {
+            font-size: 0.9em;
+            line-height: 1.4;
+            color: #d4d4d4;
+            margin-bottom: 12px;
+        }
+
+        .dropzone {
+            background: #080808;
+            border: 1px dashed #404040;
+            border-radius: 3px;
+            min-height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8em;
+            color: #737373;
+            padding: 4px;
+        }
+
+        .dropzone .tactic-card {
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        .feedback-text {
+            font-size: 0.85em;
+            font-weight: bold;
+            margin-top: 6px;
+            display: none;
+            text-align: center;
+            letter-spacing: 1px;
+        }
     </style>
 </head>
 <body>
 
 <div class="container">
     <header>
-        <h1>[ Threat Lab: Prática de IOC e IOA ]</h1>
+        <h1>[ MITRE ATT&CK: TARGETED BLACK-YELLOW LAB ]</h1>
     </header>
 
-    <div class="score-board">
-        <div>STATUS: VALIDANDO ARTEFATOS</div>
-        <div>SCORE: <span id="score" class="score">0</span> / <span id="total">0</span></div>
+    <div class="dashboard">
+        <div>STATUS: DETECÇÃO ATIVA DE TÁTICAS</div>
+        <div>PROGRESSO: <span id="score-count" style="color: var(--success)">0</span> / 11 ACERTOS</div>
     </div>
 
-    <div class="matrix-grid" id="matrix-container">
-        </div>
+    <div class="pool-section">
+        <h3 class="pool-title">Táticas Disponíveis (Arraste para o cenário correspondente):</h3>
+        <div class="cards-pool" id="tactics-pool"></div>
+    </div>
+
+    <div class="matrix-grid" id="matrix-grid"></div>
 </div>
 
 <script>
-// Base de dados exatamente igual ao texto fornecido
-const dataset = [
-    // --- IOCs ---
-    { id: 1, type: "IOC", name: "1. Hash malicioso", desc: "MD5/SHA-256 de um ransomware conhecido." },
-    { id: 2, type: "IOC", name: "2. Endereço IP malicioso", desc: "Comunicação com 185.220.101.45 (C2)." },
-    { id: 3, type: "IOC", name: "3. Domínio malicioso", desc: "update-security-fake-check.com." },
-    { id: 4, type: "IOC", name: "4. URL maliciosa", desc: "Download realizado em /payload.exe malicioso." },
-    { id: 5, type: "IOC", name: "5. Arquivo suspeito", desc: "invoice.exe localizado em %TEMP%." },
-    { id: 6, type: "IOC", name: "6. Chave de Registro", desc: "Alteração chave HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Run\\malware." },
-    { id: 7, type: "IOC", name: "7. Processo conhecido", desc: "mimikatz.exe encontrado na memória." },
-    { id: 8, type: "IOC", name: "8. Assinatura YARA", desc: "Regra Yara identifica uma família de malware." },
-    { id: 9, type: "IOC", name: "9. Certificado digital", desc: "Certificado associado a malware conhecido." },
-    { id: 10, type: "IOC", name: "10. E-mail malicioso", desc: "Remetente ou assunto identificado em campanha de phishing." },
-
-    // --- IOAs ---
-    { id: 11, type: "IOA", name: "1. PowerShell ofuscado", desc: "powershell -enc ... sendo executado." },
-    { id: 12, type: "IOA", name: "2. Movimento lateral", desc: "Uso inesperado de PsExec, SMB ou WMI entre hosts." },
-    { id: 13, type: "IOA", name: "3. Brute Force", desc: "Centenas de tentativas de login seguidas de sucesso." },
-    { id: 14, type: "IOA", name: "4. Criação de usuário", desc: "Novo usuário administrador criado fora do horário normal." },
-    { id: 15, type: "IOA", name: "5. Dump de credenciais", desc: "Execução do LSASS Dump ou acesso suspeito ao processo LSASS." },
-    { id: 16, type: "IOA", name: "6. Persistência", desc: "Criação de tarefa agendada ou serviço desconhecido." },
-    { id: 17, type: "IOA", name: "7. Desativação de segurança", desc: "Tentativa de parar o Defender, EDR ou antivírus." },
-    { id: 18, type: "IOA", name: "8. Exfiltração", desc: "Grande volume de dados enviado para IP externo." },
-    { id: 19, type: "IOA", name: "9. Descoberta do ambiente", desc: "Execução sequencial de whoami, ipconfig, net user, net group, netstat." },
-    { id: 20, type: "IOA", name: "10. Execução incomum", desc: "cmd.exe iniciado por winword.exe ou excel.exe após abrir um documento." }
+// Cenários reais, contextualizados e amarrados estritamente às tuas instruções técnicas
+const masterDatabase = [
+    { id: "m1", tactic: "Reconnaissance", text: "O atacante executa um scanning com nmap direcionado ao bloco de IPs externos do servidor web para identificar portas abertas e serviços vulneráveis expostos." },
+    { id: "m2", tactic: "Initial Access", text: "Um e-mail falso contendo uma campanha maliciosa de spearphishing é enviado para o setor de RH com um link simulando a atualização de benefícios." },
+    { id: "m3", tactic: "Execution", text: "Após o usuário abrir o documento, uma macro oculta invoca um comando via command script (cmd) no background para iniciar o agente de varredura." },
+    { id: "m4", tactic: "Persistence", text: "O artefato malicioso altera as configurações do sistema para modificar o registro do Windows, adicionando uma entrada na pasta Run para garantir o início automático com o SO." },
+    { id: "m5", tactic: "Credential Access", text: "O invasor inicia uma atividade em massa de brute force apontada para a porta 22 (SSH) tentando quebrar a credencial do usuário admin por dicionário." },
+    { id: "m6", tactic: "Discovery", text: "A rotina do script realiza um acount discovery rodando comandos nativos para listar todas as contas de usuários e grupos locais presentes no host comprometido." },
+    { id: "m7", tactic: "Lateral Movement", text: "Abusando de credenciais administrativas coletadas, o atacante usa remote services como conexões RDP e WinRM legítimas para pular para os servidores vizinhos na DMZ." },
+    { id: "m8", tactic: "Collection", text: "Uma rotina automatizada em background varre as pastas de rede executando uma coleta automatica de documentos sensíveis, juntando tudo em um container temporário." },
+    { id: "m9", tactic: "Command and Control", text: "A sessão interativa com a máquina estabelece uma comunicação reversa persistente com o servidor remoto utilizando um canal encriptado via HTTPS para despistar firewalls." },
+    { id: "m10", tactic: "Exfiltration", text: "O script inicia a extração de dados e descarrega todos os arquivos corporativos confidenciais diretamente através de conexões de C2 externas sob o controle da operação." },
+    { id: "m11", tactic: "Impact", text: "Na etapa final, o malware executa a criptografia forçada dos arquivos e a manipulacao de dados operacionais essenciais para sabotar os backups e paralisar o servidor." }
 ];
 
 function shuffle(array) {
@@ -250,56 +209,110 @@ function shuffle(array) {
 }
 
 function initLab() {
-    const container = document.getElementById('matrix-container');
-    const randomizedData = shuffle([...dataset]);
-    document.getElementById('total').innerText = randomizedData.length;
+    const pool = document.getElementById('tactics-pool');
+    const grid = document.getElementById('matrix-grid');
 
-    randomizedData.forEach((item, index) => {
+    // 1. Injeta os cards das táticas puros e limpos (embaralhados)
+    const shuffledTactics = shuffle([...masterDatabase]);
+    shuffledTactics.forEach(item => {
         const card = document.createElement('div');
-        card.className = 'challenge-card';
-        card.id = `card-${item.id}`;
+        card.className = 'tactic-card';
+        card.id = item.id;
+        card.draggable = true;
+        card.innerText = item.tactic;
 
-        card.innerHTML = `
-            <div class="meta">
-                <span>ITEM #${index + 1}</span>
-                <span>${item.name}</span>
-            </div>
-            <div class="artifact-box"><code>${item.desc}</code></div>
-            <div class="btn-group" id="actions-${item.id}">
-                <button class="btn-ioc" onclick="validate(${item.id}, 'IOC')">IOC</button>
-                <button class="btn-ioa" onclick="validate(${item.id}, 'IOA')">IOA</button>
-            </div>
-            <div class="feedback-msg" id="feed-${item.id}"></div>
+        card.addEventListener('dragstart', dragStart);
+        card.addEventListener('dragend', dragEnd);
+        pool.appendChild(card);
+    });
+
+    // 2. Injeta os blocos de cenários completos (embaralhados)
+    const shuffledScenarios = shuffle([...masterDatabase]);
+    shuffledScenarios.forEach((item, idx) => {
+        const box = document.createElement('div');
+        box.className = 'scenario-box';
+        box.innerHTML = `
+            <div class="scenario-text"><strong>#${idx + 1}</strong> - ${item.text}</div>
+            <div class="dropzone" id="zone-${item.id}">Arraste a tática aqui</div>
+            <div class="feedback-text" id="feed-${item.id}"></div>
         `;
-        container.appendChild(card);
+
+        const dropzone = box.querySelector('.dropzone');
+        dropzone.addEventListener('dragover', dragOver);
+        dropzone.addEventListener('dragenter', dragEnter);
+        dropzone.addEventListener('dragleave', dragLeave);
+        dropzone.addEventListener('drop', dragDrop);
+
+        grid.appendChild(box);
     });
 }
 
-let currentScore = 0;
+function dragStart(e) {
+    this.classList.add('dragging');
+    e.dataTransfer.setData('text/plain', this.id);
+}
 
-function validate(id, selected) {
-    const targetItem = dataset.find(i => i.id === id);
-    const card = document.getElementById(`card-${id}`);
-    const feedback = document.getElementById(`feed-${id}`);
-    const actions = document.getElementById(`actions-${id}`);
+function dragEnd() {
+    this.classList.remove('dragging');
+}
+
+function dragOver(e) { e.preventDefault(); }
+function dragEnter(e) { e.preventDefault(); this.parentElement.classList.add('drag-over'); }
+function dragLeave() { this.parentElement.classList.remove('drag-over'); }
+
+function dragDrop(e) {
+    e.preventDefault();
+    this.parentElement.classList.remove('drag-over');
     
-    const buttons = actions.getElementsByTagName('button');
-    buttons[0].disabled = true;
-    buttons[1].disabled = true;
+    const cardId = e.dataTransfer.getData('text/plain');
+    const draggableCard = document.getElementById(cardId);
+    
+    const zoneId = this.id;
+    const targetItemId = zoneId.replace('zone-', ''); 
 
-    feedback.classList.add('show');
-
-    if (selected === targetItem.type) {
-        card.classList.add('correct');
-        feedback.style.color = "var(--success)";
-        feedback.innerHTML = `[+] Correto!`;
-        currentScore++;
-        document.getElementById('score').innerText = currentScore;
-    } else {
-        card.classList.add('wrong');
-        feedback.style.color = "var(--magenta)";
-        feedback.innerHTML = `[-] Incorreto. Resposta certa: ${targetItem.type}`;
+    // Se o dropzone já contiver um card, manda de volta para a piscina
+    if (this.children.length > 0 && this.firstElementChild.classList.contains('tactic-card')) {
+        document.getElementById('tactics-pool').appendChild(this.firstElementChild);
     }
+
+    this.innerHTML = "";
+    this.appendChild(draggableCard);
+
+    const feedbackEl = document.getElementById(`feed-${targetItemId}`);
+    feedbackEl.style.display = "block";
+
+    // Validação estrita por ID interno para evitar falhas conceituais no drop
+    if (cardId === targetItemId) {
+        draggableCard.style.borderColor = "var(--success)";
+        draggableCard.style.background = "#0c260f";
+        draggableCard.draggable = false; // Trava o card correto
+        
+        feedbackEl.style.color = "var(--success)";
+        feedbackEl.innerText = "[+] CORRETO";
+    } else {
+        draggableCard.style.borderColor = "var(--error)";
+        draggableCard.style.background = "#2b000e";
+        
+        feedbackEl.style.color = "var(--error)";
+        feedbackEl.innerText = "[-] INCORRETO";
+    }
+
+    updateLiveScore();
+}
+
+function updateLiveScore() {
+    const zones = document.querySelectorAll('.dropzone');
+    let correctCount = 0;
+    
+    zones.forEach(z => {
+        const card = z.firstElementChild;
+        const targetId = z.id.replace('zone-', '');
+        if (card && card.id === targetId) {
+            correctCount++;
+        }
+    });
+
+    document.getElementById('score-count').innerText = correctCount;
 }
 
 window.onload = initLab;
