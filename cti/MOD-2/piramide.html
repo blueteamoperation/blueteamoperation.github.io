@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PYRAMID OF PAIN // IOC PARSER</title>
+    <style>
+        :root {
+            --bg-color: #0d0d0d;
+            --panel-bg: #141414;
+            --primary: #ff6600;
+            --primary-glow: rgba(255, 102, 0, 0.3);
+            --text-color: #e0e0e0;
+            --text-muted: #888;
+            --success: #00ff66;
+            --error: #ff0033;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Courier New', Courier, monospace;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+            border-bottom: 2px solid var(--primary);
+            padding-bottom: 10px;
+            width: 100%;
+            max-width: 1000px;
+            box-shadow: 0 4px 10px var(--primary-glow);
+        }
+
+        header h1 {
+            color: var(--primary);
+            font-size: 2rem;
+            letter-spacing: 3px;
+            text-shadow: 0 0 10px var(--primary);
+        }
+
+        header p {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            margin-top: 5px;
+        }
+
+        .container {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 20px;
+            width: 100%;
+            max-width: 1000px;
+        }
+
+        @media (min-width: 768px) {
+            .container {
+                grid-template-columns: 1.1fr 0.9fr;
+            }
+        }
+
+        .terminal-panel {
+            background: var(--panel-bg);
+            border: 1px solid var(--primary);
+            padding: 20px;
+            border-radius: 4px;
+            position: relative;
+            box-shadow: inset 0 0 15px rgba(255, 102, 0, 0.05);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .terminal-panel::before {
+            content: "PAIN_ENGINE: CRYPT_ACTIVE";
+            position: absolute;
+            top: -10px;
+            left: 15px;
+            background: var(--bg-color);
+            padding: 0 5px;
+            font-size: 0.75rem;
+            color: var(--primary);
+        }
+
+        .evidence-header {
+            font-weight: bold;
+            color: var(--primary);
+            margin-bottom: 10px;
+            letter-spacing: 1px;
+        }
+
+        .scenario-box {
+            font-size: 1.05rem;
+            line-height: 1.6;
+            margin-bottom: 15px;
+            min-height: 70px;
+        }
+
+        .log-output {
+            background: #050505;
+            border-left: 3px solid var(--primary);
+            padding: 12px;
+            font-size: 0.85rem;
+            color: #ffaa66;
+            overflow-x: auto;
+            white-space: pre-wrap;
+            margin-bottom: 20px;
+            flex-grow: 1;
+        }
+
+        /* Estrutura Visual da Pirâmide */
+        .pyramid-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: var(--panel-bg);
+            border: 1px solid #222;
+            padding: 20px 10px;
+            border-radius: 4px;
+        }
+
+        .pyramid-wrapper {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+            gap: 6px;
+            margin: 15px 0;
+        }
+
+        .pyramid-layer {
+            background: #0d0d0d;
+            border: 1px solid var(--primary);
+            color: var(--primary);
+            font-weight: bold;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            text-transform: uppercase;
+            padding: 10px;
+            height: 42px;
+        }
+
+        .pyramid-layer:hover {
+            background: var(--primary);
+            color: #000;
+            box-shadow: 0 0 15px var(--primary);
+        }
+
+        /* Efeito de afunilamento da pirâmide (larguras responsivas) */
+        .layer-6 { width: 45%; border-color: #ff3300; color: #ff3300; } /* TTPs - Topo Vermelho/Laranja */
+        .layer-5 { width: 55%; }
+        .layer-4 { width: 65%; }
+        .layer-3 { width: 75%; }
+        .layer-2 { width: 85%; }
+        .layer-1 { width: 95%; color: #ffaa66; border-color: #ffaa66; } /* Hashes - Base */
+
+        .score-board {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.9rem;
+            border-top: 1px dashed #333;
+            padding-top: 15px;
+            margin-top: 15px;
+            width: 100%;
+        }
+
+        .feedback {
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            text-align: center;
+            min-height: 20px;
+        }
+
+        .feedback.correct { color: var(--success); text-shadow: 0 0 8px var(--success); }
+        .feedback.incorrect { color: var(--error); text-shadow: 0 0 8px var(--error); }
+
+        .game-over {
+            text-align: center;
+            padding: 40px 20px;
+            grid-column: 1 / -1;
+        }
+
+        .game-over h2 {
+            color: var(--primary);
+            margin-bottom: 20px;
+            text-shadow: 0 0 10px var(--primary);
+        }
+
+        .btn-restart {
+            background: var(--primary);
+            color: #000;
+            border: none;
+            padding: 15px 30px;
+            font-weight: bold;
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-top: 20px;
+        }
+        
+        .btn-restart:hover {
+            box-shadow: 0 0 20px var(--primary);
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>PYRAMID_OF_PAIN // IOC_CLASSIFIER</h1>
+        <p>Classifique os indicadores encontrados na resposta a incidentes de acordo com o nível de dificuldade imposto ao atacante.</p>
+    </header>
+
+    <div class="container" id="game-container">
+        <div class="terminal-panel">
+            <div>
+                <div class="evidence-header" id="evidence-id">[INDICADOR #01]</div>
+                <div class="scenario-box" id="scenario-text">
+                    Injetando telemetria de rede...
+                </div>
+            </div>
+            <div class="log-output" id="log-text">
+                [RAW IOC DATA]
+            </div>
+        </div>
+
+        <div class="pyramid-container">
+            <p style="font-size: 0.8rem; color: var(--text-muted); text-align: center;">SELECIONE O NÍVEL CORRETO DA PIRÂMIDE:</p>
+            
+            <div class="pyramid-wrapper">
+                <button class="pyramid-layer layer-6" onclick="checkAnswer('TTPs')">TTPs (Táticas, Técnicas e Procedimentos)</button>
+                <button class="pyramid-layer layer-5" onclick="checkAnswer('Tools')">Tools (Ferramentas)</button>
+                <button class="pyramid-layer layer-4" onclick="checkAnswer('Network/Host Artifacts')">Network / Host Artifacts</button>
+                <button class="pyramid-layer layer-3" onclick="checkAnswer('Domain Names')">Domain Names</button>
+                <button class="pyramid-layer layer-2" onclick="checkAnswer('IP Addresses')">IP Addresses</button>
+                <button class="pyramid-layer layer-1" onclick="checkAnswer('Hash Values')">Hash Values</button>
+            </div>
+
+            <div class="feedback" id="feedback-text"></div>
+
+            <div class="score-board">
+                <div>IoC: <span id="current-question">0</span>/<span id="total-questions">0</span></div>
+                <div>SCORE: <span id="score-val" style="color: var(--primary);">0</span></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Casos práticos simulando artefatos de forense e logs reais
+        const database = [
+            {
+                scenario: "A equipe de SOC extraiu a assinatura estática MD5 do binário do ransomware coletado na estação de trabalho para utilizá-la em um bloqueio rápido via antivírus local.",
+                log: "EDR Block Incident:\nINDICADOR: MD5\nVALOR: 7b21a8a25c31f4228afcf4c8996f9242\nNível de Dor: Trivial (Mudar 1 bit altera o hash completamente).",
+                level: "Hash Values"
+            },
+            {
+                scenario: "O firewall de borda bloqueou conexões de saída direcionadas a um servidor de comando e controle localizado no endereço IP associado a uma botnet conhecida.",
+                log: "NetFlow Traffic Log:\nSRC_IP: 10.0.4.12 -> DST_IP: 185.220.101.5\nPROTOCOL: TCP / Port 8080\nNível de Dor: Fácil (O atacante compra outro proxy/VPS em minutos).",
+                level: "IP Addresses"
+            },
+            {
+                scenario: "O proxy corporativo identificou requisições suspeitas originadas por computadores internos para um domínio recém-registrado na internet usado para hospedar páginas de phishing.",
+                log: "Web Gateway Alert:\nURL: http://secure-login-update-microsoft.com/auth/login\nDNS RESOLUTION: NXDOMAIN / Active Malicious Sinkhole\nNível de Dor: Simples (Mudar registros DNS leva poucas horas).",
+                level: "Domain Names"
+            },
+            {
+                scenario: "A análise de memória RAM (Volatility) detectou a presença de uma chave de registro específica criada no sistema e uma string modificada no User-Agent HTTP que o malware usa para se camuflar.",
+                log: "Host Forensic Artifact:\nREGISTRY: HKCU\\Software\\AppData\\MalwareSvc\nHTTP_USER_AGENT: 'Mozilla/5.0 (CustomCyberpunkCore_v1)'\nNível de Dor: Chato (Remover rastros ou assinaturas do host exige reconfigurar o código).",
+                level: "Network/Host Artifacts"
+            },
+            {
+                scenario: "A equipe de DFIR descobriu que o grupo criminoso está utilizando o utilitário legítimo do Windows 'vssadmin.exe' para deletar os arquivos de Shadow Copy e impedir a recuperação dos dados.",
+                log: "Process Execution Monitor:\nCOMMAND: vssadmin.exe delete shadows /all /quiet\nPARENT_PROCESS: cmd.exe\nNível de Dor: Desafiador (Se bloquearmos a ferramenta ou assinaturas dela, o atacante precisa programar outra solução).",
+                level: "Tools"
+            },
+            {
+                scenario: "A inteligência de ameaças identificou que o operador utiliza e-mails de Spear-Phishing direcionados a executivos mimetizando intimações judiciais, seguidos de movimentação lateral via Pass-The-Hash e exfiltração via protocolo DNS Tunneling.",
+                log: "Threat Actor Profile (Behavioral Theory):\nTechnique 1: Spear-phishing Attachment (T1566.001)\nTechnique 2: Pass the Hash (T1550.002)\nTechnique 3: Protocol Tunneling (T1572)\nNível de Dor: Extrema (Mudar o comportamento e o modus operandi exige retreinar o fator humano do grupo).",
+                level: "TTPs"
+            },
+            {
+                scenario: "Durante a varredura, o analista localizou o script do framework de pós-exploração 'Mimikatz' renomeado para 'system32_driver.ps1' dentro de um diretório temporário.",
+                log: "Antivirus Telemetry:\nFile Detected: system32_driver.ps1\nInternal Signature: Mimikatz (LSASS Memory dumper)\nNível de Dor: Desafiador (Trocar de ferramenta atrasa a operação do atacante).",
+                level: "Tools"
+            }
+        ];
+
+        let currentIdx = 0;
+        let score = 0;
+        let shuffledQuestions = [];
+
+        function initGame() {
+            shuffledQuestions = [...database].sort(() => Math.random() - 0.5);
+            currentIdx = 0;
+            score = 0;
+            document.getElementById('total-questions').innerText = shuffledQuestions.length;
+            document.getElementById('score-val').innerText = score;
+            loadQuestion();
+        }
+
+        function loadQuestion() {
+            if (currentIdx >= shuffledQuestions.length) {
+                showGameOver();
+                return;
+            }
+
+            document.getElementById('current-question').innerText = currentIdx + 1;
+            document.getElementById('feedback-text').innerText = "";
+            document.getElementById('feedback-text').className = "feedback";
+            
+            const currentQ = shuffledQuestions[currentIdx];
+            document.getElementById('evidence-id').innerText = `[DETECÇÃO_IoC_#0${currentIdx + 1}]`;
+            document.getElementById('scenario-text').innerText = currentQ.scenario;
+            document.getElementById('log-text').innerText = currentQ.log;
+
+            // Re-habilita os botões da pirâmide
+            const buttons = document.querySelectorAll('.pyramid-layer');
+            buttons.forEach(b => b.disabled = false);
+        }
+
+        function checkAnswer(selectedLevel) {
+            const correctAnswer = shuffledQuestions[currentIdx].level;
+            const feedbackEl = document.getElementById('feedback-text');
+
+            const buttons = document.querySelectorAll('.pyramid-layer');
+            buttons.forEach(b => b.disabled = true);
+
+            if (selectedLevel === correctAnswer) {
+                feedbackEl.className = "feedback correct";
+                feedbackEl.innerText = "✓ SUCESSO // CORRELAÇÃO DE DOR VÁLIDA";
+                score += 100;
+                document.getElementById('score-val').innerText = score;
+            } else {
+                feedbackEl.className = "feedback incorrect";
+                feedbackEl.innerText = `✗ INSUFICIENTE // CORRETO: [${correctAnswer.toUpperCase()}]`;
+            }
+
+            setTimeout(() => {
+                currentIdx++;
+                loadQuestion();
+            }, 2500);
+        }
+
+        function showGameOver() {
+            const container = document.getElementById('game-container');
+            const maxScore = shuffledQuestions.length * 100;
+            const performance = (score / maxScore) * 100;
+            
+            let evaluation = "";
+            if (performance === 100) evaluation = "STATUS: MASTER OF PAIN // ATACANTE COMPLETAMENTE FRUSTRADO";
+            else if (performance >= 70) evaluation = "STATUS: THREAT HUNTER PLENO // DEFESA OPERACIONALMENTE EFICIENTE";
+            else evaluation = "STATUS: DEFESA TRIVIAL. VOCÊ SÓ ESTÁ MUDANDO REGRAS DE HASH.";
+
+            container.innerHTML = `
+                <div class="terminal-panel game-over">
+                    <h2>ANÁLISE E CLASSIFICAÇÃO CONCLUÍDA</h2>
+                    <p style="font-size: 1.2rem; margin-bottom: 10px;">Score de Frustração do Invasor: <span style="color: var(--primary); font-weight:bold;">${score}</span> / ${maxScore} pts</p>
+                    <p style="color: #ffaa66; font-weight: bold; margin-bottom: 30px;">${evaluation}</p>
+                    <button class="btn-restart" onclick="window.location.reload()">Reiniciar Matriz de Dor</button>
+                </div>
+            `;
+        }
+
+        window.onload = initGame;
+    </script>
+</body>
+</html>

