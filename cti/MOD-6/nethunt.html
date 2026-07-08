@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WEB_LOG // THREAT HUNTING CTF</title>
+    <style>
+        :root {
+            --bg-color: #0d0d0d;
+            --panel-bg: #141414;
+            --primary: #ff6600;
+            --primary-glow: rgba(255, 102, 0, 0.3);
+            --text-color: #e0e0e0;
+            --text-muted: #888;
+            --success: #00ff66;
+            --error: #ff0033;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Courier New', Courier, monospace;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+            border-bottom: 2px solid var(--primary);
+            padding-bottom: 10px;
+            width: 100%;
+            max-width: 850px;
+            box-shadow: 0 4px 10px var(--primary-glow);
+        }
+
+        header h1 {
+            color: var(--primary);
+            font-size: 1.8rem;
+            letter-spacing: 3px;
+            text-shadow: 0 0 10px var(--primary);
+        }
+
+        header p {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            margin-top: 5px;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 850px;
+        }
+
+        .quiz-container {
+            background: var(--panel-bg);
+            border: 1px solid var(--primary);
+            padding: 25px;
+            border-radius: 4px;
+            position: relative;
+            box-shadow: inset 0 0 15px rgba(255, 102, 0, 0.05);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            min-height: 480px;
+        }
+
+        .quiz-container::before {
+            content: "HTTP_AUDIT: LOG_ANALYSIS_STAGE";
+            position: absolute;
+            top: -10px;
+            left: 15px;
+            background: var(--bg-color);
+            padding: 0 5px;
+            font-size: 0.75rem;
+            color: var(--primary);
+        }
+
+        .question-box h3 {
+            color: var(--primary);
+            font-size: 1.1rem;
+            margin-bottom: 20px;
+            border-bottom: 1px dashed #333;
+            padding-bottom: 10px;
+            line-height: 1.5;
+        }
+
+        .options-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-bottom: 25px;
+        }
+
+        .option-item {
+            background: #0d0d0d;
+            border: 1px solid #333;
+            color: var(--text-color);
+            padding: 14px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-align: left;
+            font-size: 0.85rem;
+            line-height: 1.4;
+        }
+
+        .option-item:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+            background: rgba(255, 102, 0, 0.02);
+            box-shadow: 0 0 8px rgba(255, 102, 0, 0.1);
+        }
+
+        .score-board {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.9rem;
+            border-top: 1px dashed #333;
+            padding-top: 15px;
+        }
+
+        .feedback {
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            text-align: center;
+            min-height: 22px;
+            font-size: 0.85rem;
+            margin-bottom: 12px;
+        }
+
+        .feedback.correct { color: var(--success); text-shadow: 0 0 8px var(--success); }
+        .feedback.incorrect { color: var(--error); text-shadow: 0 0 8px var(--error); }
+
+        .game-over {
+            text-align: center;
+            padding: 60px 20px;
+        }
+
+        .game-over h2 {
+            color: var(--primary);
+            margin-bottom: 20px;
+            text-shadow: 0 0 10px var(--primary);
+        }
+
+        .btn-restart {
+            background: var(--primary);
+            color: #000;
+            border: none;
+            padding: 15px 30px;
+            font-weight: bold;
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-top: 20px;
+        }
+        
+        .btn-restart:hover {
+            box-shadow: 0 0 20px var(--primary);
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>WEB_LOG // FORENSICS_CHALLENGE</h1>
+        <p>Valide as métricas e os indicadores táticos extraídos da auditoria de logs HTTP <br>
+            Recurso: ForenseWorkstationWin26 C:\Users\faruk\Desktop\Artefatos\pcaps.<br></p>
+    </header>
+
+    <div class="container" id="game-container">
+        <div class="quiz-container">
+            <div class="question-box">
+                <h3 id="question-title">Carregando telemetria...</h3>
+                <div class="options-list" id="options-container">
+                    </div>
+            </div>
+
+            <div>
+                <div class="feedback" id="feedback-text"></div>
+                <div class="score-board">
+                    <div>DESAFIO: <span id="current-quest">0</span>/<span id="total-quests">0</span></div>
+                    <div>SCORE: <span id="score-val" style="color: var(--primary);">0</span></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const ctfDatabase = [
+            {
+                question: "1. Quantas requisições totais foram mapeadas nos logs vindas da ferramenta de linha de comando curl?",
+                options: [
+                    "42 requisições",
+                    "65 requisições",
+                    "50 requisições",
+                    "14 requisições"
+                ],
+                correct: 1
+            },
+            {
+                question: "2. Qual User-Agent executou comandos específicos no servidor web para tentar determinar a identidade atual do usuário autenticado no sistema?",
+                options: [
+                    "Mozilla/5.0 (Windows NT 10.0; Win64; x64)",
+                    "curl/7.81.0",
+                    "PowerShell/7.4.1",
+                    "Nmap Scripting Engine"
+                ],
+                correct: 2
+            },
+            {
+                question: "3. Avaliando a distribuição global de respostas HTTP no arquivo analisado, qual HTTP Status Code foi reportado menos vezes e qual foi reportado com maior frequência?",
+                options: [
+                    "Menos vezes: 403 // Mais vezes: 200",
+                    "Menos vezes: 500 // Mais vezes: 403",
+                    "Menos vezes: 500 // Mais vezes: 200",
+                    "Menos vezes: 404 // Mais vezes: 200"
+                ],
+                correct: 2
+            },
+            {
+                question: "4. Durante a análise forense de volumetria por origem, identificou-se que um único endereço IP realizou exatamente 50 requisições. Qual é este IP?",
+                options: [
+                    "10.10.10.14",
+                    "192.168.1.50",
+                    "10.10.10.65",
+                    "172.16.5.14"
+                ],
+                correct: 0
+            },
+            {
+                question: "5. Quantos HTTP Status Code 200 (OK) estão diretamente relacionados e registrados para acessos ao arquivo de mapeamento de indexadores 'robots.txt'?",
+                options: [
+                    "14 status_code 200",
+                    "50 status_code 200",
+                    "6 status_code 200",
+                    "23 status_code 200"
+                ],
+                correct: 2
+            },
+            {
+                question: "6. Qual foi o domínio corporativo que teve seu arquivo 'robots.txt' visualizado com a maior frequência pelos pacotes interceptados?",
+                options: [
+                    "intranet.empresa.local",
+                    "portal.empresa.local",
+                    "api.empresa.local",
+                    "homolog.empresa.local"
+                ],
+                correct: 1
+            }
+        ];
+
+        let currentIdx = 0;
+        let score = 0;
+
+        function initCTF() {
+            currentIdx = 0;
+            score = 0;
+            document.getElementById('total-quests').innerText = ctfDatabase.length;
+            document.getElementById('score-val').innerText = score;
+            loadQuestion();
+        }
+
+        function loadQuestion() {
+            if (currentIdx >= ctfDatabase.length) {
+                showGameOver();
+                return;
+            }
+
+            document.getElementById('current-quest').innerText = currentIdx + 1;
+            document.getElementById('feedback-text').innerText = "";
+            
+            const currentQ = ctfDatabase[currentIdx];
+            document.getElementById('question-title').innerText = currentQ.question;
+
+            const container = document.getElementById('options-container');
+            container.innerHTML = "";
+
+            currentQ.options.forEach((opt, idx) => {
+                const btn = document.createElement('button');
+                btn.className = "option-item";
+                btn.innerText = opt;
+                btn.onclick = () => checkAnswer(idx);
+                container.appendChild(btn);
+            });
+        }
+
+        function checkAnswer(selectedIdx) {
+            const correctAnswer = ctfDatabase[currentIdx].correct;
+            const feedbackEl = document.getElementById('feedback-text');
+            
+            const items = document.querySelectorAll('.option-item');
+            items.forEach(b => b.disabled = true);
+
+            if (selectedIdx === correctAnswer) {
+                feedbackEl.className = "feedback correct";
+                feedbackEl.innerText = "[+] FLAG VÁLIDA // MÉTRICA CONFIRMADA";
+                score += 150;
+                document.getElementById('score-val').innerText = score;
+            } else {
+                feedbackEl.className = "feedback incorrect";
+                feedbackEl.innerText = "[-] ACESSO NEGADO // DADO DIVERGENTE";
+            }
+
+            setTimeout(() => {
+                currentIdx++;
+                loadQuestion();
+            }, 2200);
+        }
+
+        function showGameOver() {
+            const container = document.getElementById('game-container');
+            const maxScore = ctfDatabase.length * 150;
+            const perf = (score / maxScore) * 100;
+            
+            let status = perf === 100 ? "STATUS: WEB FORENSICS CHIEF // RECONHECIMENTO DE PADRÕES PERFEITO" : "STATUS: ANALISTA DE LOGS VALIDADO";
+            if (perf < 70) status = "STATUS: AUDITORIA INSUFICIENTE // REVISE A TELEMETRIA EXTRAÍDA";
+
+            container.innerHTML = `
+                <div class="quiz-container game-over">
+                    <h2>AUDITORIA WEB CONCLUÍDA</h2>
+                    <p style="font-size: 1.2rem; margin-bottom: 10px;">Pontuação de Análise: <span style="color: var(--primary); font-weight:bold;">${score}</span> / ${maxScore} PTS</p>
+                    <p style="color: #ffaa66; font-weight: bold; margin-bottom: 30px;">${status}</p>
+                    <button class="btn-restart" onclick="window.location.reload()">Reiniciar Desafio</button>
+                </div>
+            `;
+        }
+
+        window.onload = initCTF;
+    </script>
+</body>
+</html>
