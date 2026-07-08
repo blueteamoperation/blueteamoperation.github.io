@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HONEYPOT CTF // LIVE LOG AUDIT</title>
+    <style>
+        :root {
+            --bg-color: #0d0d0d;
+            --panel-bg: #141414;
+            --primary: #ff6600;
+            --primary-glow: rgba(255, 102, 0, 0.3);
+            --text-color: #e0e0e0;
+            --text-muted: #888;
+            --success: #00ff66;
+            --error: #ff0033;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Courier New', Courier, monospace;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+            border-bottom: 2px solid var(--primary);
+            padding-bottom: 10px;
+            width: 100%;
+            max-width: 1100px;
+            box-shadow: 0 4px 10px var(--primary-glow);
+        }
+
+        header h1 {
+            color: var(--primary);
+            font-size: 2rem;
+            letter-spacing: 3px;
+            text-shadow: 0 0 10px var(--primary);
+        }
+
+        header p {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            margin-top: 5px;
+        }
+
+        .container {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 20px;
+            width: 100%;
+            max-width: 1100px;
+        }
+
+        @media (min-width: 900px) {
+            .container {
+                grid-template-columns: 0.9fr 1.1fr;
+            }
+        }
+
+        .terminal-panel {
+            background: var(--panel-bg);
+            border: 1px solid var(--primary);
+            padding: 20px;
+            border-radius: 4px;
+            position: relative;
+            box-shadow: inset 0 0 15px rgba(255, 102, 0, 0.05);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .terminal-panel::before {
+            content: "MISSION_INSTRUCTIONS // READ_ONLY";
+            position: absolute;
+            top: -10px;
+            left: 15px;
+            background: var(--bg-color);
+            padding: 0 5px;
+            font-size: 0.75rem;
+            color: var(--primary);
+        }
+
+        .instruction-box {
+            background: #050505;
+            border-left: 3px solid var(--primary);
+            padding: 15px;
+            font-size: 0.85rem;
+            color: #ffaa66;
+            line-height: 1.6;
+            height: 100%;
+        }
+
+        .instruction-box h4 {
+            color: var(--primary);
+            margin-bottom: 10px;
+            text-transform: uppercase;
+        }
+
+        .instruction-box ul {
+            margin-left: 20px;
+            margin-top: 10px;
+        }
+
+        .quiz-container {
+            background: var(--panel-bg);
+            border: 1px solid #222;
+            padding: 20px;
+            border-radius: 4px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            min-height: 450px;
+        }
+
+        .question-box h3 {
+            color: var(--primary);
+            font-size: 1.05rem;
+            margin-bottom: 15px;
+            border-bottom: 1px dashed #333;
+            padding-bottom: 8px;
+            line-height: 1.4;
+        }
+
+        .options-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .option-item {
+            background: #0d0d0d;
+            border: 1px solid #333;
+            color: var(--text-color);
+            padding: 12px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-align: left;
+            font-size: 0.85rem;
+        }
+
+        .option-item:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+            background: rgba(255, 102, 0, 0.02);
+        }
+
+        .score-board {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.9rem;
+            border-top: 1px dashed #333;
+            padding-top: 15px;
+        }
+
+        .feedback {
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            text-align: center;
+            min-height: 20px;
+            font-size: 0.85rem;
+            margin-bottom: 10px;
+        }
+
+        .feedback.correct { color: var(--success); text-shadow: 0 0 8px var(--success); }
+        .feedback.incorrect { color: var(--error); text-shadow: 0 0 8px var(--error); }
+
+        .game-over {
+            text-align: center;
+            padding: 60px 20px;
+            grid-column: 1 / -1;
+        }
+
+        .game-over h2 {
+            color: var(--primary);
+            margin-bottom: 20px;
+            text-shadow: 0 0 10px var(--primary);
+        }
+
+        .btn-restart {
+            background: var(--primary);
+            color: #000;
+            border: none;
+            padding: 15px 30px;
+            font-weight: bold;
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-top: 20px;
+        }
+        
+        .btn-restart:hover {
+            box-shadow: 0 0 20px var(--primary);
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>HONEYPOT_CTF // LIVE_LOG_AUDIT</h1>
+        <p>Execute a ferramenta de teste no laboratório, audite os registros gerados e responda à matriz de validação técnica.</p>
+    </header>
+
+    <div class="container" id="game-container">
+        <div class="terminal-panel">
+            <div class="instruction-box">
+                <h4>[DIRETRIZ DE INVESTIGAÇÃO]</h4>
+                <p>1. Recurso ForensicWorkstationWin26 - Tool: HONEYHACK.</p>
+                <p>2. Execute o script <strong>"pen.py"</strong> contido no diretório HONEYHACK.</p>
+                <p>3. Abra o arquivo de log gerado em tempo real pelo seu ambiente de monitoramento.</p>
+                <p>4. Analise a sequência de comportamento do atacante simulado para responder às perguntas do console lateral.</p>
+                <br>
+                <h4>[PADRÕES DE EVENTO ESPERADOS]</h4>
+                <ul>
+                    <li>• INTELLIGENCE ALERT: Comportamentos de Scan</li>
+                    <li>• CREDENTIAL EXFILTRATED: Captura de inputs brutoforce</li>
+                    <li>• Session encounterd an error: Sockets interrompidos</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="quiz-container">
+            <div class="question-box">
+                <h3 id="question-title">Carregando parâmetros...</h3>
+                <div class="options-list" id="options-container">
+                    </div>
+            </div>
+
+            <div>
+                <div class="feedback" id="feedback-text"></div>
+                <div class="score-board">
+                    <div>ETAPA: <span id="current-quest">0</span>/<span id="total-quests">0</span></div>
+                    <div>SCORE: <span id="score-val" style="color: var(--primary);">0</span></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Perguntas táticas puras que dependem apenas da leitura do log gerado em tempo de execução
+        const ctfDatabase = [
+            {
+                question: "1. Analisando a linha de assinatura 'INTELLIGENCE ALERT: Port Scan behavior identified!', quais foram as portas específicas catalogadas pelo Honeypot como alvo direto da varredura de Reconhecimento?",
+                options: [
+                    "Portas [21, 22, 23, 25, 80, 110]",
+                    "Portas [21, 23, 110]",
+                    "Portas [23, 110]",
+                    "Portas [22, 80, 443]"
+                ],
+                correct: 1
+            },
+            {
+                question: "2. O script disparou payloads interativos de autenticação em duas portas específicas. Uma delas foi a porta 23 (Telnet). Qual foi a outra porta que recebeu as strings de 'USER' e 'PASS'?",
+                options: [
+                    "Porta 21 (FTP)",
+                    "Porta 22 (SSH)",
+                    "Porta 110 (POP3)",
+                    "Porta 25 (SMTP)"
+                ],
+                correct: 2
+            },
+            {
+                question: "3. Com base no comportamento de brute force registrado pelo Honeypot nas portas interativas, qual a lista exata e sequencial de usernames simulados pelo script atacante?",
+                options: [
+                    "admin, guest, user, anonymous",
+                    "root, administrator, sysadmin, backup",
+                    "admin, root, operator, suporte, guest",
+                    "user, password, test, login"
+                ],
+                correct: 2
+            },
+            {
+                question: "4. Observe os logs estruturados da porta 23 (Telnet) e da porta 110 (POP3). De que forma as credenciais (usuário/senha) capturadas na porta 110 se diferenciam visualmente das capturadas na porta 23?",
+                options: [
+                    "Na porta 110, os dados são precedidos explicitamente pelos comandos de protocolo 'USER' e 'PASS'.",
+                    "Na porta 110, as credenciais aparecem criptografadas em MD5.",
+                    "Na porta 23, o log mostra os comandos 'LOGIN' e 'PASSWORD' antes dos dados.",
+                    "Não há diferenciação, ambas salvam apenas as strings limpas sem comandos de protocolo."
+                ],
+                correct: 0
+            }
+        ];
+
+        let currentIdx = 0;
+        let score = 0;
+
+        function initCTF() {
+            currentIdx = 0;
+            score = 0;
+            document.getElementById('total-quests').innerText = ctfDatabase.length;
+            document.getElementById('score-val').innerText = score;
+            loadQuestion();
+        }
+
+        function loadQuestion() {
+            if (currentIdx >= ctfDatabase.length) {
+                showGameOver();
+                return;
+            }
+
+            document.getElementById('current-quest').innerText = currentIdx + 1;
+            document.getElementById('feedback-text').innerText = "";
+            
+            const currentQ = ctfDatabase[currentIdx];
+            document.getElementById('question-title').innerText = currentQ.question;
+
+            const container = document.getElementById('options-container');
+            container.innerHTML = "";
+
+            currentQ.options.forEach((opt, idx) => {
+                const btn = document.createElement('button');
+                btn.className = "option-item";
+                btn.innerText = opt;
+                btn.onclick = () => checkAnswer(idx);
+                container.appendChild(btn);
+            });
+        }
+
+        function checkAnswer(selectedIdx) {
+            const correctAnswer = ctfDatabase[currentIdx].correct;
+            const feedbackEl = document.getElementById('feedback-text');
+            
+            const items = document.querySelectorAll('.option-item');
+            items.forEach(b => b.disabled = true);
+
+            if (selectedIdx === correctAnswer) {
+                feedbackEl.className = "feedback correct";
+                feedbackEl.innerText = "[+] ANÁLISE CORRETA // REQUISITO VALIDADO";
+                score += 250;
+                document.getElementById('score-val').innerText = score;
+            } else {
+                feedbackEl.className = "feedback incorrect";
+                feedbackEl.innerText = "[-] FALHA NA VERIFICAÇÃO // DADO INCONSISTENTE";
+            }
+
+            setTimeout(() => {
+                currentIdx++;
+                loadQuestion();
+            }, 2500);
+        }
+
+        function showGameOver() {
+            const container = document.getElementById('game-container');
+            const maxScore = ctfDatabase.length * 250;
+            
+            container.innerHTML = `
+                <div class="terminal-panel game-over" style="border: 1px solid var(--primary);">
+                    <h2>VALIDAÇÃO COMPLETA</h2>
+                    <p style="font-size: 1.2rem; margin-bottom: 10px;">Pontuação Forense: <span style="color: var(--primary); font-weight:bold;">${score}</span> / ${maxScore} PTS</p>
+                    <p style="color: #ffaa66; font-weight: bold; margin-bottom: 30px;">[SISTEMA] Auditoria realizada. Evidências do script correlacionadas com sucesso.</p>
+                    <button class="btn-restart" onclick="window.location.reload()">Resetar Painel</button>
+                </div>
+            `;
+        }
+
+        window.onload = initCTF;
+    </script>
+</body>
+</html>
