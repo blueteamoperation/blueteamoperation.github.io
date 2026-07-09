@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mini CTF - Análise YARA</title>
+    <style>
+        :root {
+            --bg-color: #0d0d0d;
+            --card-bg: #1a1a1a;
+            --primary-orange: #ff6600;
+            --light-orange: #ff8533;
+            --text-color: #e0e0e0;
+            --success-green: #2ecc71;
+            --error-red: #e74c3c;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .ctf-container {
+            max-width: 700px;
+            width: 100%;
+            background: var(--card-bg);
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(255, 102, 0, 0.15);
+            border: 1px solid #2a2a2a;
+        }
+
+        h1 {
+            color: var(--primary-orange);
+            text-align: center;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 5px;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #888;
+            margin-bottom: 25px;
+            font-size: 0.95em;
+        }
+
+        .resource-box {
+            background-color: #000;
+            border-left: 4px solid var(--primary-orange);
+            padding: 15px;
+            margin-bottom: 30px;
+            border-radius: 0 4px 4px 0;
+        }
+
+        .resource-box p {
+            margin: 5px 0;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 0.9em;
+        }
+
+        .resource-box span {
+            color: var(--primary-orange);
+        }
+
+        .question-card {
+            background: #222;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 6px;
+            border: 1px solid #333;
+            transition: transform 0.2s, border-color 0.2s;
+        }
+
+        .question-card:hover {
+            border-color: var(--primary-orange);
+        }
+
+        .question-text {
+            font-weight: 600;
+            margin-bottom: 12px;
+            display: block;
+        }
+
+        .input-group {
+            display: flex;
+            gap: 10px;
+        }
+
+        input[type="text"] {
+            flex: 1;
+            background-color: #111;
+            border: 1px solid #444;
+            color: #fff;
+            padding: 10px 15px;
+            border-radius: 4px;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 1em;
+            transition: border-color 0.3s;
+        }
+
+        input[type="text"]:focus {
+            outline: none;
+            border-color: var(--primary-orange);
+        }
+
+        button {
+            background-color: var(--primary-orange);
+            color: #000;
+            border: none;
+            padding: 10px 20px;
+            font-weight: bold;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.2s, transform 0.1s;
+            text-transform: uppercase;
+            font-size: 0.85em;
+        }
+
+        button:hover {
+            background-color: var(--light-orange);
+        }
+
+        button:active {
+            transform: scale(0.98);
+        }
+
+        .feedback {
+            margin-top: 10px;
+            font-size: 0.9em;
+            font-weight: bold;
+            display: none;
+        }
+
+        .feedback.correct {
+            color: var(--success-green);
+            display: block;
+        }
+
+        .feedback.incorrect {
+            color: var(--error-red);
+            display: block;
+        }
+    </style>
+</head>
+<body>
+
+<div class="ctf-container">
+    <h1>Mini CTF: Yara Lab</h1>
+    <div class="subtitle">Investigação Forense e Análise de Assinaturas</div>
+
+    <div class="resource-box">
+        <p><span>[RECURSO]</span> Estação: ForensicWorkstationPurple26</p>
+        <p><span>[DIRETÓRIO]</span> /home/investigator/analises/yara_lab</p>
+    </div>
+
+    <div class="question-card">
+        <label class="question-text" for="q1">1. Qual é o nome do arquivo que possui a assinatura <code>BASE64_C2_TOKEN_2026</code>?</label>
+        <div class="input-group">
+            <input type="text" id="q1" placeholder="Ex: arquivo.txt" autocomplete="off">
+            <button onclick="validarResposta('q1', 'artifact_04_base64_note.txt')">Submeter</button>
+        </div>
+        <div id="feedback-q1" class="feedback"></div>
+    </div>
+
+    <div class="question-card">
+        <label class="question-text" for="q2">2. Qual é o nome do arquivo que possui a assinatura <code>cdn-blueteam-update</code>?</label>
+        <div class="input-group">
+            <input type="text" id="q2" placeholder="Ex: arquivo.exe" autocomplete="off">
+            <button onclick="validarResposta('q2', 'artifact_06_downloader.ps1')">Submeter</button>
+        </div>
+        <div id="feedback-q2" class="feedback"></div>
+    </div>
+
+    <div class="question-card">
+        <label class="question-text" for="q3">3. Qual é o nome do arquivo que possui a assinatura <code>"Your files were encrypted"</code>?</label>
+        <div class="input-group">
+            <input type="text" id="q3" placeholder="Ex: arquivo.log" autocomplete="off">
+            <button onclick="validarResposta('q3', 'artifact_08_ransom_note.txt')">Submeter</button>
+        </div>
+        <div id="feedback-q3" class="feedback"></div>
+    </div>
+
+    <div class="question-card">
+        <label class="question-text" for="q4">4. Quanto ao arquivo que possui assinatura <code>/usr/bin/.cacheupd</code>, qual é o offset inicial da assinatura?</label>
+        <div class="input-group">
+            <input type="text" id="q4" placeholder="Ex: 0x00" autocomplete="off">
+            <button onclick="validarResposta('q4', '0x1f')">Submeter</button>
+        </div>
+        <div id="feedback-q4" class="feedback"></div>
+    </div>
+</div>
+
+<script>
+    function validarResposta(idCampo, respostaCorreta) {
+        const inputElement = document.getElementById(idCampo);
+        const feedbackElement = document.getElementById('feedback-' + idCampo);
+        
+        // Remove espaços extras nas pontas e padroniza para letras minúsculas
+        const respostaUsuario = inputElement.value.trim().toLowerCase();
+        const gabarito = respostaCorreta.toLowerCase();
+
+        if (respostaUsuario === "") {
+            feedbackElement.textContent = "⚠️ Por favor, digite uma resposta antes de submeter.";
+            feedbackElement.className = "feedback incorrect";
+            return;
+        }
+
+        if (respostaUsuario === gabarito) {
+            feedbackElement.textContent = "🟢 Correto! Flag aceita.";
+            feedbackElement.className = "feedback correct";
+            inputElement.style.borderColor = "var(--success-green)";
+        } else {
+            feedbackElement.textContent = "🔴 Incorreto. Tente novamente.";
+            feedbackElement.className = "feedback incorrect";
+            inputElement.style.borderColor = "var(--error-red)";
+        }
+    }
+</script>
+
+</body>
+</html>
