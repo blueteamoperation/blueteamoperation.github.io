@@ -69,16 +69,16 @@
                     Insira a palavra-passe (senha) de segurança corporativa gerada para liberar o seu bilhete de embarque criptográfico.
                 </p>
 
-                <div class="space-y-4">
+                <form method="GET" action="" class="space-y-4">
                     <div>
                         <label for="password-input" class="block text-xs text-slate-400 mb-2 uppercase font-semibold">Chave de Segurança (Passkey)</label>
-                        <input type="password" id="password-input" placeholder="Digite a palavra-chave..." 
+                        <input type="password" id="password-input" name="passkey" placeholder="Digite a palavra-chave..." 
                                class="w-full bg-slate-950 border border-slate-800 rounded p-3 text-sm text-cyan-300 focus:outline-none focus:border-cyan-500 font-mono">
                     </div>
-                    <button onclick="checkPassword()" class="w-full bg-cyan-600 hover:bg-cyan-500 text-slate-950 font-bold py-3 px-4 rounded text-sm transition-all uppercase tracking-wider">
+                    <button type="submit" class="w-full bg-cyan-600 hover:bg-cyan-500 text-slate-950 font-bold py-3 px-4 rounded text-sm transition-all uppercase tracking-wider">
                         Validar Credencial
                     </button>
-                </div>
+                </form>
 
                 <div id="feedback" class="mt-4 text-xs font-semibold hidden text-center p-2 rounded"></div>
             </div>
@@ -106,15 +106,14 @@
     </footer>
 
     <script>
-        // A senha correta é "criptograficos" (ou qualquer palavra que você escolher que esteja no site)
         const CHAVE_CORRETA = "aeroglitch";
 
-        function checkPassword() {
-            const input = document.getElementById('password-input').value.trim().toLowerCase();
+        // Função que valida visualmente o input da tela
+        function checkPassword(valorInput) {
             const feedback = document.getElementById('feedback');
             const ticketOutput = document.getElementById('ticket-output');
 
-            if (input === CHAVE_CORRETA) {
+            if (valorInput === CHAVE_CORRETA) {
                 feedback.className = "mt-4 text-xs font-semibold text-emerald-400 bg-emerald-950/30 p-2 rounded text-center";
                 feedback.innerText = "ACESSO AUTORIZADO! BILHETE DISPONÍVEL.";
                 feedback.classList.remove('hidden');
@@ -127,12 +126,24 @@
             }
         }
 
-        // --- MOCK API PARA REQUISIÇÃO VIA CURL ---
-        // Permite que os alunos façam um POST ou GET simulado para testar palavras via curl
-        // Se eles usarem o curl para enviar uma requisição POST para esta página contendo o parâmetro 'passkey'
-        // Como é uma página estática no lado do cliente, este listener intercepta "submissões" se você quiser rodar um backend simples, 
-        // ou você pode orientá-los a fazer um script de força bruta na própria UI simulada usando Selenium/Python,
-        // OU instruí-los a fazer uma análise do código fonte para entender a chave de validação local.
+        // Intercepta os parâmetros direto da URL do navegador logo após o carregamento da página
+        window.addEventListener('DOMContentLoaded', () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            const passkey = urlParams.get('passkey');
+
+            if (passkey !== null) {
+                const cleanedKey = passkey.trim().toLowerCase();
+                
+                // Preenche o campo visual com o termo enviado na URL
+                const inputEl = document.getElementById('password-input');
+                if (inputEl) {
+                    inputEl.value = passkey;
+                }
+                
+                // Roda a validação para o usuário ver o resultado na tela imediatamente
+                checkPassword(cleanedKey);
+            }
+        });
     </script>
 </body>
 </html>
