@@ -1,0 +1,882 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SocialBook - Perfil de Maurício Silva</title>
+    <style>
+        :root {
+            --bg-main: #0f172a;
+            --bg-card: #1e293b;
+            --text-primary: #f8fafc;
+            --text-secondary: #94a3b8;
+            --accent: #38bdf8;
+            --border: #334155;
+            --placeholder: #475569;
+            --btn-hover: #0284c7;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-main);
+            color: var(--text-primary);
+            padding-bottom: 50px;
+        }
+
+        header {
+            background-color: var(--bg-card);
+            border-bottom: 1px solid var(--border);
+            padding: 15px 20px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        header h1 {
+            font-size: 1.5rem;
+            color: var(--accent);
+            font-weight: 800;
+            letter-spacing: 1px;
+        }
+
+        .container {
+            max-width: 935px;
+            margin: 30px auto;
+            padding: 0 20px;
+        }
+
+        /* Profile Section */
+        .profile-header {
+            display: flex;
+            align-items: center;
+            gap: 40px;
+            padding-bottom: 40px;
+            border-bottom: 1px solid var(--border);
+            margin-bottom: 30px;
+        }
+
+        .profile-avatar-container {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            background-color: var(--placeholder);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border: 3px solid var(--accent);
+            overflow: hidden;
+            font-size: 0.8rem;
+            text-align: center;
+            color: var(--text-secondary);
+        }
+
+        .profile-avatar-container img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .profile-info h2 {
+            font-size: 2rem;
+            margin-bottom: 10px;
+        }
+
+        .profile-stats {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 15px;
+        }
+
+        .profile-stats span strong {
+            color: var(--accent);
+        }
+
+        .profile-bio {
+            line-height: 1.6;
+            color: var(--text-secondary);
+        }
+
+        .profile-bio p {
+            margin-bottom: 5px;
+        }
+
+        /* Grid de Posts */
+        .posts-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+
+        .post-card {
+            background-color: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            display: none; /* Controlado via JS */
+        }
+
+        .post-header {
+            padding: 10px 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--border);
+            font-size: 0.85rem;
+        }
+
+        .post-date {
+            color: var(--text-secondary);
+        }
+
+        .post-image-placeholder {
+            width: 100%;
+            height: 250px;
+            background-color: var(--placeholder);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 0.9rem;
+            color: var(--text-primary);
+            text-align: center;
+            border-bottom: 1px solid var(--border);
+            position: relative;
+        }
+
+        .post-image-placeholder img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            position: absolute;
+            top: 0;
+            left: 0;
+        }
+
+        .post-content {
+            padding: 15px;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .post-text {
+            font-size: 0.95rem;
+            line-height: 1.5;
+            margin-bottom: 15px;
+        }
+
+        .post-likes {
+            font-size: 0.8rem;
+            color: var(--accent);
+            font-weight: bold;
+        }
+
+        /* Controles de Paginação */
+        .pagination-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .pagination-btn {
+            background-color: var(--bg-card);
+            color: var(--text-primary);
+            border: 1px solid var(--border);
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.2s ease-in-out;
+        }
+
+        .pagination-btn:hover:not(:disabled) {
+            background-color: var(--accent);
+            color: var(--bg-main);
+            border-color: var(--accent);
+        }
+
+        .pagination-btn:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+
+        .page-indicator {
+            font-size: 1rem;
+            color: var(--text-secondary);
+        }
+
+        @media (max-width: 600px) {
+            .profile-header {
+                flex-direction: column;
+                align-items: center;
+                text-align: center;
+                gap: 20px;
+            }
+            .profile-stats {
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>SocialBook</h1>
+        <div style="font-size: 0.9rem; color: var(--text-secondary);">@mauricio_silva90</div>
+    </header>
+
+    <div class="container">
+        
+        <!-- CABEÇALHO DO PERFIL -->
+        <section class="profile-header">
+            <div class="profile-avatar-container">
+                <img src="images/avatar.png" alt="[avatar.png]">
+            </div>
+            <div class="profile-info">
+                <h2>Sizenando Freitas @freitao </h2>
+                <div class="profile-stats">
+                    <span><strong>60</strong> publicações</span>
+                    <span><strong>1.240</strong> seguidores</span>
+                    <span><strong>850</strong> seguindo</span>
+                </div>
+                <div class="profile-bio">
+                    <p><strong>🔥 Tech Manager na InovaTech Soluções</strong></p>
+                    <p>☕ Apaixonado por café, corrida de rua e tecnologia.</p>
+                    <p>📍 São Paulo - SP (01/01/90)</p>
+                    <p style="font-size: 0.85rem; margin-top: 10px;"><em>"A persistência realiza o impossível."</em></p>
+                </div>
+            </div>
+        </section>
+
+        <!-- FEED DE POSTS -->
+        <main class="posts-grid" id="postsContainer">
+
+            <!-- PÁGINA 1 (POSTS 1 - 12) -->
+            <!-- POST 1: INFO - Nome da Mãe -->
+            <div class="post-card">
+                <div class="post-header"><span class="post-date">10/07/2026</span></div>
+                <div class="post-image-placeholder"><img src="images/foto1.png" alt="[images/foto1.png] (Mãe do Maurício)"></div>
+                <div class="post-content">
+                    <p class="post-text">Hoje o dia é todo dela! Parabéns para a melhor mãe do mundo, Dona <strong>Regina Silva</strong>! Obrigado por me ensinar tudo o que sei. Te amo!</p>
+                    <span class="post-likes">❤️ 142 curtidas</span>
+                </div>
+            </div>
+
+            <!-- POST 2: RUÍDO -->
+            <div class="post-card">
+                <div class="post-header"><span class="post-date">08/07/2026</span></div>
+                <div class="post-content">
+                    <p class="post-text">Segunda-feira só começa de verdade depois da terceira xícara de café espresso duplo. Bora para cima que a semana está só começando!</p>
+                    <span class="post-likes">❤️ 34 curtidas</span>
+                </div>
+            </div>
+
+            <!-- POST 3: RUÍDO -->
+            <div class="post-card">
+                <div class="post-header"><span class="post-date">05/07/2026</span></div>
+                <div class="post-content">
+                    <p class="post-text">Marginal Pinheiros travada como sempre. Que saudade do home office pleno...</p>
+                    <span class="post-likes">❤️ 12 curtidas</span>
+                </div>
+            </div>
+
+            <!-- POST 4: INFO - Nome da Filha e Aniversário -->
+            <div class="post-card">
+                <div class="post-header"><span class="post-date">03/07/2026</span></div>
+                <div class="post-image-placeholder"><img src="images/foto2.png" alt="[images/foto2.png] (Aniversário da Beatriz)"></div>
+                <div class="post-content">
+                    <p class="post-text">Parece que foi ontem que você nasceu. Hoje a minha <b>BIA</b>,  <strong>Beatriz</strong> completa <strong>8 anos</strong> de muita alegria nas nossas vidas! Papai te ama demais, Bia! 🎉🎂</p>
+                    <span class="post-likes">❤️ 210 curtidas</span>
+                </div>
+            </div>
+
+            <!-- POST 5: RUÍDO -->
+            <div class="post-card">
+                <div class="post-header"><span class="post-date">28/06/2026</span></div>
+                <div class="post-content">
+                    <p class="post-text">Que roubo! Juiz acabou com o jogo hoje. Sem condições de assistir campeonato esse ano. Vergonha.</p>
+                    <span class="post-likes">❤️ 45 curtidas</span>
+                </div>
+            </div>
+
+            <!-- POST 6: RUÍDO -->
+            <div class="post-card">
+                <div class="post-header"><span class="post-date">25/06/2026</span></div>
+                <div class="post-image-placeholder"><img src="images/foto3.png" alt="[images/foto3.png] (Meme TI)"></div>
+                <div class="post-content">
+                    <p class="post-text">Quem nunca quase dropou um banco de dados em produção em plena quinta-feira não sabe o que é adrenalina kkkkk rindo para não chorar.</p>
+                    <span class="post-likes">❤️ 98 curtidas</span>
+                </div>
+            </div>
+
+            <!-- POST 7: INFO - Nome do Pet -->
+            <div class="post-card">
+                <div class="post-header"><span class="post-date">20/06/2026</span></div>
+                <div class="post-image-placeholder"><img src="images/foto4.png" alt="[images/foto4.png] (Cachorro Thor)"></div>
+                <div class="post-content">
+                    <p class="post-text">Esse é o verdadeiro dono da casa. Nosso parceiro de quatro patas, o <strong>Thor</strong>, destruindo mais uma almofada da sala.</p>
+                    <span class="post-likes">❤️ 180 curtidas</span>
+                </div>
+            </div>
+
+            <!-- POST 8: RUÍDO -->
+            <div class="post-card">
+                <div class="post-header"><span class="post-date">17/06/2026</span></div>
+                <div class="post-content">
+                    <p class="post-text">Terminei hoje a leitura de 'O Poder do Hábito'. Leitura altamente recomendada para quem quer melhorar a rotina de trabalho e foco.</p>
+                    <span class="post-likes">❤️ 29 curtidas</span>
+                </div>
+            </div>
+
+            <!-- POST 9: INFO - Nome do Pai -->
+            <div class="post-card">
+                <div class="post-header"><span class="post-date">14/06/2026</span></div>
+                <div class="post-image-placeholder"><img src="images/foto5.png" alt="[images/foto5.png] (Pai Geraldo)"></div>
+                <div class="post-content">
+                    <p class="post-text">Dia de pescaria com o coroa! Seu <strong>Geraldo Silva</strong> continua sendo o melhor pescador da família (ou pelo menos o que conta as melhores mentiras!).</p>
+                    <span class="post-likes">❤️ 88 curtidas</span>
+                </div>
+            </div>
+
+            <!-- POST 10: RUÍDO -->
+            <div class="post-card">
+                <div class="post-header"><span class="post-date">10/06/2026</span></div>
+                <div class="post-content">
+                    <p class="post-text">Pago! Corrida de 5km na chuva para lavar a alma e queimar a pizza do final de semana. Foco no objetivo!</p>
+                    <span class="post-likes">❤️ 52 curtidas</span>
+                </div>
+            </div>
+
+            <!-- POST 11: RUÍDO -->
+            <div class="post-card">
+                <div class="post-header"><span class="post-date">06/06/2026</span></div>
+                <div class="post-content">
+                    <p class="post-text">Maratonando a nova temporada daquela série de ficção científica. Simplesmente genial o roteiro. Alguém mais assistindo?</p>
+                    <span class="post-likes">❤️ 15 curtidas</span>
+                </div>
+            </div>
+
+            <!-- POST 12: INFO - Data de Nascimento (36 anos completados em 2026) -->
+            <div class="post-card">
+                <div class="post-header"><span class="post-date">01/06/2026</span></div>
+                <div class="post-image-placeholder"><img src="images/foto6.png" alt="[images/foto6.png] (Aniversário Maurício)"></div>
+                <div class="post-content">
+                    <p class="post-text">Hoje comemoro a chegada dos meus <strong>36 anos</strong> de vida! Agradeço a Deus por mais um ano cheio de saúde, família e conquistas. (Sim, nasci no primeiro dia de junho, o melhor mês!).</p>
+                    <span class="post-likes">❤️ 312 curtidas</span>
+                </div>
+            </div>
+
+
+            <!-- PÁGINA 2 (POSTS 13 - 24) -->
+            <!-- POST 13: RUÍDO -->
+            <div class="post-card">
+                <div class="post-header"><span class="post-date">28/05/2026</span></div>
+                <div class="post-image-placeholder"><img src="images/foto7.png" alt="[images/foto7.png] (Churrasco)"></div>
+                <div class="post-content">
+                    <p class="post-text">Domingão pede aquela carne assada de lei. Bom domingo a todos os amigos!</p>
+                    <span class="post-likes">❤️ 115 curtidas</span>
+                </div>
+            </div>
+
+            <!-- POST 14: INFO - Empresa InovaTech -->
+            <div class="post-card">
+                <div class="post-header"><span class="post-date">15/05/2026</span></div>
+                <div class="post-image-placeholder"><img src="images/foto8.png" alt="[images/foto8.png] (Kit InovaTech)"></div>
+                <div class="post-content">
+                    <p class="post-text">Feliz demais em anunciar que hoje completo meu primeiro mês oficial como Gerente na <strong>InovaTech Soluções</strong>! O time me recebeu incrivelmente bem.</p>
+                    <span class="post-likes">❤️ 240 curtidas</span>
+                </div>
+            </div>
+
+            <!-- POST 15: RUÍDO -->
+            <div class="post-card">
+                <div class="post-header"><span class="post-date">12/05/2026</span></div>
+                <div class="post-content">
+                    <p class="post-text">Frio repentino em SP. Casaco que estava guardado há 2 anos finalmente viu a luz do dia.</p>
+                    <span class="post-likes">❤️ 19 curtidas</span>
+                </div>
+            </div>
+
+            <!-- POST 16: RUÍDO -->
+            <div class="post-card">
+                <div class="post-header"><span class="post-date">08/05/2026</span></div>
+                <div class="post-content">
+                    <p class="post-text">Lendo artigos sobre o impacto de IA Generativa no gerenciamento de projetos de tecnologia.</p>
+                    <span class="post-likes">❤️ 41 curtidas</span>
+                </div>
+            </div>
+
+            <!-- POST 17: RUÍDO -->
+            <div class="post-card">
+                <div class="post-header"><span class="post-date">03/05/2026</span></div>
+                <div class="post-image-placeholder"><img src="images/foto9.png" alt="[images/foto9.png] (Sushi)"></div>
+                <div class="post-content">
+                    <p class="post-text">Noite do rodízio japonês com a patroa para comemorar o fim de uma semana exaustiva.</p>
+                    <span class="post-likes">❤️ 73 curtidas</span>
+                </div>
+            </div>
+
+            <!-- POST 18: RUÍDO -->
+            <div class="post-card">
+                <div class="post-header"><span class="post-date">28/04/2026</span></div>
+                <div class="post-content">
+                    <p class="post-text">Migrando os dados para o celular novo. Que parto é fazer backup de aplicativo de banco hoje em dia, burocracia sem fim.</p>
+                    <span class="post-likes">❤️ 22 curtidas</span>
+                </div>
+            </div>
+
+            <!-- POST 19: RUÍDO -->
+            <div class="post-card">
+                <div class="post-header"><span class="post-date">24/04/2026</span></div>
+                <div class="post-content">
+                    <p class="post-text">Não limite seus desafios. Desafie seus limites!</p>
+                    <span class="post-likes">❤️ 11 curtidas</span>
+                </div>
+            </div>
+
+            <!-- POST 20: RUÍDO -->
+            <div class="post-card">
+                <div class="post-header"><span class="post-date">20/04/2026</span></div>
+                <div class="post-image-placeholder"><img src="images/foto10.png" alt="[images/foto10.png] (Teclado Mecânico)"></div>
+                <div class="post-content">
+                    <p class="post-text">Chegou meu novo brinquedo! Teclado mecânico com switch marrom.</p>
+                    <span class="post-likes">❤️ 67 curtidas</span>
+                </div>
+            </div>
+
+            <!-- POST 21: RUÍDO -->
+            <div class="post-card">
+                <div class="post-header"><span class="post-date">15/04/2026</span></div>
+                <div class="post-content">
+                    <p class="post-text">Ouvindo um bom rock clássico dos anos 80 no fone para concentrar enquanto escrevo os OKRs.</p>
+                    <span class="post-likes">❤️ 30 curtidas</span>
+                </div>
+            </div>
+
+            <!-- POST 22: RUÍDO -->
+            <div class="post-card">
+                <div class="post-header"><span class="post-date">09/04/2026</span></div>
+                <div class="post-image-placeholder"><img src="images/foto11.png" alt="[images/foto11.png] (Praia)"></div>
+                <div class="post-content">
+                    <p class="post-text">Tbt daquela viagem inesquecível para o Nordeste. A cabeça tá na planilha mas o coração tá nessa praia.</p>
+                    <span class="post-likes">❤️ 145 curtidas</span>
+                </div>
+            </div>
+
+            <!-- POST 23: RUÍDO -->
+            <div class="post-card">
+                <div class="post-header"><span class="post-date">05/04/2026</span></div>
+                <div class="post-content">
+                    <p class="post-text">Sensacional a discussão no podcast de tecnologia de hoje sobre cibersegurança empresarial.</p>
+                    <span class="post-likes">❤️ 18 curtidas</span>
+                </div>
+            </div>
+
+            <!-- POST 24: RUÍDO -->
+            <div class="post-card">
+                <div class="post-header"><span class="post-date">03/04/2026</span></div>
+                <div class="post-content">
+                    <p class="post-text">Sextou da melhor forma! Uma boa IPA artesanal para comemorar que a sprint foi entregue.</p>
+                    <span class="post-likes">❤️ 55 curtidas</span>
+                </div>
+            </div>
+
+
+            <!-- PÁGINA 3 (POSTS 25 - 36) -->
+            <!-- POST 25: RUÍDO -->
+            <div class="post-card">
+                <div class="post-header"><span class="post-date">30/03/2026</span></div>
+                <div class="post-content">
+                    <p class="post-text">Academia vazia na segunda-feira à noite é um milagre que deve ser registrado. Foco!</p>
+                    <span class="post-likes">❤️ 28 curtidas</span>
+                </div>
+            </div>
+
+            <!-- POST 26: RUÍDO -->
+            <div class="post-card">
+                <div class="post-header"><span class="post-date">26/03/2026</span></div>
+                <div class="post-content">
+                    <p class="post-text">São Paulo não é para amadores. Choveu 2 gotas e a cidade inteira entra em pane de trânsito.</p>
+                    <span class="post-likes">❤️ 14 curtidas</span>
+                </div>
+            </div>
+
+            <!-- POST 27: RUÍDO -->
+            <div class="post-card">
+                <div class="post-header"><span class="post-date">22/03/2026</span></div>
+                <div class="post-content">
+                    <p class="post-text">Golaço! Esse atacante novo calou a minha boca hoje. Vamos subir na tabela!</p>
+                    <span class="post-likes">❤️ 40 curtidas</span>
+                </div>
+            </div>
+
+            <!-- POST 28: RUÍDO -->
+            <div class="post-card">
+                <div class="post-header"><span class="post-date">15/03/2026</span></div>
+                <div class="post-image-placeholder"><img src="images/foto12.png" alt="[images/foto12.png] (Pizza)"></div>
+                <div class="post-content">
+                    <p class="post-text">Tradicional pizza de domingo à noite com a família reunida na sala assistindo TV.</p>
+                    <span class="post-likes">❤️ 92 curtidas</span>
+                </div>
+            </div>
+
+            <!-- POST 29: RUÍDO -->
+            <div class="post-card">
+                <div class="post-header"><span class="post-date">11/03/2026</span></div>
+                <div class="post-content">
+                    <p class="post-text">Aquela reunião de alinhamento que poderia facilmente ter sido resolvida com um simples e-mail de duas linhas...</p>
+                    <span class="post-likes">❤️ 61 curtidas</span>
+                </div>
+            </div>
+
+            <!-- POST 30: RUÍDO -->
+            <div class="post-card">
+                <div class="post-header"><span class="post-date">07/03/2026</span></div>
+                <div class="post-content">
+                    <p class="post-text">Organizando as gavetas do escritório do home office. Achei adaptadores de 2018.</p>
+                    <span class="post-likes">❤️ 23 curtidas</span>
+                </div>
+            </div>
+
+            <!-- POST 31: RUÍDO -->
+            <div class="post-card">
+                <div class="post-header"><span class="post-date">01/03/2026</span></div>
+                <div class="post-content">
+                    <p class="post-text">Iniciando o mês com novos planos, novos projetos e energia renovada no trabalho.</p>
+                    <span class="post-likes">❤️ 33 curtidas</span>
+                </div>
+            </div>
+
+            <!-- POST 32: RUÍDO -->
+            <div class="post-card">
+                <div class="post-header"><span class="post-date">25/02/2026</span></div>
+                <div class="post-content">
+                    <p class="post-text">Hoje o treino rendeu bem. 6km batendo o recorde pessoal de tempo do mês passado.</p>
+                    <span class="post-likes">❤️ 19 curtidas</span>
+                </div>
+            </div>
+
+            <!-- POST 33: RUÍDO -->
+            <div class="post-card">
+                <div class="post-header"><span class="post-date">20/02/2026</span></div>
+                <div class="post-content">
+                    <p class="post-text">Almoço rápido de hoje: aquele PF de respeito no restaurante de sempre na esquina da empresa.</p>
+                    <span class="post-likes">❤️ 27 curtidas</span>
+                </div>
+            </div>
+
+            <!-- POST 34: RUÍDO -->
+            <div class="post-card">
+                <div class="post-header"><span class="post-date">14/02/2026</span></div>
+                <div class="post-content">
+                    <p class="post-text">Sábado é dia de mercado. Carrinho cheio de compras, preços altos como sempre.</p>
+                    <span class="post-likes">❤️ 10 curtidas</span>
+                </div>
+            </div>
+
+            <!-- POST 35: RUÍDO -->
+            <div class="post-card">
+                <div class="post-header"><span class="post-date">10/02/2026</span></div>
+                <div class="post-content">
+                    <p class="post-text">Mais um bug resolvido na calada da noite pelo time de engenharia. Vocês são feras!</p>
+                    <span class="post-likes">❤️ 50 curtidas</span>
+                </div>
+            </div>
+
+            <!-- POST 36: RUÍDO -->
+            <div class="post-card">
+                <div class="post-header"><span class="post-date">05/02/2026</span></div>
+                <div class="post-content">
+                    <p class="post-text">Não aguento mais esse calor sem fim. Onde aperta para o inverno voltar urgente?</p>
+                    <span class="post-likes">❤️ 15 curtidas</span>
+                </div>
+            </div>
+
+
+            <!-- PÁGINA 4 (POSTS 37 - 48) -->
+            <!-- POST 37: RUÍDO -->
+            <div class="post-card">
+                <div class="post-header"><span class="post-date">01/02/2026</span></div>
+                <div class="post-content">
+                    <p class="post-text">Chegamos em fevereiro! O ano está passando voando, mal dá tempo de piscar.</p>
+                    <span class="post-likes">❤️ 8 curtidas</span>
+                </div>
+            </div>
+
+            <!-- POST 38: RUÍDO -->
+            <div class="post-card">
+                <div class="post-header"><span class="post-date">28/01/2026</span></div>
+                <div class="post-content">
+                    <p class="post-text">Dica de livro para quem lidera equipes técnicas: 'The Mythical Man-Month'. Clássico absoluto.</p>
+                    <span class="post-likes">❤️ 38 curtidas</span>
+                </div>
+            </div>
+
+            <!-- POST 39: RUÍDO -->
+            <div class="post-card">
+                <div class="post-header"><span class="post-date">22/01/2026</span></div>
+                <div class="post-content">
+                    <p class="post-text">Bela apresentação dos novos objetivos globais do trimestre hoje na empresa.</p>
+                    <span class="post-likes">❤️ 45 curtidas</span>
+                </div>
+            </div>
+
+            <!-- POST 40: RUÍDO -->
+            <div class="post-card">
+                <div class="post-header"><span class="post-date">18/01/2026</span></div>
+                <div class="post-image-placeholder"><img src="images/foto13.png" alt="[images/foto13.png] (Parque)"></div>
+                <div class="post-content">
+                    <p class="post-text">Passeio no parque com a família para recarregar as energias para a rotina.</p>
+                    <span class="post-likes">❤️ 105 curtidas</span>
+                </div>
+            </div>
+
+            <!-- POST 41: RUÍDO -->
+            <div class="post-card">
+                <div class="post-header"><span class="post-date">14/01/2026</span></div>
+                <div class="post-content">
+                    <p class="post-text">Aquela preguiça pós-almoço no trabalho de escritório que só um café bem forte cura.</p>
+                    <span class="post-likes">❤️ 12 curtidas</span>
+                </div>
+            </div>
+
+            <!-- POST 42: RUÍDO -->
+            <div class="post-card">
+                <div class="post-header"><span class="post-date">09/01/2026</span></div>
+                <div class="post-content">
+                    <p class="post-text">Sexta-feira chuvosa em SP. Ótimo pretexto para ficar em casa e colocar as séries em dia.</p>
+                    <span class="post-likes">❤️ 31 curtidas</span>
+                </div>
+            </div>
+
+            <!-- POST 43: RUÍDO -->
+            <div class="post-card">
+                <div class="post-header"><span class="post-date">05/01/2026</span></div>
+                <div class="post-content">
+                    <p class="post-text">Primeira segunda-feira de trabalho útil do ano. Metas traçadas, foco no plano.</p>
+                    <span class="post-likes">❤️ 41 curtidas</span>
+                </div>
+            </div>
+
+            <!-- POST 44: RUÍDO -->
+            <div class="post-card">
+                <div class="post-header"><span class="post-date">31/12/2025</span></div>
+                <div class="post-image-placeholder"><img src="images/foto14.png" alt="[images/foto14.png] (Ano Novo)"></div>
+                <div class="post-content">
+                    <p class="post-text">Adeus 2025! Que 2026 venha cheio de prosperidade, saúde e paz para todos nós!</p>
+                    <span class="post-likes">❤️ 188 curtidas</span>
+                </div>
+            </div>
+
+            <!-- POST 45: RUÍDO -->
+            <div class="post-card">
+                <div class="post-header"><span class="post-date">25/12/2025</span></div>
+                <div class="post-content">
+                    <p class="post-text">Natal com mesa farta, risadas com os tios e as clássicas piadas de pavê. Feliz Natal!</p>
+                    <span class="post-likes">❤️ 120 curtidas</span>
+                </div>
+            </div>
+
+            <!-- POST 46: RUÍDO -->
+            <div class="post-card">
+                <div class="post-header"><span class="post-date">20/12/2025</span></div>
+                <div class="post-content">
+                    <p class="post-text">Confraternização de final de ano do time da empresa foi excelente. Valeu a parceria!</p>
+                    <span class="post-likes">❤️ 76 curtidas</span>
+                </div>
+            </div>
+
+            <!-- POST 47: RUÍDO -->
+            <div class="post-card">
+                <div class="post-header"><span class="post-date">15/12/2025</span></div>
+                <div class="post-content">
+                    <p class="post-text">Entrando no clima de fim de ano. O cansaço bate forte em dezembro, mas o dever foi cumprido.</p>
+                    <span class="post-likes">❤️ 22 curtidas</span>
+                </div>
+            </div>
+
+            <!-- POST 48: RUÍDO -->
+            <div class="post-card">
+                <div class="post-header"><span class="post-date">10/12/2025</span></div>
+                <div class="post-content">
+                    <p class="post-text">Corrida rápida na esteira só para não perder o hábito de me movimentar na semana.</p>
+                    <span class="post-likes">❤️ 18 curtidas</span>
+                </div>
+            </div>
+
+
+            <!-- PÁGINA 5 (POSTS 49 - 60) -->
+            <!-- POST 49: RUÍDO -->
+            <div class="post-card">
+                <div class="post-header"><span class="post-date">05/12/2025</span></div>
+                <div class="post-content">
+                    <p class="post-text">Incrível como o ano passou de pressa. Parece que o carnaval foi ontem.</p>
+                    <span class="post-likes">❤️ 9 curtidas</span>
+                </div>
+            </div>
+
+            <!-- POST 50: RUÍDO -->
+            <div class="post-card">
+                <div class="post-header"><span class="post-date">01/12/2025</span></div>
+                <div class="post-content">
+                    <p class="post-text">Dezembro chegou. Hora de fechar os últimos projetos e planejar o merecido descanso.</p>
+                    <span class="post-likes">❤️ 30 curtidas</span>
+                </div>
+            </div>
+
+            <!-- POST 51: RUÍDO -->
+            <div class="post-card">
+                <div class="post-header"><span class="post-date">25/11/2025</span></div>
+                <div class="post-content">
+                    <p class="post-text">Assistindo documentário sensacional sobre a história das grandes empresas do Vale do Silício.</p>
+                    <span class="post-likes">❤️ 25 curtidas</span>
+                </div>
+            </div>
+
+            <!-- POST 52: RUÍDO -->
+            <div class="post-card">
+                <div class="post-header"><span class="post-date">20/11/2025</span></div>
+                <div class="post-content">
+                    <p class="post-text">Feriado no meio de semana é excelente para quebrar a rotina cansativa.</p>
+                    <span class="post-likes">❤️ 40 curtidas</span>
+                </div>
+            </div>
+
+            <!-- POST 53: RUÍDO -->
+            <div class="post-card">
+                <div class="post-header"><span class="post-date">15/11/2025</span></div>
+                <div class="post-content">
+                    <p class="post-text">Aproveitando o feriado para dormir até tarde e não pensar em problemas de banco de dados.</p>
+                    <span class="post-likes">❤️ 52 curtidas</span>
+                </div>
+            </div>
+
+            <!-- POST 54: RUÍDO -->
+            <div class="post-card">
+                <div class="post-header"><span class="post-date">10/11/2025</span></div>
+                <div class="post-content">
+                    <p class="post-text">Chuva fina em São Paulo. O clima perfeito para comer um bom caldo quente no jantar.</p>
+                    <span class="post-likes">❤️ 16 curtidas</span>
+                </div>
+            </div>
+
+            <!-- POST 55: RUÍDO -->
+            <div class="post-card">
+                <div class="post-header"><span class="post-date">05/11/2025</span></div>
+                <div class="post-content">
+                    <p class="post-text">Mais um dia produtivo. Planejamento estratégico de tecnologia finalizado com sucesso.</p>
+                    <span class="post-likes">❤️ 28 curtidas</span>
+                </div>
+            </div>
+
+            <!-- POST 56: RUÍDO -->
+            <div class="post-card">
+                <div class="post-header"><span class="post-date">01/11/2025</span></div>
+                <div class="post-content">
+                    <p class="post-text">Novembro começou. A contagem regressiva para o término do ano de trabalho foi ativada.</p>
+                    <span class="post-likes">❤️ 11 curtidas</span>
+                </div>
+            </div>
+
+            <!-- POST 57: RUÍDO -->
+            <div class="post-card">
+                <div class="post-header"><span class="post-date">28/10/2025</span></div>
+                <div class="post-content">
+                    <p class="post-text">Aquele churrasco simples no sábado para recarregar o ânimo após semanas difíceis.</p>
+                    <span class="post-likes">❤️ 87 curtidas</span>
+                </div>
+            </div>
+
+            <!-- POST 58: RUÍDO -->
+            <div class="post-card">
+                <div class="post-header"><span class="post-date">22/10/2025</span></div>
+                <div class="post-content">
+                    <p class="post-text">Reunião presencial com os diretores de tecnologia hoje. Novidades muito boas vindo por aí.</p>
+                    <span class="post-likes">❤️ 63 curtidas</span>
+                </div>
+            </div>
+
+            <!-- POST 59: RUÍDO -->
+            <div class="post-card">
+                <div class="post-header"><span class="post-date">15/10/2025</span></div>
+                <div class="post-content">
+                    <p class="post-text">Dia dos professores! Um abraço especial para todos que dedicam a vida a ensinar.</p>
+                    <span class="post-likes">❤️ 45 curtidas</span>
+                </div>
+            </div>
+
+            <!-- POST 60: RUÍDO -->
+            <div class="post-card">
+                <div class="post-header"><span class="post-date">12/10/2025</span></div>
+                <div class="post-content">
+                    <p class="post-text">Dia das crianças com muita bagunça no quintal de casa. Ver a alegria deles não tem preço.</p>
+                    <span class="post-likes">❤️ 99 curtidas</span>
+                </div>
+            </div>
+
+        </main>
+
+        <!-- CONTROLES DE PAGINAÇÃO -->
+        <div class="pagination-container">
+            <button class="pagination-btn" id="prevBtn" onclick="changePage(-1)" disabled>Anterior</button>
+            <span class="page-indicator" id="pageIndicator">Página 1 de 5</span>
+            <button class="pagination-btn" id="nextBtn" onclick="changePage(1)">Próxima</button>
+        </div>
+
+    </div>
+
+    <!-- SCRIPT DE PAGINAÇÃO DINÂMICA -->
+    <script>
+        const postsPerPage = 12;
+        let currentPage = 1;
+        
+        const posts = Array.from(document.querySelectorAll('.post-card'));
+        const totalPages = Math.ceil(posts.length / postsPerPage);
+
+        function displayPosts() {
+            const startIdx = (currentPage - 1) * postsPerPage;
+            const endIdx = startIdx + postsPerPage;
+
+            posts.forEach((post, index) => {
+                if (index >= startIdx && index < endIdx) {
+                    post.style.display = 'flex';
+                } else {
+                    post.style.display = 'none';
+                }
+            });
+
+            document.getElementById('pageIndicator').innerText = `Página ${currentPage} de ${totalPages}`;
+            document.getElementById('prevBtn').disabled = (currentPage === 1);
+            document.getElementById('nextBtn').disabled = (currentPage === totalPages);
+
+            if(currentPage > 1) {
+                document.getElementById('postsContainer').scrollIntoView({ behavior: 'smooth' });
+            }
+        }
+
+        function changePage(direction) {
+            currentPage += direction;
+            if (currentPage < 1) currentPage = 1;
+            if (currentPage > totalPages) currentPage = totalPages;
+            displayPosts();
+        }
+
+        window.onload = displayPosts;
+    </script>
+
+</body>
+</html>
