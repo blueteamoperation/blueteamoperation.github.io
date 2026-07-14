@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AeroGlitch - Cyber Booking System</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Estilo personalizado para a vibe hacker/cyberpunk discreta */
+        .neon-border {
+            box-shadow: 0 0 10px rgba(6, 182, 212, 0.5);
+        }
+        .hidden-secret {
+            display: none;
+        }
+    </style>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col justify-between font-mono">
+
+    <header class="border-b border-cyan-500/30 bg-slate-900/80 backdrop-blur p-4">
+        <div class="max-w-6xl mx-auto flex justify-between items-center">
+            <span class="text-xl font-black tracking-widest text-cyan-400">AERO<span class="text-fuchsia-500">GLITCH</span></span>
+            <span class="text-xs text-slate-400">STATUS: OPERACIONAL</span>
+        </div>
+    </header>
+
+    <main class="max-w-6xl mx-auto p-6 grid grid-cols-1 md:grid-cols-3 gap-8 my-auto w-full">
+        
+        <div class="md:col-span-2 space-y-6">
+            <section class="bg-slate-900/50 p-6 rounded-lg border border-slate-800">
+                <h1 class="text-2xl font-bold text-cyan-400 mb-4">Protocolo de Viagem Suborbital e Conectividade Global</h1>
+                <p class="text-slate-300 leading-relaxed text-sm mb-3">
+                    Bem-vindo à plataforma de logística aeroespacial AeroGlitch. Nós redefinimos o conceito de transição de coordenadas terrestres através de propulsão iônica avançada e fusão de hidrogênio molecular. Nossos algoritmos de vetorização calculam a rota mais eficiente, evitando zonas de turbulência eletromagnética na estratosfera superior.
+                </p>
+                <p class="text-slate-300 leading-relaxed text-sm">
+                    Garantimos total integridade de dados criptográficos durante o seu embarque. Nossa infraestrutura descentralizada utiliza sistemas legados de mainframe integrados com contêineres efêmeros, garantindo que sua passagem digital seja imutável, segura e livre de gargalos burocráticos.
+                </p>
+            </section>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div class="bg-slate-900/40 p-4 rounded border border-slate-800/80">
+                    <span class="text-xs text-fuchsia-400 font-bold">ROTA AZIMUTE-99</span>
+                    <h3 class="text-lg font-bold text-slate-200">Terminal Neo-Tóquio</h3>
+                    <p class="text-xs text-slate-400 mt-2">Conexão direta de alta velocidade via cápsula pressurizada. Destino preferido para engenheiros de firmware e analistas de infraestrutura crítica.</p>
+                </div>
+                <div class="bg-slate-900/40 p-4 rounded border border-slate-800/80">
+                    <span class="text-xs text-cyan-400 font-bold">ROTA ZENITE-10</span>
+                    <h3 class="text-lg font-bold text-slate-200">Arquipélago Svalbard</h3>
+                    <p class="text-xs text-slate-400 mt-2">Armazenamento frio de dados e contingência de servidores. Viagem de baixa temperatura projetada para administradores de bancos de dados resilientes.</p>
+                </div>
+            </div>
+
+            <section class="bg-slate-950 p-4 rounded border border-slate-900">
+                <h4 class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Termos de Serviço Técnico</h4>
+                <p class="text-[10px] text-slate-500 leading-relaxed">
+                    O passageiro concorda em não realizar engenharia reversa nos motores de dobra quântica. Qualquer tentativa de interceptar pacotes de telemetria durante o vôo resultará em exclusão sumária do manifesto de passageiros. A validação do bilhete eletrônico requer uma chave de autenticação (passkey) derivada de nossa matriz semântica de segurança. Senha padrão gerada via algoritmo pseudo-aleatório contido em nossos registros locais.
+                </p>
+            </section>
+        </div>
+
+        <div class="bg-slate-900 p-6 rounded-lg border border-cyan-500/30 neon-border flex flex-col justify-between">
+            <div>
+                <div class="flex items-center space-x-2 mb-6">
+                    <div class="h-2 w-2 rounded-full bg-emerald-500 animate-pulse"></div>
+                    <h2 class="text-lg font-bold tracking-wide">EMISSOR DE BILHETE</h2>
+                </div>
+                
+                <p class="text-xs text-slate-400 mb-4">
+                    Insira a palavra-passe (senha) de segurança corporativa gerada para liberar o seu bilhete de embarque criptográfico.
+                </p>
+
+                <div class="space-y-4">
+                    <div>
+                        <label for="password-input" class="block text-xs text-slate-400 mb-2 uppercase font-semibold">Chave de Segurança (Passkey)</label>
+                        <input type="password" id="password-input" placeholder="Digite a palavra-chave..." 
+                               class="w-full bg-slate-950 border border-slate-800 rounded p-3 text-sm text-cyan-300 focus:outline-none focus:border-cyan-500 font-mono">
+                    </div>
+                    <button onclick="checkPassword()" class="w-full bg-cyan-600 hover:bg-cyan-500 text-slate-950 font-bold py-3 px-4 rounded text-sm transition-all uppercase tracking-wider">
+                        Validar Credencial
+                    </button>
+                </div>
+
+                <div id="feedback" class="mt-4 text-xs font-semibold hidden text-center p-2 rounded"></div>
+            </div>
+
+            <div id="ticket-output" class="hidden mt-6 pt-6 border-t border-slate-800">
+                <div class="bg-slate-950 p-4 rounded border border-dashed border-cyan-500/50">
+                    <div class="flex justify-between items-center mb-4">
+                        <span class="text-[10px] bg-cyan-500/20 text-cyan-400 px-2 py-0.5 rounded font-bold">BOARDING PASS</span>
+                        <span class="text-[10px] text-fuchsia-400 font-mono font-bold">FLIGHT #AG-747</span>
+                    </div>
+                    <div class="space-y-2 text-xs">
+                        <p class="text-slate-400">PASSAGEIRO: <span class="text-slate-200 font-bold">RECRUTA_CTF</span></p>
+                        <p class="text-slate-400">TOKEN DE ACESSO:</p>
+                        <p class="bg-slate-900 p-2 rounded text-cyan-400 font-mono break-all text-[11px] border border-slate-800 select-all">
+                            FLAG{5cr4p1ng_w1th_cur1_1s_4w3s0m3_994}
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer class="border-t border-slate-900 bg-slate-950 p-4 text-center text-xs text-slate-600">
+        <p>&copy; 2026 AeroGlitch Inc. Todos os direitos reservados. Criptografia homologada pela diretiva de segurança espacial AG-9002.</p>
+    </footer>
+
+    <script>
+        // A senha correta é "criptograficos" (ou qualquer palavra que você escolher que esteja no site)
+        const CHAVE_CORRETA = "criptograficos";
+
+        function checkPassword() {
+            const input = document.getElementById('password-input').value.trim().toLowerCase();
+            const feedback = document.getElementById('feedback');
+            const ticketOutput = document.getElementById('ticket-output');
+
+            if (input === CHAVE_CORRETA) {
+                feedback.className = "mt-4 text-xs font-semibold text-emerald-400 bg-emerald-950/30 p-2 rounded text-center";
+                feedback.innerText = "ACESSO AUTORIZADO! BILHETE DISPONÍVEL.";
+                feedback.classList.remove('hidden');
+                ticketOutput.classList.remove('hidden');
+            } else {
+                feedback.className = "mt-4 text-xs font-semibold text-rose-500 bg-rose-950/30 p-2 rounded text-center";
+                feedback.innerText = "ERRO: CHAVE DE SEGURANÇA INVÁLIDA.";
+                feedback.classList.remove('hidden');
+                ticketOutput.classList.add('hidden');
+            }
+        }
+
+        // --- MOCK API PARA REQUISIÇÃO VIA CURL ---
+        // Permite que os alunos façam um POST ou GET simulado para testar palavras via curl
+        // Se eles usarem o curl para enviar uma requisição POST para esta página contendo o parâmetro 'passkey'
+        // Como é uma página estática no lado do cliente, este listener intercepta "submissões" se você quiser rodar um backend simples, 
+        // ou você pode orientá-los a fazer um script de força bruta na própria UI simulada usando Selenium/Python,
+        // OU instruí-los a fazer uma análise do código fonte para entender a chave de validação local.
+    </script>
+</body>
+</html>
