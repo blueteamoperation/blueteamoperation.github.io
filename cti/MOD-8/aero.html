@@ -106,43 +106,62 @@
     </footer>
 
     <script>
-        const CHAVE_CORRETA = "aeroglitch";
+    const CHAVE_CORRETA = "aeroglitch";
 
-        // Função que valida visualmente o input da tela
-        function checkPassword(valorInput) {
-            const feedback = document.getElementById('feedback');
-            const ticketOutput = document.getElementById('ticket-output');
+// Função que valida visualmente o input da tela
+function checkPassword(valorInput) {
+    const feedback = document.getElementById('feedback');
+    const ticketOutput = document.getElementById('ticket-output');
 
-            if (valorInput === CHAVE_CORRETA) {
-                feedback.className = "mt-4 text-xs font-semibold text-emerald-400 bg-emerald-950/30 p-2 rounded text-center";
-                feedback.innerText = "ACESSO AUTORIZADO! BILHETE DISPONÍVEL.";
-                feedback.classList.remove('hidden');
-                ticketOutput.classList.remove('hidden');
-            } else {
-                feedback.className = "mt-4 text-xs font-semibold text-rose-500 bg-rose-950/30 p-2 rounded text-center";
-                feedback.innerText = "ERRO: CHAVE DE SEGURANÇA INVÁLIDA.";
-                feedback.classList.remove('hidden');
-                ticketOutput.classList.add('hidden');
-            }
+    if (valorInput === CHAVE_CORRETA) {
+        feedback.className = "mt-4 text-xs font-semibold text-emerald-400 bg-emerald-950/30 p-2 rounded text-center";
+        feedback.innerText = "ACESSO AUTORIZADO! BILHETE DISPONÍVEL.";
+        feedback.classList.remove('hidden');
+        ticketOutput.classList.remove('hidden');
+    } else {
+        feedback.className = "mt-4 text-xs font-semibold text-rose-500 bg-rose-950/30 p-2 rounded text-center";
+        feedback.innerText = "ERRO: CHAVE DE SEGURANÇA INVÁLIDA.";
+        feedback.classList.remove('hidden');
+        ticketOutput.classList.add('hidden');
+    }
+}
+
+// Intercepta os parâmetros direto da URL do navegador logo após o carregamento da página
+window.addEventListener('DOMContentLoaded', () => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const passkey = urlParams.get('passkey');
+
+    if (passkey !== null) {
+        const cleanedKey = passkey.trim().toLowerCase();
+        
+        // Se a chave estiver correta e quisermos apenas o HTML do bilhete
+        if (cleanedKey === CHAVE_CORRETA) {
+            // Remove todo o conteúdo do body e deixa APENAS o HTML do bilhete purificado
+            const ticketHTML = `
+<div class="bg-slate-950 p-4 rounded border border-dashed border-cyan-500/50" style="font-family: monospace; color: #f1f5f9; background-color: #020617; padding: 20px; border: 1px dashed #06b6d4; max-width: 400px;">
+    <div style="display: flex; justify-content: space-between; margin-bottom: 16px;">
+        <span style="background: rgba(6, 182, 212, 0.2); color: #22d3ee; padding: 2px 8px; border-radius: 4px; font-weight: bold; font-size: 10px;">BOARDING PASS</span>
+        <span style="color: #d946ef; font-weight: bold; font-size: 10px;">FLIGHT #AG-747 - aeroglitch</span>
+    </div>
+    <div style="font-size: 12px; line-height: 1.5;">
+        <p style="color: #94a3b8; margin: 4px 0;">PASSAGEIRO: <span style="color: #f1f5f9; font-weight: bold;">RECRUTA_CTF</span></p>
+        <p style="color: #94a3b8; margin: 4px 0;">TOKEN DE ACESSO:</p>
+        <p style="background: #0f172a; padding: 8px; border-radius: 4px; color: #22d3ee; border: 1px solid #1e293b; word-break: break-all; margin: 8px 0;">
+            FLAG{5cr4p1ng_w1th_cur1_1s_4w3s0m3_994}
+        </p>
+    </div>
+</div>`;
+            document.body.innerHTML = ticketHTML;
+            return; // Interrompe o resto da execução
         }
 
-        // Intercepta os parâmetros direto da URL do navegador logo após o carregamento da página
-        window.addEventListener('DOMContentLoaded', () => {
-            const urlParams = new URLSearchParams(window.location.search);
-            const passkey = urlParams.get('passkey');
-
-            if (passkey !== null) {
-                const cleanedKey = passkey.trim().toLowerCase();
-                
-                // Preenche o campo visual com o termo enviado na URL
-                const inputEl = document.getElementById('password-input');
-                if (inputEl) {
-                    inputEl.value = passkey;
-                }
-                
-                // Roda a validação para o usuário ver o resultado na tela imediatamente
-                checkPassword(cleanedKey);
-            }
+        // Caso a chave esteja errada e seja uma requisição direta, exibe apenas o erro em texto simples
+        if (cleanedKey !== CHAVE_CORRETA) {
+            document.body.innerHTML = `<pre style="color: #f43f5e; font-family: monospace; padding: 20px;">ERRO: CHAVE DE SEGURANÇA INVÁLIDA.</pre>`;
+            return;
+        }
+    }
+});
         });
     </script>
 </body>
