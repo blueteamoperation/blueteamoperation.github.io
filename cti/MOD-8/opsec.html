@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OSINT CHALLENGE - TARGET: ROBERTO SILVA</title>
+    <style>
+        :root {
+            --bg-color: #0a0a0c;
+            --card-bg: #141419;
+            --accent-orange: #ff6600;
+            --accent-orange-dim: #b34700;
+            --accent-green: #39ff14;
+            --accent-red: #ff3333;
+            --text-color: #e0e0e6;
+            --text-muted: #8a8a93;
+            --border-color: #2a2a35;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Courier New', Courier, monospace, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        header {
+            width: 100%;
+            max-width: 1000px;
+            text-align: center;
+            margin-bottom: 30px;
+            border: 2px solid var(--accent-orange);
+            background: rgba(255, 102, 0, 0.05);
+            padding: 20px;
+            box-shadow: 0 0 15px rgba(255, 102, 0, 0.15);
+            position: relative;
+            overflow: hidden;
+        }
+
+        header::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 50%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 102, 0, 0.1), transparent);
+            animation: scan 4s linear infinite;
+        }
+
+        @keyframes scan {
+            0% { left: -100%; }
+            100% { left: 150%; }
+        }
+
+        h1 {
+            font-size: 1.8rem;
+            color: var(--accent-orange);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 10px;
+            text-shadow: 0 0 10px rgba(255, 102, 0, 0.5);
+        }
+
+        .subtitle {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+        }
+
+        .dashboard {
+            width: 100%;
+            max-width: 1000px;
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            padding: 15px 25px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+
+        .score-box {
+            font-size: 1.1rem;
+            font-weight: bold;
+        }
+
+        .score-box span {
+            color: var(--accent-orange);
+            text-shadow: 0 0 5px rgba(255, 102, 0, 0.5);
+        }
+
+        .progress-bar-container {
+            width: 50%;
+            background: #222;
+            height: 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            overflow: hidden;
+        }
+
+        .progress-bar {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, var(--accent-orange-dim), var(--accent-orange));
+            box-shadow: 0 0 10px var(--accent-orange);
+            transition: width 0.4s ease;
+        }
+
+        .reset-btn {
+            background: transparent;
+            border: 1px solid var(--accent-red);
+            color: var(--accent-red);
+            padding: 5px 12px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            transition: all 0.2s;
+        }
+
+        .reset-btn:hover {
+            background: rgba(255, 51, 51, 0.1);
+            box-shadow: 0 0 8px rgba(255, 51, 51, 0.3);
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+            width: 100%;
+            max-width: 1000px;
+            margin-bottom: 50px;
+        }
+
+        .card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            padding: 20px;
+            border-radius: 4px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .card:hover {
+            border-color: var(--accent-orange-dim);
+            box-shadow: 0 0 10px rgba(255, 102, 0, 0.05);
+            transform: translateY(-2px);
+        }
+
+        .card.solved {
+            border-color: var(--accent-green);
+            background: rgba(57, 255, 20, 0.02);
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 15px;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            border-bottom: 1px dashed var(--border-color);
+            padding-bottom: 8px;
+        }
+
+        .card.solved .card-header {
+            border-color: rgba(57, 255, 20, 0.2);
+        }
+
+        .q-num {
+            font-weight: bold;
+            color: var(--accent-orange);
+        }
+
+        .card.solved .q-num {
+            color: var(--accent-green);
+        }
+
+        .q-status {
+            text-transform: uppercase;
+            font-weight: bold;
+        }
+
+        .q-text {
+            font-size: 0.95rem;
+            line-height: 1.4;
+            margin-bottom: 20px;
+            min-height: 45px;
+        }
+
+        .input-group {
+            display: flex;
+            gap: 10px;
+        }
+
+        input {
+            flex-grow: 1;
+            background: #08080a;
+            border: 1px solid var(--border-color);
+            color: var(--text-color);
+            padding: 8px 12px;
+            font-size: 0.9rem;
+            border-radius: 3px;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        input:focus {
+            border-color: var(--accent-orange);
+        }
+
+        input:disabled {
+            background: #111115;
+            color: var(--text-muted);
+            border-color: #222;
+            cursor: not-allowed;
+        }
+
+        .submit-btn {
+            background: var(--accent-orange);
+            color: #000;
+            border: none;
+            padding: 8px 15px;
+            font-weight: bold;
+            cursor: pointer;
+            border-radius: 3px;
+            transition: all 0.2s;
+            text-transform: uppercase;
+            font-size: 0.8rem;
+        }
+
+        .submit-btn:hover {
+            background: #ff8533;
+            box-shadow: 0 0 10px rgba(255, 102, 0, 0.4);
+        }
+
+        .submit-btn:disabled {
+            background: #222;
+            color: #555;
+            cursor: not-allowed;
+            box-shadow: none;
+        }
+
+        .feedback {
+            font-size: 0.8rem;
+            margin-top: 8px;
+            min-height: 16px;
+            font-weight: bold;
+        }
+
+        .feedback.error {
+            color: var(--accent-red);
+        }
+
+        .feedback.success {
+            color: var(--accent-green);
+        }
+
+        footer {
+            margin-top: auto;
+            text-align: center;
+            color: var(--text-muted);
+            font-size: 0.8rem;
+            padding: 20px;
+            border-top: 1px dashed var(--border-color);
+            width: 100%;
+            max-width: 1000px;
+        }
+
+        footer span {
+            color: var(--accent-orange);
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>FIAP Cyber Defense - OSINT CTF</h1>
+        <div class="subtitle">Investigação e Análise de Exposição: Alvo "Roberto Silva"</div>
+    </header>
+
+    <div class="dashboard">
+        <div class="score-box">FLAGS: <span id="solved-count">0</span> / 25</div>
+        <div class="progress-bar-container">
+            <div class="progress-bar" id="progress-bar"></div>
+        </div>
+        <button class="reset-btn" onclick="resetCTF()">Resetar Progresso</button>
+    </div>
+
+    <div class="grid" id="ctf-grid"></div>
+
+    <footer>
+        Desenvolvido para fins educacionais • FIAP Coordenação/Docência Cyber Defense • Instructor: <span>Prof. Silvio</span>
+    </footer>
+
+    <script>
+        // Banco de Questões e Respostas para validação
+        // As respostas serão limpas/normalizadas antes da verificação
+        const challenges = [
+            { id: 1, question: "Qual o nome completo do alvo?", answers: ["roberto silva", "roberto zero silva"] },
+            { id: 2, question: "Qual é o apelido utilizado?", answers: ["zero"] },
+            { id: 3, question: "Qual cidade ele mora?", answers: ["sao bernardo do campo", "são bernardo do campo", "sbc"] },
+            { id: 4, question: "De qual cidade ele é?", answers: ["santo andre", "santo andré"] },
+            { id: 5, question: "Qual empresa trabalha?", answers: ["techglobal solutions", "techglobal"] },
+            { id: 6, question: "Qual cargo ocupa?", answers: ["analista de infraestrutura senior", "analista de infraestrutura sênior", "analista de infraestrutura", "analista de infraestrutura de ti e segurança pleno", "analista de infraestrutura pleno", "analista pleno"] },
+            { id: 7, question: "Quantos anos de experiência possui?", answers: ["8", "oito", "8 anos", "mais de 8 anos"] },
+            { id: 8, question: "Qual firewall administra?", answers: ["fortinet fortigate", "fortigate", "fortinet"] },
+            { id: 9, question: "Qual fabricante dos switches core?", answers: ["cisco"] },
+            { id: 10, question: "Qual servidor web local é mencionado?", answers: ["apache"] },
+            { id: 11, question: "Qual tecnologia está implantando?", answers: ["zero trust", "arquitetura zero trust"] },
+            { id: 12, question: "Qual versão do Windows Server está aposentando?", answers: ["2012 r2", "windows server 2012 r2", "server 2012 r2", "2012r2"] },
+            { id: 13, question: "Em qual horário ocorrerá a manutenção?", answers: ["00:00", "meia noite", "meia-noite", "24:00", "00h00"] },
+            { id: 14, question: "Qual banco será migrado?", answers: ["banco de dados principal de produção", "banco de dados", "banco de dados principal", "banco de dados de producao", "banco de dados de produção"] },
+            { id: 15, question: "Quem ficará de plantão?", answers: ["equipe de devs da techglobal", "devs da techglobal", "devs", "equipe de devs"] },
+            { id: 16, question: "Qual academia frequenta?", answers: ["smart fit", "smartfit"] },
+            { id: 17, question: "Qual unidade?", answers: ["sbc centro", "centro", "unidade sbc centro"] },
+            { id: 18, question: "Qual carro comprou?", answers: ["mitsubishi asx", "asx", "mitsubishi"] },
+            { id: 19, question: "Qual amigo deu parabéns?", answers: ["thiago ramos"] },
+            { id: 20, question: "Qual é a data de aniversário?", answers: ["15 de marco", "15 de março", "15/03"] },
+            { id: 21, question: "Quantos anos completou?", answers: ["35", "trinta e cinco"] },
+            { id: 22, question: "Desde quando é membro?", answers: ["2011"] },
+            { id: 23, question: "Qual sistema operacional aparece no setup?", answers: ["kali linux", "kali", "linux kali"] },
+            { id: 24, question: "Qual raça do cachorro?", answers: ["golden retriever", "golden"] },
+            { id: 25, question: "Como chama o cachorro?", answers: ["mel"] }
+        ];
+
+        // Estado inicial do CTF (carrega do LocalStorage se existir)
+        let solvedList = JSON.parse(localStorage.getItem('fiap_ctf_solved')) || [];
+
+        // Função de normalização para evitar frustração de digitação dos alunos (acentos, espaços extras, etc)
+        function normalizeString(str) {
+            return str
+                .toLowerCase()
+                .normalize("NFD")
+                .replace(/[̀-ͯ]/g, "") // remove acentos
+                .trim()
+                .replace(/\s+/g, ' '); // remove espaços duplicados
+        }
+
+        // Toca bips com o Web Audio API para dar clima cyberpunk gamificado
+        function playBeep(type) {
+            try {
+                const ctx = new (window.AudioContext || window.webkitAudioContext)();
+                const osc = ctx.createOscillator();
+                const gain = ctx.createGain();
+                
+                osc.connect(gain);
+                gain.connect(ctx.destination);
+                
+                if (type === 'success') {
+                    // Bip de Sucesso (Agudo duplo)
+                    osc.frequency.setValueAtTime(800, ctx.currentTime);
+                    gain.gain.setValueAtTime(0.1, ctx.currentTime);
+                    osc.start();
+                    osc.frequency.setValueAtTime(1200, ctx.currentTime + 0.08);
+                    gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.25);
+                    osc.stop(ctx.currentTime + 0.25);
+                } else if (type === 'error') {
+                    // Bip de Erro (Grave curto)
+                    osc.frequency.setValueAtTime(150, ctx.currentTime);
+                    gain.gain.setValueAtTime(0.1, ctx.currentTime);
+                    osc.start();
+                    gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.15);
+                    osc.stop(ctx.currentTime + 0.15);
+                }
+            } catch (e) {
+                // Navegador bloqueou áudio ou sem suporte
+            }
+        }
+
+        function updateUI() {
+            document.getElementById('solved-count').innerText = solvedList.length;
+            const percentage = (solvedList.length / challenges.length) * 100;
+            document.getElementById('progress-bar').style.width = percentage + '%';
+        }
+
+        function checkAnswer(id) {
+            const card = document.getElementById(`card-${id}`);
+            const input = document.getElementById(`input-${id}`);
+            const btn = document.getElementById(`btn-${id}`);
+            const feedback = document.getElementById(`feedback-${id}`);
+            
+            const chal = challenges.find(c => c.id === id);
+            const userAnswer = normalizeString(input.value);
+
+            // Verifica se bate com qualquer uma das respostas aceitas
+            const isCorrect = chal.answers.some(ans => normalizeString(ans) === userAnswer);
+
+            if (isCorrect) {
+                solvedList.push(id);
+                localStorage.setItem('fiap_ctf_solved', JSON.stringify(solvedList));
+                
+                card.classList.add('solved');
+                input.disabled = true;
+                btn.disabled = true;
+                feedback.className = "feedback success";
+                feedback.innerText = "FLAG ACQUIRED!";
+                
+                playBeep('success');
+                updateUI();
+            } else {
+                feedback.className = "feedback error";
+                feedback.innerText = "ACCESS DENIED - TRY AGAIN";
+                playBeep('error');
+                
+                // Shake effect no card
+                card.style.transform = 'translateX(5px)';
+                setTimeout(() => card.style.transform = 'translateX(-5px)', 50);
+                setTimeout(() => card.style.transform = 'translateX(5px)', 100);
+                setTimeout(() => card.style.transform = 'none', 150);
+            }
+        }
+
+        function resetCTF() {
+            if (confirm("Deseja realmente apagar seu progresso e recomeçar?")) {
+                localStorage.removeItem('fiap_ctf_solved');
+                solvedList = [];
+                renderGrid();
+                updateUI();
+            }
+        }
+
+        function renderGrid() {
+            const grid = document.getElementById('ctf-grid');
+            grid.innerHTML = '';
+
+            challenges.forEach(chal => {
+                const isSolved = solvedList.includes(chal.id);
+                const card = document.createElement('div');
+                card.className = `card ${isSolved ? 'solved' : ''}`;
+                card.id = `card-${chal.id}`;
+
+                card.innerHTML = `
+                    <div class="card-header">
+                        <span class="q-num">CHALLENGE #${String(chal.id).padStart(2, '0')}</span>
+                        <span class="q-status">${isSolved ? 'SECURED' : 'LOCKED'}</span>
+                    </div>
+                    <div class="q-text">${chal.question}</div>
+                    <div class="input-group">
+                        <input type="text" id="input-${chal.id}" placeholder="Digite a flag..." ${isSolved ? 'disabled value="********"' : ''} onkeydown="if(event.key === 'Enter') checkAnswer(${chal.id})">
+                        <button class="submit-btn" id="btn-${chal.id}" ${isSolved ? 'disabled' : ''} onclick="checkAnswer(${chal.id})">OK</button>
+                    </div>
+                    <div class="feedback" id="feedback-${chal.id}">${isSolved ? 'FLAG ACQUIRED!' : ''}</div>
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+        // Inicialização
+        renderGrid();
+        updateUI();
+    </script>
+</body>
+</html>
