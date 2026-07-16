@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RONICLEIDSON TRACE — CTF OSINT</title>
+<style>
+:root{--bg:#050505;--panel:#0d0d0d;--orange:#ff7a00;--orange2:#ff9d2e;--text:#f5f5f5;--muted:#9d9d9d;--ok:#31d07c;--bad:#ff5050;--border:rgba(255,122,0,.38)}
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;color:var(--text);font-family:Consolas,Monaco,monospace;background:radial-gradient(circle at 20% 0%,rgba(255,122,0,.15),transparent 35%),#050505}
+body:before{content:"";position:fixed;inset:0;pointer-events:none;background-image:linear-gradient(rgba(255,122,0,.04) 1px,transparent 1px),linear-gradient(90deg,rgba(255,122,0,.04) 1px,transparent 1px);background-size:34px 34px}
+.scan{position:fixed;left:0;right:0;top:-120px;height:120px;pointer-events:none;background:linear-gradient(transparent,rgba(255,122,0,.08),transparent);animation:scan 7s linear infinite}
+@keyframes scan{to{transform:translateY(120vh)}}
+.wrap{width:min(1000px,calc(100% - 30px));margin:auto;padding:28px 0 60px}
+.topbar{display:flex;justify-content:space-between;align-items:center;gap:16px;padding:14px 18px;border:1px solid var(--border);border-radius:14px;background:rgba(8,8,8,.94)}
+.brand{display:flex;align-items:center;gap:12px}.logo{width:44px;height:44px;display:grid;place-items:center;border:1px solid var(--orange);border-radius:10px;color:var(--orange);font-weight:900}
+.brand h1{margin:0;font-size:17px}.brand small{display:block;color:var(--muted);margin-top:3px}
+.timer{padding:8px 11px;border:1px solid #292929;border-radius:9px;color:var(--muted);font-size:12px}.timer b{color:var(--orange2)}
+.card{margin-top:26px;border:1px solid var(--border);border-radius:18px;overflow:hidden;background:linear-gradient(180deg,#121212,#080808);box-shadow:0 18px 55px rgba(0,0,0,.5)}
+.hero{padding:34px}.kicker{color:var(--orange);font-size:12px;letter-spacing:2px}
+h2{font-size:clamp(34px,6vw,66px);line-height:.95;margin:14px 0 20px;letter-spacing:-2px}h2 span{color:var(--orange)}
+.lore{color:#d0d0d0;line-height:1.75;font-size:16px}
+.notice{margin-top:22px;padding:15px 17px;border-left:3px solid var(--orange);background:rgba(255,122,0,.07);line-height:1.6;font-size:13px}
+.terminal{margin-top:22px;padding:18px;border:1px solid #292929;border-radius:12px;background:#060606;color:#ccc;line-height:1.8;font-size:13px}.prompt{color:var(--orange2)}
+.challenge{padding:30px}.meta{color:var(--muted);font-size:12px;margin-bottom:16px}.question{font-size:clamp(22px,3vw,32px);line-height:1.35;margin:0 0 22px}
+.row{display:flex;gap:10px}
+input{flex:1;min-width:0;padding:15px 16px;border-radius:10px;border:1px solid #333;background:#050505;color:#fff;font:inherit;outline:none}
+input:focus{border-color:var(--orange);box-shadow:0 0 0 3px rgba(255,122,0,.12)}
+button{padding:14px 20px;border:0;border-radius:10px;background:var(--orange);color:#111;font:inherit;font-weight:900;cursor:pointer}button:hover{background:var(--orange2)}
+.feedback{display:none;margin-top:16px;padding:14px;border-radius:10px;line-height:1.5;font-size:13px}
+.feedback.ok{display:block;color:#bdf6d7;background:rgba(49,208,124,.08);border:1px solid rgba(49,208,124,.35)}
+.feedback.bad{display:block;color:#ffc4c4;background:rgba(255,80,80,.08);border:1px solid rgba(255,80,80,.35)}
+.success{display:none;text-align:center;padding:38px}.success.show{display:block}.success .icon{margin:0;font-size:72px;color:var(--orange)}
+.flag{max-width:600px;margin:22px auto;padding:18px;border:1px dashed var(--orange);border-radius:12px;color:#ffb45f;background:#070707;font-size:22px}
+.footer{text-align:center;color:#686868;font-size:11px;margin-top:28px}
+@media(max-width:620px){.topbar{flex-direction:column;align-items:flex-start}.row{flex-direction:column}.hero,.challenge,.success{padding:22px}}
+</style>
+</head>
+<body>
+<div class="scan"></div>
+<div class="wrap">
+<header class="topbar">
+<div class="brand"><div class="logo">RC</div><div><h1>RONICLEIDSON TRACE // OSINT CTF</h1><small>Operação: Mensagem Oculta</small></div></div>
+<div class="timer">TEMPO <b id="timer">00:00</b></div>
+</header>
+
+<section class="card hero">
+<div class="kicker">BRIEFING DA MISSÃO</div>
+<h2>ENCONTRE A <span>MENSAGEM</span></h2>
+<div class="lore">Ronecleidson deixou uma mensagem escondida em algum lugar da internet. Sua missão é investigar sua presença digital, localizar a mensagem e informar exatamente o conteúdo encontrado.</div>
+<div class="notice">Utilize técnicas de OSINT para localizar a mensagem. Este desafio é destinado exclusivamente ao treinamento.</div>
+<div class="terminal"><span class="prompt">investigator@blueteamops:~$</span> buscar_alvo "Ronecleidson"<br>[*] Verificando perfis públicos...<br>[*] Correlacionando nomes de usuário...<br>[*] Procurando mensagens e descrições...<br>[!] Uma mensagem foi encontrada em algum lugar.</div>
+</section>
+
+<section id="challenge" class="card challenge">
+<div class="meta">QUESTÃO ÚNICA // VALIDAÇÃO</div>
+<h3 class="question">Qual foi a mensagem deixada por Ronecleidson?</h3>
+<div class="row"><input id="answer" type="text" autocomplete="off" placeholder="Digite a resposta..."><button id="check">VALIDAR</button></div>
+<div id="feedback" class="feedback"></div>
+</section>
+
+<section id="success" class="card success">
+<p class="icon">✓</p><h2>MISSÃO CONCLUÍDA</h2><p>A mensagem foi validada com sucesso.</p>
+<div class="flag">semprehackudo</div><button onclick="location.reload()">REINICIAR</button>
+</section>
+
+<div class="footer">BLUETEAMOPS • MINI CTF EDUCACIONAL • RONICLEIDSON TRACE</div>
+</div>
+
+<script>
+const correctAnswer="semprehackudo";
+const answer=document.getElementById("answer");
+const feedback=document.getElementById("feedback");
+const check=document.getElementById("check");
+
+function normalize(value){
+  return value.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/\s+/g,"").trim();
+}
+function validateAnswer(){
+  const value=normalize(answer.value);
+  if(!value){
+    feedback.className="feedback bad";
+    feedback.textContent="Digite uma resposta antes de validar.";
+    return;
+  }
+  if(value===correctAnswer){
+    feedback.className="feedback ok";
+    feedback.innerHTML="<strong>RESPOSTA CORRETA.</strong> Mensagem localizada.";
+    answer.disabled=true;
+    check.disabled=true;
+    setTimeout(()=>{
+      document.getElementById("challenge").style.display="none";
+      document.getElementById("success").classList.add("show");
+      window.scrollTo({top:document.body.scrollHeight,behavior:"smooth"});
+    },700);
+  }else{
+    feedback.className="feedback bad";
+    feedback.innerHTML="<strong>RESPOSTA INCORRETA.</strong> Continue investigando.";
+    answer.select();
+  }
+}
+check.addEventListener("click",validateAnswer);
+answer.addEventListener("keydown",event=>{if(event.key==="Enter")validateAnswer();});
+
+let seconds=0;
+setInterval(()=>{
+  seconds++;
+  const minutes=String(Math.floor(seconds/60)).padStart(2,"0");
+  const remainingSeconds=String(seconds%60).padStart(2,"0");
+  document.getElementById("timer").textContent=`${minutes}:${remainingSeconds}`;
+},1000);
+
+answer.focus();
+</script>
+</body>
+</html>
