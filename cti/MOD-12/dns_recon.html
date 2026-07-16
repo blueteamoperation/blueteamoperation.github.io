@@ -1,0 +1,560 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CTF OSINT - DNS Recon</title>
+  <style>
+    :root {
+      --bg: #080808;
+      --panel: #111111;
+      --panel-2: #171717;
+      --orange: #ff7a00;
+      --orange-2: #ff9a3c;
+      --text: #f5f5f5;
+      --muted: #a7a7a7;
+      --success: #20d67a;
+      --error: #ff4d4d;
+      --border: #2b2b2b;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      min-height: 100vh;
+      font-family: Arial, Helvetica, sans-serif;
+      background:
+        radial-gradient(circle at top right, rgba(255, 122, 0, 0.13), transparent 28%),
+        linear-gradient(135deg, #050505, #0d0d0d);
+      color: var(--text);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 30px 16px;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 980px;
+    }
+
+    .header {
+      border: 1px solid var(--border);
+      border-left: 6px solid var(--orange);
+      background: rgba(17, 17, 17, 0.96);
+      padding: 24px;
+      border-radius: 14px;
+      margin-bottom: 20px;
+      box-shadow: 0 0 30px rgba(255, 122, 0, 0.08);
+    }
+
+    .header h1 {
+      color: var(--orange);
+      font-size: 2rem;
+      margin-bottom: 8px;
+      letter-spacing: 1px;
+    }
+
+    .header p {
+      color: var(--muted);
+      line-height: 1.6;
+    }
+
+    .lab-info {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 12px;
+      margin-top: 18px;
+    }
+
+    .info-box {
+      background: var(--panel-2);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 14px;
+    }
+
+    .info-box strong {
+      color: var(--orange-2);
+      display: block;
+      margin-bottom: 5px;
+    }
+
+    .progress-wrap {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      padding: 16px;
+      border-radius: 12px;
+      margin-bottom: 20px;
+    }
+
+    .progress-label {
+      display: flex;
+      justify-content: space-between;
+      color: var(--muted);
+      font-size: 0.95rem;
+      margin-bottom: 10px;
+    }
+
+    .progress-bar {
+      height: 13px;
+      background: #262626;
+      border-radius: 999px;
+      overflow: hidden;
+    }
+
+    .progress {
+      width: 0%;
+      height: 100%;
+      background: linear-gradient(90deg, var(--orange), var(--orange-2));
+      transition: width 0.35s ease;
+    }
+
+    .card {
+      background: rgba(17, 17, 17, 0.97);
+      border: 1px solid var(--border);
+      border-top: 4px solid var(--orange);
+      padding: 28px;
+      border-radius: 14px;
+      box-shadow: 0 14px 45px rgba(0, 0, 0, 0.45);
+    }
+
+    .question-number {
+      color: var(--orange);
+      font-size: 0.9rem;
+      font-weight: bold;
+      text-transform: uppercase;
+      letter-spacing: 1.2px;
+      margin-bottom: 12px;
+    }
+
+    .question {
+      font-size: 1.45rem;
+      line-height: 1.45;
+      margin-bottom: 20px;
+    }
+
+    .hint {
+      color: var(--muted);
+      background: #0b0b0b;
+      border: 1px dashed #353535;
+      border-radius: 8px;
+      padding: 12px;
+      margin-bottom: 18px;
+      font-size: 0.95rem;
+    }
+
+    .input-group {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    input {
+      flex: 1;
+      min-width: 230px;
+      background: #080808;
+      color: var(--text);
+      border: 1px solid #363636;
+      border-radius: 9px;
+      padding: 15px;
+      font-size: 1rem;
+      outline: none;
+      transition: 0.2s;
+    }
+
+    input:focus {
+      border-color: var(--orange);
+      box-shadow: 0 0 0 3px rgba(255, 122, 0, 0.12);
+    }
+
+    button {
+      border: none;
+      border-radius: 9px;
+      padding: 14px 22px;
+      font-weight: bold;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: transform 0.2s, opacity 0.2s;
+    }
+
+    button:hover {
+      transform: translateY(-1px);
+    }
+
+    .btn-check {
+      background: var(--orange);
+      color: #111;
+    }
+
+    .btn-next {
+      background: #f5f5f5;
+      color: #111;
+      display: none;
+    }
+
+    .btn-restart {
+      background: var(--orange);
+      color: #111;
+      margin-top: 20px;
+    }
+
+    .feedback {
+      min-height: 28px;
+      margin-top: 16px;
+      font-weight: bold;
+      line-height: 1.45;
+    }
+
+    .feedback.success {
+      color: var(--success);
+    }
+
+    .feedback.error {
+      color: var(--error);
+    }
+
+    .result {
+      display: none;
+      text-align: center;
+    }
+
+    .result h2 {
+      color: var(--orange);
+      font-size: 2rem;
+      margin-bottom: 14px;
+    }
+
+    .score {
+      font-size: 3rem;
+      color: var(--text);
+      margin: 18px 0;
+      font-weight: bold;
+    }
+
+    .summary {
+      color: var(--muted);
+      line-height: 1.7;
+      max-width: 650px;
+      margin: 0 auto;
+    }
+
+    .footer {
+      text-align: center;
+      color: #777;
+      font-size: 0.85rem;
+      margin-top: 18px;
+    }
+
+    @media (max-width: 600px) {
+      .header h1 {
+        font-size: 1.55rem;
+      }
+
+      .question {
+        font-size: 1.15rem;
+      }
+
+      .input-group {
+        flex-direction: column;
+      }
+
+      input, button {
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="container">
+    <section class="header">
+      <h1>CTF OSINT — DNS Recon</h1>
+      <p>
+        Analise os dados de registros A, MX, NS e TXT do domínio
+        <strong>blueteamops.com.br</strong>. Responda corretamente para liberar a próxima questão.
+      </p>
+
+      <div class="lab-info">
+        <div class="info-box">
+          <strong>Alvo</strong>
+          blueteamops.com.br
+        </div>
+        <div class="info-box">
+          <strong>Categoria</strong>
+          OSINT / DNS Enumeration
+        </div>
+        <div class="info-box">
+          <strong>Modo</strong>
+          Validação questão a questão
+        </div>
+      </div>
+    </section>
+
+    <section class="progress-wrap">
+      <div class="progress-label">
+        <span id="progressText">Questão 1 de 14</span>
+        <span id="scoreText">Acertos: 0</span>
+      </div>
+      <div class="progress-bar">
+        <div class="progress" id="progressBar"></div>
+      </div>
+    </section>
+
+    <section class="card" id="quizCard">
+      <div class="question-number" id="questionNumber"></div>
+      <div class="question" id="questionText"></div>
+      <div class="hint" id="questionHint"></div>
+
+      <div class="input-group">
+        <input
+          type="text"
+          id="answerInput"
+          placeholder="Digite sua resposta..."
+          autocomplete="off"
+        />
+        <button class="btn-check" id="checkButton">Validar</button>
+        <button class="btn-next" id="nextButton">Próxima</button>
+      </div>
+
+      <div class="feedback" id="feedback"></div>
+    </section>
+
+    <section class="card result" id="resultCard">
+      <h2>Desafio concluído</h2>
+      <div class="score" id="finalScore"></div>
+      <p class="summary" id="finalMessage"></p>
+      <button class="btn-restart" onclick="restartQuiz()">Reiniciar CTF</button>
+    </section>
+
+    <div class="footer">
+      Laboratório educacional de OSINT e enumeração DNS
+    </div>
+  </main>
+
+  <script>
+    const questions = [
+      {
+        question: "Quantos endereços IPv4 foram identificados nos registros A do domínio principal?",
+        answers: ["2", "dois"],
+        hint: "Considere apenas os registros A apresentados para blueteamops.com.br.",
+        explanation: "Foram identificados dois endereços IPv4: 172.67.194.247 e 104.21.82.44."
+      },
+      {
+        question: "Qual é o primeiro endereço IPv4 listado para blueteamops.com.br?",
+        answers: ["172.67.194.247"],
+        hint: "Resposta no formato IPv4.",
+        explanation: "O primeiro endereço listado é 172.67.194.247."
+      },
+      {
+        question: "Qual é o segundo endereço IPv4 listado para blueteamops.com.br?",
+        answers: ["104.21.82.44"],
+        hint: "Resposta no formato IPv4.",
+        explanation: "O segundo endereço listado é 104.21.82.44."
+      },
+      {
+        question: "Qual ASN está associado aos dois registros A do domínio?",
+        answers: ["13335", "as13335", "asn13335", "asn 13335", "as 13335"],
+        hint: "Aceita o número puro ou com o prefixo AS.",
+        explanation: "Os dois endereços pertencem ao AS13335."
+      },
+      {
+        question: "Qual empresa é responsável pelo ASN dos registros A?",
+        answers: ["cloudflare", "cloudflare inc", "cloudflare inc.", "cloudflare, inc.", "cloudflare net"],
+        hint: "Informe apenas o nome da organização.",
+        explanation: "O AS13335 pertence à Cloudflare, Inc."
+      },
+      {
+        question: "Qual mensagem aparece ao tentar acessar diretamente os IPs protegidos pela Cloudflare?",
+        answers: ["direct ip access not allowed"],
+        hint: "Digite a mensagem em inglês, sem aspas.",
+        explanation: "A resposta apresentada é Direct IP access not allowed."
+      },
+      {
+        question: "Qual é o servidor MX com maior prioridade de entrega de e-mail?",
+        answers: ["mx1.titan.email", "10 mx1.titan.email"],
+        hint: "No DNS, o menor número de preferência indica maior prioridade.",
+        explanation: "O MX de prioridade 10 é mx1.titan.email."
+      },
+      {
+        question: "Qual é o valor de prioridade do servidor mx2.titan.email?",
+        answers: ["20"],
+        hint: "Informe somente o número.",
+        explanation: "O servidor mx2.titan.email possui prioridade 20."
+      },
+      {
+        question: "Qual provedor de e-mail é utilizado pelo domínio?",
+        answers: ["titan", "titan email", "titan.email"],
+        hint: "Observe os hostnames dos registros MX e o include do SPF.",
+        explanation: "O domínio utiliza o serviço Titan Email."
+      },
+      {
+        question: "Qual ASN está associado aos servidores MX apresentados?",
+        answers: ["14618", "as14618", "asn14618", "asn 14618", "as 14618"],
+        hint: "Os dois servidores MX estão hospedados em infraestrutura da AWS.",
+        explanation: "Os servidores MX estão associados ao AS14618."
+      },
+      {
+        question: "Qual tecnologia HTTP foi identificada nos servidores MX?",
+        answers: ["amazon elb", "awselb", "awselb/2.0", "amazon elastic load balancer"],
+        hint: "A identificação aparece no campo tech e no banner HTTP.",
+        explanation: "Foi identificado Amazon ELB, com banner awselb/2.0."
+      },
+      {
+        question: "Quais são os dois Name Servers autoritativos do domínio?",
+        answers: [
+          "gemma.ns.cloudflare.com,julio.ns.cloudflare.com",
+          "julio.ns.cloudflare.com,gemma.ns.cloudflare.com",
+          "gemma.ns.cloudflare.com julio.ns.cloudflare.com",
+          "julio.ns.cloudflare.com gemma.ns.cloudflare.com"
+        ],
+        hint: "Informe os dois hostnames, separados por espaço ou vírgula.",
+        explanation: "Os servidores autoritativos são gemma.ns.cloudflare.com e julio.ns.cloudflare.com."
+      },
+      {
+        question: "Qual é o conteúdo completo do registro TXT SPF?",
+        answers: [
+          "v=spf1 include:spf.titan.email ~all",
+          "\"v=spf1 include:spf.titan.email ~all\""
+        ],
+        hint: "Inclua v=spf1, o include e o mecanismo final.",
+        explanation: "O registro é v=spf1 include:spf.titan.email ~all."
+      },
+      {
+        question: "Qual mecanismo SPF indica soft fail para remetentes não autorizados?",
+        answers: ["~all", "tilde all", "softfail", "soft fail"],
+        hint: "É o último elemento do registro SPF.",
+        explanation: "O mecanismo ~all representa soft fail."
+      }
+    ];
+
+    let currentQuestion = 0;
+    let score = 0;
+    let answered = false;
+
+    const questionNumber = document.getElementById("questionNumber");
+    const questionText = document.getElementById("questionText");
+    const questionHint = document.getElementById("questionHint");
+    const answerInput = document.getElementById("answerInput");
+    const checkButton = document.getElementById("checkButton");
+    const nextButton = document.getElementById("nextButton");
+    const feedback = document.getElementById("feedback");
+    const progressBar = document.getElementById("progressBar");
+    const progressText = document.getElementById("progressText");
+    const scoreText = document.getElementById("scoreText");
+    const quizCard = document.getElementById("quizCard");
+    const resultCard = document.getElementById("resultCard");
+    const finalScore = document.getElementById("finalScore");
+    const finalMessage = document.getElementById("finalMessage");
+
+    function normalize(value) {
+      return value
+        .toLowerCase()
+        .trim()
+        .replace(/[.;]+$/g, "")
+        .replace(/\s+/g, " ")
+        .replace(/\s*,\s*/g, ",");
+    }
+
+    function loadQuestion() {
+      const item = questions[currentQuestion];
+      answered = false;
+
+      questionNumber.textContent = `Questão ${currentQuestion + 1}`;
+      questionText.textContent = item.question;
+      questionHint.textContent = item.hint;
+      answerInput.value = "";
+      answerInput.disabled = false;
+      checkButton.style.display = "inline-block";
+      nextButton.style.display = "none";
+      feedback.textContent = "";
+      feedback.className = "feedback";
+
+      progressText.textContent = `Questão ${currentQuestion + 1} de ${questions.length}`;
+      scoreText.textContent = `Acertos: ${score}`;
+      progressBar.style.width = `${(currentQuestion / questions.length) * 100}%`;
+
+      answerInput.focus();
+    }
+
+    function checkAnswer() {
+      if (answered) return;
+
+      const userAnswer = normalize(answerInput.value);
+      const item = questions[currentQuestion];
+      const valid = item.answers.some(answer => normalize(answer) === userAnswer);
+
+      if (!userAnswer) {
+        feedback.textContent = "Digite uma resposta antes de validar.";
+        feedback.className = "feedback error";
+        return;
+      }
+
+      if (valid) {
+        answered = true;
+        score++;
+        feedback.textContent = `Correto. ${item.explanation}`;
+        feedback.className = "feedback success";
+        answerInput.disabled = true;
+        checkButton.style.display = "none";
+        nextButton.style.display = "inline-block";
+        scoreText.textContent = `Acertos: ${score}`;
+      } else {
+        feedback.textContent = "Resposta incorreta. Analise novamente os dados e tente outra vez.";
+        feedback.className = "feedback error";
+        answerInput.select();
+      }
+    }
+
+    function nextQuestion() {
+      currentQuestion++;
+
+      if (currentQuestion < questions.length) {
+        loadQuestion();
+      } else {
+        showResult();
+      }
+    }
+
+    function showResult() {
+      quizCard.style.display = "none";
+      resultCard.style.display = "block";
+      progressBar.style.width = "100%";
+      progressText.textContent = "CTF concluído";
+      scoreText.textContent = `Acertos: ${score}`;
+
+      finalScore.textContent = `${score}/${questions.length}`;
+
+      finalMessage.textContent =
+        "Você concluiu a análise dos registros A, MX, NS e TXT. O exercício avaliou identificação de IPs, ASN, provedores, prioridades MX, servidores autoritativos e interpretação de SPF.";
+    }
+
+    function restartQuiz() {
+      currentQuestion = 0;
+      score = 0;
+      answered = false;
+      quizCard.style.display = "block";
+      resultCard.style.display = "none";
+      loadQuestion();
+    }
+
+    checkButton.addEventListener("click", checkAnswer);
+    nextButton.addEventListener("click", nextQuestion);
+
+    answerInput.addEventListener("keydown", event => {
+      if (event.key === "Enter") {
+        if (answered) {
+          nextQuestion();
+        } else {
+          checkAnswer();
+        }
+      }
+    });
+
+    loadQuestion();
+  </script>
+</body>
+</html>
