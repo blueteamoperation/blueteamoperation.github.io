@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="color-scheme" content="dark">
+  <title>C2 Investigation // CTF</title>
+  <style>
+    :root{--cyan:#00f6ff;--cyan2:#00aeb8;--ink:#020607;--panel:#071114;--muted:#78979a;--danger:#ff315f;--ok:#3dffb2;--line:rgba(0,246,255,.24)}
+    *{box-sizing:border-box} html{min-height:100%;background:var(--ink)}
+    body{margin:0;min-height:100vh;color:#dffcff;font:500 16px/1.5 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;overflow-x:hidden;background:radial-gradient(circle at 75% 10%,rgba(0,246,255,.1),transparent 25%),linear-gradient(135deg,#010303,#051013 55%,#020506)}
+    body:before{content:"";position:fixed;inset:0;pointer-events:none;opacity:.25;background:repeating-linear-gradient(0deg,transparent 0 3px,rgba(0,246,255,.04) 4px);z-index:10}
+    .shell{width:min(1040px,calc(100% - 32px));margin:auto;min-height:100vh;display:grid;align-content:center;padding:42px 0}
+    header{display:flex;align-items:flex-end;justify-content:space-between;gap:24px;margin-bottom:20px}
+    .eyebrow{color:var(--cyan);letter-spacing:.22em;text-transform:uppercase;font-size:.72rem}.title{position:relative;margin:.25rem 0 0;font:900 clamp(2.3rem,7vw,5.8rem)/.82 Impact,Haettenschweiler,'Arial Narrow Bold',sans-serif;letter-spacing:.02em;text-transform:uppercase;text-shadow:4px 0 #00555a,-3px 0 #102d30}.title:after{content:"C2 INVESTIGATION";position:absolute;left:3px;top:2px;color:transparent;-webkit-text-stroke:1px rgba(0,246,255,.35);clip-path:inset(62% 0 12%);transform:translateX(-5px)}
+    .status{text-align:right;color:var(--muted);font-size:.78rem;white-space:nowrap}.status b{display:block;color:var(--ok);letter-spacing:.12em}.dot{display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--ok);box-shadow:0 0 12px var(--ok);margin-right:8px}
+    main{position:relative;border:1px solid var(--line);background:linear-gradient(145deg,rgba(7,17,20,.95),rgba(2,8,10,.98));box-shadow:0 0 0 1px #000,0 24px 80px #000,0 0 48px rgba(0,246,255,.05);padding:clamp(22px,5vw,52px);clip-path:polygon(0 0,calc(100% - 28px) 0,100% 28px,100% 100%,28px 100%,0 calc(100% - 28px))}
+    main:before,main:after{content:"";position:absolute;background:var(--cyan);box-shadow:0 0 14px var(--cyan)}main:before{width:90px;height:2px;right:26px;top:0}main:after{height:70px;width:2px;left:0;bottom:28px}
+    .topline{display:flex;justify-content:space-between;align-items:center;gap:20px;margin-bottom:38px}.artifact{display:inline-flex;align-items:center;gap:10px;color:#aee9ed;background:#02090b;border:1px solid var(--line);padding:8px 12px;font-size:.78rem}.artifact:before{content:"EVTX";color:#001315;background:var(--cyan);font-weight:900;padding:2px 5px}.counter{color:var(--muted);font-size:.8rem;letter-spacing:.1em}.counter strong{color:var(--cyan);font-size:1.25rem}
+    .progress{height:3px;background:#102427;margin-bottom:42px;overflow:hidden}.progress i{display:block;width:0;height:100%;background:var(--cyan);box-shadow:0 0 16px var(--cyan);transition:width .45s cubic-bezier(.2,.8,.2,1)}
+    .qid{color:var(--cyan2);font-size:.76rem;letter-spacing:.2em;text-transform:uppercase;margin-bottom:10px}.question{max-width:780px;min-height:5.4em;margin:0 0 28px;font:700 clamp(1.25rem,3vw,2rem)/1.35 system-ui,sans-serif;color:#f0feff}
+    label{display:block;color:var(--muted);font-size:.72rem;letter-spacing:.14em;text-transform:uppercase;margin-bottom:8px}.entry{display:flex;gap:10px}.entry input{min-width:0;flex:1;border:1px solid #174044;border-bottom-color:var(--cyan2);background:#010607;color:#ecffff;padding:16px;font:600 1rem ui-monospace,monospace;outline:none;box-shadow:inset 0 0 20px rgba(0,0,0,.7)}.entry input:focus{border-color:var(--cyan);box-shadow:0 0 0 2px rgba(0,246,255,.1),inset 0 0 20px #000}.entry input[disabled]{opacity:.5}
+    button{border:0;cursor:pointer;font:900 .82rem ui-monospace,monospace;letter-spacing:.1em;text-transform:uppercase}.validate{position:relative;background:var(--cyan);color:#001012;padding:0 25px;min-height:54px;clip-path:polygon(10px 0,100% 0,100% calc(100% - 10px),calc(100% - 10px) 100%,0 100%,0 10px);transition:.15s}.validate:hover{filter:brightness(1.18);box-shadow:0 0 28px rgba(0,246,255,.3)}.validate:active{transform:translateY(2px)}.validate:disabled{cursor:not-allowed;filter:grayscale(1);opacity:.5}
+    .feedback{min-height:31px;margin-top:15px;font-size:.82rem;letter-spacing:.03em}.feedback.ok{color:var(--ok)}.feedback.bad{color:var(--danger)}.feedback.ok:before{content:"[ACCESS GRANTED]  "}.feedback.bad:before{content:"[ACCESS DENIED]  "}
+    .footer{display:flex;justify-content:space-between;align-items:center;margin-top:34px;padding-top:18px;border-top:1px dashed #163236;color:#58777a;font-size:.7rem}.reset{color:#57777a;background:transparent;padding:6px}.reset:hover{color:var(--cyan)}
+    .complete{text-align:center;padding:16px 0 4px}.complete .seal{width:94px;height:94px;margin:0 auto 24px;display:grid;place-items:center;border:2px solid var(--ok);border-radius:50%;color:var(--ok);box-shadow:0 0 35px rgba(61,255,178,.2),inset 0 0 25px rgba(61,255,178,.08);font-size:2.5rem}.complete h2{margin:0;color:#fff;font:900 clamp(2rem,5vw,3.8rem)/1 Impact,sans-serif;letter-spacing:.06em}.complete p{color:var(--muted)}
+    .shake{animation:shake .28s linear}@keyframes shake{25%{transform:translateX(-6px)}50%{transform:translateX(5px)}75%{transform:translateX(-3px)}}
+    @media(max-width:650px){.shell{width:min(100% - 20px,1040px);padding:22px 0}header{align-items:flex-start}.status{display:none}.title{font-size:clamp(2.8rem,15vw,4rem)}main{padding:24px 18px}.topline{margin-bottom:28px}.artifact{max-width:70%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.entry{display:block}.validate{width:100%;margin-top:10px;min-height:50px}.question{min-height:7.4em}.footer span{display:none}}
+    @media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <header>
+      <div><div class="eyebrow">Blue Team // Forensic Challenge</div><h1 class="title">C2<br>Investigation</h1></div>
+      <div class="status"><b><span class="dot"></span>LAB ONLINE</b>CASE_ID: C2-4688<br>CLASSIFICATION: HOSTILE</div>
+    </header>
+    <main id="panel">
+      <div class="topline"><div class="artifact" title="Artefato da investigação"><a href="https://github.com/blueteamoperation/blueteamoperation.github.io/raw/refs/heads/main/Cases/c2.evtx" target="_blank">c2.evtx</a></div><div class="counter"><strong id="current">01</strong> / <span id="total">15</span></div></div>
+      <div class="progress" aria-label="Progresso"><i id="bar"></i></div>
+      <section id="challenge">
+        <div class="qid" id="qid">Questão 01 // Initial Access</div>
+        <h2 class="question" id="question"></h2>
+        <form id="form" autocomplete="off">
+          <label for="answer">Resposta investigativa</label>
+          <div class="entry"><input id="answer" name="answer" spellcheck="false" autocapitalize="off" placeholder="Digite a evidência encontrada…" aria-describedby="feedback" required><button class="validate" id="validate" type="submit">Validar</button></div>
+          <div class="feedback" id="feedback" role="status" aria-live="polite"></div>
+        </form>
+      </section>
+      <div class="footer"><span>Analise o artefato. Confie nas evidências.</span><button type="button" class="reset" id="reset">[ Reiniciar sessão ]</button></div>
+    </main>
+  </div>
+  <script>
+    (()=>{
+      'use strict';
+      const cases=[
+        ['Initial Access','Qual endereço IP originou as tentativas de autenticação contra a máquina comprometida?','a4dca1b668fee61c0d007bba110fbeb0ad18b354dca78276cdc71d2704445167'],
+        ['Target Account','Qual conta de usuário foi alvo das tentativas de autenticação?','59062ebfecf03c8e5eda4152a1fd4e01fcf61af11ca98bba6232fe823feb47cb'],
+        ['Brute Force','Quantas tentativas de autenticação falharam antes do primeiro acesso bem-sucedido?','4a44dc15364204a80fe80e9039455cc1608281820fe2b24f1e5233ade6af1dd5'],
+        ['Failed Logon','Qual Event ID registra as tentativas de logon que falharam?','d65112fe4b7673c7e4677845ab91b4a6686e4543ea7b1c2420f89481f7d1b965'],
+        ['Successful Logon','Qual Event ID evidencia que o atacante conseguiu autenticar com sucesso?','d7f6d016e67079eb2eaa101fa1d4432de89f9103f8c7623c123378ed4eb191e8'],
+        ['Remote Session','Qual foi o tipo de logon utilizado no acesso remoto bem-sucedido?','4e07408562bedb8b60ce05c1decfe3ad16b72230967de01f640b7e4729b49fce'],
+        ['Lateral Access','Qual compartilhamento de rede foi acessado após o comprometimento da conta?','d783237865f9e841b4af9a7e2ecf989059ee8857cdda332656879b5ea3f3b78c'],
+        ['Data Access','Qual arquivo presente no compartilhamento foi acessado pelo atacante?','b30c1753a80b5e18289f584ed56adda7d2d03ce27103879d4ad85d79f4877e22'],
+        ['SMB Telemetry','Qual Event ID permite identificar detalhadamente o acesso ao arquivo através do compartilhamento SMB?','766af62a6275002e9909af31d1f15e02609d9443de336c0ce13ba52cb3e56042'],
+        ['Living Off The Land','Qual binário legítimo do Windows aparece posteriormente sendo utilizado de maneira suspeita?','3713dba4ea66cc397a9e0d6de9d6390f2d0623fae80cbd044b78ff63c57f999f'],
+        ['Process Creation','Qual Event ID permitiu identificar a execução desse processo e seus argumentos?','cea10c90eee9f29280e698a1a2c4a70831fee2881d425c883de61d5b6e72e823'],
+        ['Encoded Payload','Qual conteúdo codificado aparece na linha de comando associada ao processo suspeito?','6cc2e6916016018a631ee3f68292c16002e65f9f59a0e4ac014a3f33b9300cce'],
+        ['Payload Format','Após decodificar o conteúdo Base64, qual formato de compactação pode ser identificado?','c8d77bf4d8b1a10dd67a283d0c82bd96c9d5609860f84d7fc77692a36ab9b4c2'],
+        ['C2 Endpoint','Após realizar Base64 Decode e descompactar o conteúdo GZIP, qual URL é recuperada?','4c355fc038b07239e37d77f458a1a42c828c4d461e101546867dee762fbe9000'],
+        ['Attribution','Qual domínio está associado à infraestrutura de Command and Control identificada durante a investigação?','c803d3ba1ac02ece5efb1511c0d8e499dd999229060553f6d95eb3a3fd846992']
+      ];
+      const $=s=>document.querySelector(s), panel=$('#panel'), form=$('#form'), input=$('#answer'), feedback=$('#feedback');
+      let step=Math.min(Number(localStorage.getItem('c2-ctf-progress'))||0,cases.length);
+      const normal=s=>s.trim().toLowerCase().replace(/^event\s*id\s*[:#-]?\s*/,'').replace(/^logon\s*type\s*[:#-]?\s*/,'').replace(/\\+$/,'');
+      async function hash(s){const b=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(s));return [...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,'0')).join('')}
+      function draw(){
+        $('#bar').style.width=`${step/cases.length*100}%`; $('#current').textContent=String(Math.min(step+1,cases.length)).padStart(2,'0');
+        if(step===cases.length){$('#challenge').innerHTML='<div class="complete"><div class="seal">✓</div><h2>INVESTIGAÇÃO CONCLUÍDA</h2><p>Cadeia de ataque reconstruída. Infraestrutura C2 identificada.</p></div>';return}
+        const [tag,q]=cases[step];$('#qid').textContent=`Questão ${String(step+1).padStart(2,'0')} // ${tag}`;$('#question').textContent=q;input.value='';input.disabled=false;$('#validate').disabled=false;feedback.textContent='';feedback.className='feedback';setTimeout(()=>input.focus(),50)
+      }
+      form.addEventListener('submit',async e=>{e.preventDefault();if(!input.value.trim())return;input.disabled=true;$('#validate').disabled=true;const ok=await hash(normal(input.value))===cases[step][2];if(ok){feedback.textContent='Evidência confirmada. Avançando para o próximo evento…';feedback.className='feedback ok';step++;localStorage.setItem('c2-ctf-progress',step);setTimeout(draw,850)}else{feedback.textContent='A evidência não confere. Revise o c2.evtx e tente novamente.';feedback.className='feedback bad';panel.classList.remove('shake');void panel.offsetWidth;panel.classList.add('shake');input.disabled=false;$('#validate').disabled=false;input.select()}});
+      $('#reset').addEventListener('click',()=>{if(confirm('Reiniciar todo o progresso desta investigação?')){step=0;localStorage.removeItem('c2-ctf-progress');location.reload()}});
+      $('#total').textContent=cases.length;draw();
+    })();
+  </script>
+</body>
+</html>
