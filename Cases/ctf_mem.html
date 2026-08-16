@@ -1,0 +1,148 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>CTF // Análise de Memória</title>
+  <style>
+    :root { --cyan:#00f6ff; --cyan2:#00a7b5; --black:#030708; --panel:#071114; --text:#d9ffff; --muted:#78aeb2; --ok:#39ff88; --bad:#ff4773; }
+    * { box-sizing:border-box; }
+    html { color-scheme:dark; scroll-behavior:smooth; }
+    body { margin:0; min-height:100vh; color:var(--text); background:radial-gradient(circle at 15% 0%,#07333a 0,transparent 30%),linear-gradient(180deg,#020506,#061013 70%,#020506); font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace; }
+    body::before { content:""; position:fixed; inset:0; pointer-events:none; opacity:.18; background:repeating-linear-gradient(0deg,transparent 0 3px,rgba(0,246,255,.12) 4px); }
+    .wrap { width:min(980px,calc(100% - 32px)); margin:auto; padding:44px 0 60px; position:relative; }
+    header { border:1px solid var(--cyan2); background:rgba(3,10,12,.88); padding:clamp(24px,5vw,52px); box-shadow:0 0 35px rgba(0,246,255,.14),inset 0 0 28px rgba(0,246,255,.04); position:relative; overflow:hidden; }
+    header::after { content:"MEM_FORENSICS // CASE 0x01"; position:absolute; right:-34px; top:24px; transform:rotate(90deg); color:rgba(0,246,255,.23); font-size:11px; letter-spacing:2px; }
+    .eyebrow,.tag { color:var(--cyan); letter-spacing:.18em; text-transform:uppercase; font-size:12px; }
+    h1 { margin:.35em 0 .2em; font-size:clamp(34px,7vw,72px); line-height:.95; text-transform:uppercase; text-shadow:0 0 18px rgba(0,246,255,.45); }
+    .lead { max-width:720px; color:#a9d8db; line-height:1.75; }
+    .case { margin:24px 0; padding:24px; border-left:3px solid var(--cyan); background:rgba(0,246,255,.055); line-height:1.72; }
+    .artifact { display:flex; gap:16px; align-items:center; justify-content:space-between; flex-wrap:wrap; padding:18px 20px; border:1px dashed var(--cyan); background:#02090b; }
+    .artifact strong { display:block; color:var(--cyan); margin-bottom:6px; }
+    .artifact a { color:var(--text); word-break:break-all; }
+    .progress-row { margin:28px 0 14px; display:flex; align-items:center; justify-content:space-between; gap:16px; }
+    .meter { height:8px; flex:1; border:1px solid #15575e; background:#020607; }
+    .meter > span { display:block; width:0; height:100%; background:var(--cyan); box-shadow:0 0 12px var(--cyan); transition:width .3s ease; }
+    #score { color:var(--cyan); white-space:nowrap; }
+    .questions { display:grid; gap:16px; }
+    .question { border:1px solid #164c52; background:rgba(5,16,19,.92); padding:22px; transition:border-color .2s,box-shadow .2s; }
+    .question.correct { border-color:var(--ok); box-shadow:inset 3px 0 var(--ok); }
+    .question.incorrect { border-color:var(--bad); box-shadow:inset 3px 0 var(--bad); }
+    .qhead { display:flex; gap:14px; align-items:flex-start; margin-bottom:16px; }
+    .num { color:var(--black); background:var(--cyan); padding:4px 7px; font-weight:900; box-shadow:0 0 12px rgba(0,246,255,.45); }
+    h2 { font-size:17px; margin:2px 0 0; font-weight:700; }
+    .answer-row { display:grid; grid-template-columns:1fr auto; gap:10px; }
+    input { min-width:0; width:100%; color:white; background:#010506; border:1px solid #236069; padding:13px 14px; font:inherit; outline:none; }
+    input:focus { border-color:var(--cyan); box-shadow:0 0 0 2px rgba(0,246,255,.12); }
+    button { border:1px solid var(--cyan); background:rgba(0,246,255,.08); color:var(--cyan); padding:12px 18px; font:700 12px inherit; letter-spacing:.12em; cursor:pointer; text-transform:uppercase; }
+    button:hover { background:var(--cyan); color:#001012; box-shadow:0 0 18px rgba(0,246,255,.32); }
+    .feedback { min-height:20px; margin:12px 0 0; font-size:13px; }
+    .correct .feedback { color:var(--ok); }
+    .incorrect .feedback { color:var(--bad); }
+    .actions { display:flex; justify-content:flex-end; margin-top:22px; }
+    .reset { border-color:#5f8387; color:#a8c4c7; }
+    footer { margin-top:28px; text-align:center; color:var(--muted); font-size:11px; letter-spacing:.12em; }
+    @media (max-width:620px) { .wrap{width:min(100% - 20px,980px);padding-top:10px}.answer-row{grid-template-columns:1fr}.answer-row button{width:100%} header{padding:24px 20px} }
+  </style>
+</head>
+<body>
+  <main class="wrap">
+    <header>
+      <div class="eyebrow">Operação memória fantasma</div>
+      <h1>CTF<br>Análise de Memória</h1>
+      <p class="lead">Uma investigação forense contra o relógio. Recupere os indicadores ocultos na memória volátil e reconstrua a intrusão.</p>
+      <section class="case">
+        <span class="tag">// Cenário</span><br>
+        Às 02:17, o SOC detectou tráfego incomum partindo de uma estação Windows do setor financeiro. Antes que o equipamento fosse isolado, um processo desconhecido abriu uma conexão externa e acessou um domínio suspeito. A máquina foi desligada da rede, mas o invasor pode ter deixado rastros na memória. Você recebeu o dump capturado no momento do incidente. Analise processos, conexões, usuários e artefatos para identificar toda a cadeia de comprometimento.
+      </section>
+      <section class="artifact" aria-label="Download do artefato">
+        <div><strong>ARTEFATO PARA ANÁLISE</strong><span><a href="https://drive.proton.me/urls/N6APTPSBJ4#5tQPlM0oxzbL" target=_blank">Artefato : mal.raw.zip </a> </span></div>
+        <!-- PROFESSOR: substitua o valor de href pelo link do artefato. -->
+        <a href="COLE_AQUI_O_LINK_DO_ARTEFATO" target="_blank" rel="noopener">[ BAIXAR DUMP DE MEMÓRIA ]</a>
+      </section>
+    </header>
+
+    <div class="progress-row"><div class="meter" aria-label="Progresso"><span id="bar"></span></div><div id="score">0 / 6 RESOLVIDAS</div></div>
+    <section class="questions" id="questions"></section>
+    <div class="actions"><button class="reset" id="reset" type="button">Resetar progresso</button></div>
+    <footer>FORENSIC LAB // NENHUM DADO É ENVIADO OU ARMAZENADO</footer>
+  </main>
+
+  <script>
+    // ================================================================
+    // PROFESSOR: EDITE SOMENTE AS RESPOSTAS ABAIXO.
+    // Cada lista aceita múltiplas respostas equivalentes.
+    // ================================================================
+    const RESPOSTAS = {
+      artefato: ["evil.exe", "evil.exe (malware)"],
+      pid: ["4321", "PID 4321"],
+      ipAtacante: ["203.0.113.50"],
+      ipVitima: ["192.168.1.10"],
+      dominio: ["malicioso.example", "www.malicioso.example"],
+      usuario: ["financeiro\\analista", "analista", "FINANCEIRO/analista"]
+    };
+
+    const QUESTOES = [
+      ["artefato", "Qual é o artefato malicioso?"],
+      ["pid", "Qual é o PID?"],
+      ["ipAtacante", "Qual é o IP do atacante?"],
+      ["ipVitima", "Qual é o IP da vítima?"],
+      ["dominio", "Qual domínio foi acessado pelo artefato?"],
+      ["usuario", "Que usuário executou o malware?"]
+    ];
+
+    const resolvidas = new Set();
+    const normalizar = valor => String(valor).trim().toLocaleLowerCase("pt-BR");
+    const container = document.getElementById("questions");
+
+    QUESTOES.forEach(([id, texto], indice) => {
+      const bloco = document.createElement("article");
+      bloco.className = "question";
+      bloco.dataset.id = id;
+      bloco.innerHTML = `
+        <div class="qhead"><span class="num">${String(indice + 1).padStart(2, "0")}</span><h2>${texto}</h2></div>
+        <div class="answer-row">
+          <input id="resposta-${id}" type="text" autocomplete="off" spellcheck="false" aria-label="Resposta: ${texto}">
+          <button type="button" data-validar="${id}">Validar</button>
+        </div>
+        <p class="feedback" aria-live="polite"></p>`;
+      container.appendChild(bloco);
+    });
+
+    function atualizarProgresso() {
+      const total = QUESTOES.length;
+      document.getElementById("score").textContent = `${resolvidas.size} / ${total} RESOLVIDAS`;
+      document.getElementById("bar").style.width = `${(resolvidas.size / total) * 100}%`;
+    }
+
+    function validar(id) {
+      const bloco = document.querySelector(`[data-id="${id}"]`);
+      const entrada = bloco.querySelector("input");
+      const feedback = bloco.querySelector(".feedback");
+      const valor = normalizar(entrada.value);
+      const correta = valor !== "" && RESPOSTAS[id].some(resposta => normalizar(resposta) === valor);
+      bloco.classList.remove("correct", "incorrect");
+      bloco.classList.add(correta ? "correct" : "incorrect");
+      feedback.textContent = correta ? "✓ RESPOSTA CORRETA — indicador confirmado." : "✕ RESPOSTA INCORRETA — revise a evidência e tente novamente.";
+      correta ? resolvidas.add(id) : resolvidas.delete(id);
+      atualizarProgresso();
+    }
+
+    container.addEventListener("click", evento => {
+      const botao = evento.target.closest("[data-validar]");
+      if (botao) validar(botao.dataset.validar);
+    });
+    container.addEventListener("keydown", evento => {
+      if (evento.key === "Enter" && evento.target.matches("input")) validar(evento.target.closest(".question").dataset.id);
+    });
+    document.getElementById("reset").addEventListener("click", () => {
+      resolvidas.clear();
+      document.querySelectorAll("input").forEach(campo => campo.value = "");
+      document.querySelectorAll(".question").forEach(bloco => bloco.classList.remove("correct", "incorrect"));
+      document.querySelectorAll(".feedback").forEach(item => item.textContent = "");
+      atualizarProgresso();
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    });
+  </script>
+</body>
+</html>
