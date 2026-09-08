@@ -1,0 +1,20 @@
+'use strict';
+const questions = window.CTF_QUESTIONS;
+const key = 'cyan-dfir-v1';
+const solved = new Set();
+const answers = {};
+const note = document.getElementById('storage-note');
+const normalize = value => value.trim().toLowerCase();
+async function digest(value) {
+  if (!globalThis.crypto?.subtle) throw new Error('crypto-unavailable');
+  const buffer = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(value));
+  return Array.from(new Uint8Array(buffer), v => v.toString(16).padStart(2,'0')).join('');
+}
+async function valid(q, value) {return q.hashes.includes(await digest(q.salt + '|' + normalize(value)));}
+function save(){try{localStorage.setItem(key,JSON.stringify(answers));}catch{note.textContent='O navegador não permite salvar o progresso. As respostas permanecem nesta sessão.';}}
+function update(){document.getElementById('score').innerHTML=`${(solved.size*100).toLocaleString('pt-BR')} <small>/ 1.500 pts</small>`;document.getElementById('count').textContent=`${solved.size} de 15 resolvidas`;document.getElementById('progress').value=solved.size;document.getElementById('complete').hidden=solved.size!==questions.length;}
+function mark(q,card,input,button,feedback){solved.add(q.id);answers[q.id]=input.value;card.classList.add('solved');input.readOnly=true;button.disabled=true;button.textContent='Resolvida ✓';feedback.className='feedback success';feedback.textContent='Resposta correta. +100 pontos';update();}
+let generation=0;
+function render(){document.getElementById('questions').replaceChildren();for(const q of questions){const card=document.createElement('article');card.className='question';card.innerHTML=`<div class="q-meta"><span><span class="q-number">${String(q.id).padStart(2,'0')}</span>${q.phase}</span><span>100 PTS</span></div><h3 id="title-${q.id}"></h3><form aria-labelledby="title-${q.id}"><label for="answer-${q.id}"></label><div class="answer-row"><input id="answer-${q.id}" type="text" required autocomplete="off" autocapitalize="none" spellcheck="false" aria-describedby="feedback-${q.id}"><button class="validate" type="submit">Validar resposta</button></div><p class="feedback" id="feedback-${q.id}" role="status" aria-live="polite"></p></form>`;card.querySelector('h3').textContent=q.title;card.querySelector('label').textContent=q.format;const input=card.querySelector('input'),button=card.querySelector('button'),feedback=card.querySelector('.feedback');card.querySelector('form').addEventListener('submit',async e=>{e.preventDefault();if(solved.has(q.id))return;const version=generation;const value=input.value;if(!value.trim()){feedback.textContent='Digite uma resposta antes de validar.';return;}button.disabled=true;input.readOnly=true;try{const ok=await valid(q,value);if(version!==generation)return;if(ok){mark(q,card,input,button,feedback);save();}else{feedback.className='feedback error';feedback.textContent='Ainda não. Confira as evidências e o formato solicitado.';input.setAttribute('aria-invalid','true');}}catch{feedback.className='feedback error';feedback.textContent='Validação indisponível neste navegador. Abra em um navegador com Web Crypto ou via localhost/HTTPS.';}finally{if(!solved.has(q.id)){button.disabled=false;input.readOnly=false;}}});input.addEventListener('input',()=>input.removeAttribute('aria-invalid'));document.getElementById('questions').append(card);if(solved.has(q.id)){input.value=answers[q.id];mark(q,card,input,button,feedback);}}update();}
+document.getElementById('reset').addEventListener('click',()=>{if(!confirm('Apagar todas as respostas e a pontuação deste navegador?'))return;generation++;solved.clear();for(const id of Object.keys(answers))delete answers[id];save();render();});
+(async()=>{render();const version=generation;try{const stored=JSON.parse(localStorage.getItem(key)||'{}');if(stored&&typeof stored==='object'){for(const q of questions){if(typeof stored[q.id]==='string'&&await valid(q,stored[q.id])){if(version!==generation)return;answers[q.id]=stored[q.id];solved.add(q.id);}}if(version===generation)render();}}catch{note.textContent='Não foi possível restaurar o progresso. Você pode começar uma nova investigação.';}})();
